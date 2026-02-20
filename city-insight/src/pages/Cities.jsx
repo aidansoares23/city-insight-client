@@ -21,7 +21,7 @@ export default function Cities() {
     setError("");
 
     api
-      .get("/api/cities", { params: { limit: 100 } })
+      .get("/cities", { params: { limit: 100 } })
       .then((res) => {
         if (!alive) return;
         setCities(res.data?.cities || []);

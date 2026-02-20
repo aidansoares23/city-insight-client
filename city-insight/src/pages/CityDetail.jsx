@@ -172,7 +172,7 @@ export default function CityDetail() {
     setCityData(null);
 
     api
-      .get(`/api/cities/${slug}/details`)
+      .get(`/cities/${slug}/details`)
       .then((res) => {
         if (!alive) return;
         setCityData(res.data);
@@ -204,7 +204,7 @@ export default function CityDetail() {
     setNextCursor(null);
 
     api
-      .get(`/api/cities/${slug}/reviews?pageSize=10`)
+      .get(`/cities/${slug}/reviews?pageSize=10`)
       .then((res) => {
         if (!alive) return;
         setPublicReviews(res.data?.reviews || []);
@@ -242,7 +242,7 @@ export default function CityDetail() {
     setIsMyReviewLoading(true);
 
     api
-      .get(`/api/cities/${slug}/reviews/me`)
+      .get(`/cities/${slug}/reviews/me`)
       .then((res) => {
         if (!alive) return;
         setMyReview(res.data?.review ?? null);
@@ -270,7 +270,7 @@ export default function CityDetail() {
     setIsLoadingMore(true);
     try {
       const qs = buildReviewsQuery({ pageSize: 10, cursor: nextCursor });
-      const res = await api.get(`/api/cities/${slug}/reviews?${qs}`);
+      const res = await api.get(`/cities/${slug}/reviews?${qs}`);
 
       const newReviews = res.data?.reviews || [];
       const newCursor = res.data?.nextCursor || null;

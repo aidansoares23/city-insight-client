@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
    */
   async function refreshSessionUser() {
     try {
-      const response = await api.get("/api/me");
+      const response = await api.get("/me");
       const userFromServer = response.data?.user ?? null;
 
       if (!didUnmountRef.current) setSessionUser(userFromServer);
@@ -98,7 +98,7 @@ export function AuthProvider({ children }) {
    */
   async function loginWithGoogleIdToken(googleIdToken) {
     // Exchange Google token for server session cookie (httpOnly).
-    const loginResponse = await api.post("/api/auth/login", {
+    const loginResponse = await api.post("/auth/login", {
       idToken: googleIdToken,
     });
 
@@ -115,7 +115,7 @@ export function AuthProvider({ children }) {
    */
   async function logout() {
     try {
-      await api.post("/api/auth/logout");
+      await api.post("/auth/logout");
     } finally {
       if (!didUnmountRef.current) setSessionUser(null);
     }

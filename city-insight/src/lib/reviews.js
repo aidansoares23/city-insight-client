@@ -13,7 +13,7 @@ export function buildReviewsQuery({ pageSize = 10, cursor } = {}) {
 // GET current user's reviews (Account page)
 export function fetchMyReviews({ limit = 50 } = {}) {
   return api
-    .get(`/api/me/reviews?limit=${limit}`)
+    .get(`/me/reviews?limit=${limit}`)
     .then((res) => res.data?.reviews || []);
 }
 
@@ -21,18 +21,18 @@ export function fetchMyReviews({ limit = 50 } = {}) {
 export function fetchMyReview(citySlug) {
   if (!citySlug) throw new Error("fetchMyReview: missing citySlug");
   return api
-    .get(`/api/cities/${citySlug}/reviews/me`)
+    .get(`/cities/${citySlug}/reviews/me`)
     .then((res) => res.data?.review ?? null);
 }
 
 // POST create/update my review for a city
 export function upsertMyReview(citySlug, payload) {
   if (!citySlug) throw new Error("upsertMyReview: missing citySlug");
-  return api.post(`/api/cities/${citySlug}/reviews`, payload);
+  return api.post(`/cities/${citySlug}/reviews`, payload);
 }
 
 // DELETE my review for a city
 export function deleteMyReview(citySlug) {
   if (!citySlug) throw new Error("deleteMyReview: missing citySlug");
-  return api.delete(`/api/cities/${citySlug}/reviews/me`);
+  return api.delete(`/cities/${citySlug}/reviews/me`);
 }
