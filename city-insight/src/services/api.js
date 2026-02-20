@@ -3,7 +3,8 @@ import axios from "axios";
 import { setApiStatus } from "../state/apiStatus";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  // baseURL: import.meta.env.VITE_API_URL,
+  baseURL: "/api",
   timeout: 15000,
   withCredentials: true, // cookie auth
 });
