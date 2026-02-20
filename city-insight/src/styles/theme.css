@@ -1,0 +1,94 @@
+@import url("https://fonts.googleapis.com/css2?family=Bungee&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* =========================
+   City Insight Theme Tokens
+   ========================= */
+:root {
+  /* Base */
+  --background: 0 0% 100%;
+  --foreground: 200 92% 10%; /* #022333 */
+
+  --card: 0 0% 100%;
+  --card-foreground: 200 92% 10%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 200 92% 10%;
+
+  /* Brand */
+  /* #8FD9FB */
+  /* --primary: 199 93% 77%; */
+  /* --primary: #7dd3fc; */
+  /* --primary: #ea252f; */
+  --primary: 199 97% 74%;
+  --primary-foreground: 200 92% 10%; /* #022333 */
+
+  /* Support */
+  /* soft tint derived from #99B8C7 */
+  /* --secondary: 200 29% 92%; */
+  --secondary: 199 92% 84%;
+  --secondary-foreground: 200 92% 10%;
+
+  --muted: 200 29% 95%;
+  --muted-foreground: 198 23% 31%; /* #3D5661 */
+
+  --accent: 200 29% 94%;
+  --accent-foreground: 200 92% 10%;
+
+  --border: 200 29% 88%;
+  --input: 200 29% 88%;
+  --ring: 199 93% 77%; /* match primary */
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+}
+
+/* Optional dark theme (we can tune later) */
+.dark {
+  --background: 200 92% 8%;
+  --foreground: 0 0% 98%;
+
+  --card: 200 92% 10%;
+  --card-foreground: 0 0% 98%;
+
+  --popover: 200 92% 10%;
+  --popover-foreground: 0 0% 98%;
+
+  --primary: 199 93% 77%;
+  --primary-foreground: 200 92% 10%;
+
+  --secondary: 198 23% 18%;
+  --secondary-foreground: 0 0% 98%;
+
+  --muted: 198 23% 16%;
+  --muted-foreground: 200 12% 70%;
+
+  --accent: 198 23% 18%;
+  --accent-foreground: 0 0% 98%;
+
+  --border: 198 23% 22%;
+  --input: 198 23% 22%;
+  --ring: 199 93% 77%;
+}
+
+.brand-font {
+  font-family: "Bungee", sans-serif;
+  /* font-weight: 900; */
+  /* font-size: xx-large; */
+}
+
+.underline-hover {
+  background-image: linear-gradient(hsl(var(--primary)), hsl(var(--primary)));
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: 0 2px;
+  transition: background-size 200ms ease;
+}
+
+.group:hover .underline-hover {
+  background-size: 100% 2px;
+}
