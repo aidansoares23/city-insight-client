@@ -1,16 +1,3 @@
-// import { defineConfig } from "vite";
-// import react from "@vitejs/plugin-react";
-// import tailwindcss from "@tailwindcss/vite";
-// import path from "path";
-
-// export default defineConfig({
-//   plugins: [react(), tailwindcss()],
-//   resolve: {
-//     alias: {
-//       "@": path.resolve(__dirname, "./src"),
-//     },
-//   },
-// });
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -25,13 +12,13 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      // send /api/* to your backend
+      // send /api/* to backend
       "/api": {
-        target: "http://localhost:3000", // <-- change to your local Express port
+        target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
       },
-      // optional if you call /health directly
+      // optional to call /health directly
       "/health": {
         target: "http://localhost:3000",
         changeOrigin: true,
