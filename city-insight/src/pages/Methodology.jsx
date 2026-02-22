@@ -66,7 +66,7 @@ function FormulaRow({ label, children }) {
 }
 
 export default function Methodology() {
-  usePageTitle("How it works — City Insight");
+  usePageTitle("How It Works");
 
   const scrollToId = (id) => {
     const el = document.getElementById(id);

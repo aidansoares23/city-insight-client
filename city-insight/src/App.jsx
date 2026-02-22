@@ -33,7 +33,6 @@ export default function App() {
 
   return (
     <div>
-      {/* <ApiOverlay show={status === "waking"} message={message} /> */}
       <ApiOverlay
         show={status === "waking"}
         // optional overrides
