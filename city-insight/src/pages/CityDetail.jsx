@@ -12,6 +12,9 @@ import PageHero from "@/components/layout/PageHero";
 import PerceptionVsRealityChart from "@/components/city/PerceptionVsRealityChart";
 import { Loading } from "@/components/ui/loading";
 
+import CityMap from "@/components/city/CityMap";
+import { MapPin } from "lucide-react";
+
 import {
   Car,
   BarChart3,
@@ -41,6 +44,11 @@ import {
 // =====================================================
 // Small UI pieces
 // =====================================================
+function fmtOutOf10(x) {
+  const n = safeNumOrNull(x);
+  return n == null ? "—" : `${n.toFixed(1)}/10`;
+}
+
 function MetricCard({ title, icon: Icon, value, subtitle }) {
   return (
     <div className="rounded-2xl border border-slate-200/70 bg-white px-6 py-5 shadow-xl">
@@ -81,7 +89,7 @@ function RatingRow({ label, value, icon: Icon }) {
       </div>
 
       <div className="text-right text-sm font-semibold text-slate-900 tabular-nums">
-        {safeValue == null ? "—" : `${Math.round(safeValue * 10) / 10}/10`}
+        {safeValue == null ? "—" : `${safeValue.toFixed(1)}/10`}
       </div>
     </div>
   );
@@ -140,7 +148,7 @@ export default function CityDetail() {
   );
 
   // -----------------------------
-  // Hero score (normalized 0–10)
+  // Hero score (0–10)
   // -----------------------------
   const heroScore = useMemo(() => {
     const raw =
@@ -150,6 +158,7 @@ export default function CityDetail() {
       stats?.livabilityScore ??
       null;
 
+    // backend guarantees out of 10, keep normalization in case older data sneaks in
     return toOutOf10(raw);
   }, [livability, stats]);
 
@@ -313,11 +322,8 @@ export default function CityDetail() {
     const userCost = safeNumOrNull(avgRatings?.cost);
 
     const objSafety =
-      metrics?.safetyScore != null
-        ? safeNumOrNull(metrics.safetyScore) / 10
-        : null;
+      metrics?.safetyScore != null ? safeNumOrNull(metrics.safetyScore) : null;
 
-    // Requires backend normalization to 0–10 (recommended)
     const objCost =
       metrics?.costScore != null ? safeNumOrNull(metrics.costScore) : null;
 
@@ -325,7 +331,7 @@ export default function CityDetail() {
       safetyRows: [
         {
           key: "safety",
-          label: "Safety",
+          label: "Safety | Higher is better",
           user: userSafety,
           objective: Number.isFinite(objSafety) ? objSafety : null,
           polarity: "higher_is_better",
@@ -334,7 +340,7 @@ export default function CityDetail() {
       costRows: [
         {
           key: "cost",
-          label: "Cost",
+          label: "Cost | Lower is better",
           user: userCost,
           objective: objCost,
           polarity: "higher_is_worse",
@@ -359,6 +365,9 @@ export default function CityDetail() {
   if (!city) {
     return <div className="text-sm text-slate-600">City not found.</div>;
   }
+
+  const lat = safeNumOrNull(city?.lat);
+  const lng = safeNumOrNull(city?.lng);
 
   // -----------------------------
   // Display strings
@@ -421,7 +430,7 @@ export default function CityDetail() {
             <div className="mt-2 inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3 shadow-sm">
               <Star className="h-5 w-5 text-amber-400" />
               <span className="text-4xl font-semibold text-slate-900 tabular-nums">
-                {heroScore ?? "—"}
+                {heroScore == null ? "—" : heroScore.toFixed(1)}
               </span>
               <span className="text-sm font-semibold text-slate-600">/10</span>
             </div>
@@ -439,15 +448,14 @@ export default function CityDetail() {
         subtitle="Quick city-level indicators used in the livability view."
         action={
           <div className="relative group">
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => navigate("/methodology")}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
-              aria-label="Learn about city metrics"
-              type="button"
             >
-              <Info className="h-4 w-4" />
-            </button>
-
+              <Info className="h-4 w-4 shrink-0 text-slate-400" />
+              <span>Learn More</span>
+            </Button>
             <div className="pointer-events-none absolute right-0 top-11 z-20 w-64 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 shadow-md opacity-0 transition-opacity duration-200 group-hover:opacity-100">
               Click to learn more about how city metrics are sourced and
               calculated.
@@ -459,8 +467,8 @@ export default function CityDetail() {
           <MetricCard
             title="Safety Score"
             icon={Shield}
-            value={fmtNum(metrics?.safetyScore)}
-            subtitle="out of 100"
+            value={fmtOutOf10(metrics?.safetyScore)}
+            subtitle="objective (0–10)"
           />
           <MetricCard
             title="Median rent"
@@ -483,9 +491,38 @@ export default function CityDetail() {
         </div>
 
         <div className="mt-3 text-xs text-slate-500">
-          Metrics were last synced {fmtDateTime(metrics?.meta?.syncedAt)}
+          Metrics were last synced{" "}
+          {fmtDateTime(metrics?.meta?.metricsSync?.syncedAtIso)}
         </div>
       </SectionCard>
+
+      {/* =====================================================
+    LOCATION
+    ====================================================== */}
+      {Number.isFinite(lat) && Number.isFinite(lng) ? (
+        <SectionCard
+          icon={MapPin}
+          title="Location"
+          subtitle="Where this city is on the map."
+        >
+          <CityMap
+            cityName={city?.name}
+            state={city?.state}
+            lat={lat}
+            lng={lng}
+          />
+        </SectionCard>
+      ) : (
+        <SectionCard
+          icon={MapPin}
+          title="Location"
+          subtitle="Where this city is on the map."
+        >
+          <div className="text-sm text-slate-600">
+            Map coming soon (missing latitude/longitude for this city).
+          </div>
+        </SectionCard>
+      )}
 
       {/* =====================================================
           USER REVIEWS AVERAGED
@@ -520,11 +557,6 @@ export default function CityDetail() {
           <PerceptionVsRealityChart rows={insights.safetyRows} />
           <PerceptionVsRealityChart rows={insights.costRows} />
         </div>
-
-        <div className="mt-3 text-xs text-slate-500">
-          Safety data is normalized to 0–10. Cost “data” requires a 0–10 cost
-          score (e.g., rent index normalization).
-        </div>
       </SectionCard>
 
       {/* =====================================================
@@ -551,7 +583,7 @@ export default function CityDetail() {
         ) : (
           <ReviewCard
             review={myReview}
-            variant="account"
+            variant="list"
             title="You"
             editTo={`/cities/${slug}/review`}
             onDelete={deleteMyReview}

@@ -14,11 +14,11 @@ function fmtMoney(x) {
   return `$${Math.round(n).toLocaleString()}`;
 }
 
-function fmtSafety(x) {
+function fmtSafety10(x) {
   if (x == null) return "—";
   const n = Number(x);
   if (!Number.isFinite(n)) return "—";
-  return Math.round(n).toLocaleString();
+  return (Math.round(n * 10) / 10).toFixed(1);
 }
 
 function scoreTone(outOf10) {
@@ -112,7 +112,7 @@ export default function CityCard({ city }) {
               label="Safety"
               value={
                 city?.safetyScore != null
-                  ? `${fmtSafety(city.safetyScore)} /100`
+                  ? `${fmtSafety10(city.safetyScore)}/10`
                   : "—"
               }
             />

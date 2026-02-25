@@ -94,33 +94,6 @@ export default function Cities() {
 
   usePageTitle(title);
 
-  // const controls = (
-  //   <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[360px]">
-  //     <div className="flex items-center gap-2">
-  //       <span className="text-sm text-slate-600">Sort</span>
-  //       <select
-  //         className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-200/60"
-  //         value={sort}
-  //         onChange={(e) => setSort(e.target.value)}
-  //       >
-  //         <option value="livability_desc">Highest rating</option>
-  //         <option value="safety_desc">Safest</option>
-  //         <option value="rent_asc">Lowest rent</option>
-  //         <option value="rent_desc">Highest rent</option>
-  //         <option value="reviews_desc">Most reviews</option>
-  //         <option value="name_asc">Name (A–Z)</option>
-  //       </select>
-  //     </div>
-
-  //     <Input
-  //       value={q}
-  //       onChange={(e) => setQ(e.target.value)}
-  //       placeholder="Search cities…"
-  //       className="h-10 w-full"
-  //     />
-  //   </div>
-  // );
-
   return (
     <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
       <PageHero

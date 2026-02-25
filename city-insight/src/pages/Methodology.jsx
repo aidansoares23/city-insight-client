@@ -85,29 +85,29 @@ export default function Methodology() {
         title="At a glance"
         icon={Info}
         subtitle="The quick version: what we show, where it comes from, and how often it updates."
-        action={
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => scrollToId("scores")}>
-              <Calculator className="h-4 w-4" />
-              Scores
-            </Button>
-            <Button variant="outline" onClick={() => scrollToId("metrics")}>
-              <BarChart3 className="h-4 w-4" />
-              Metrics
-            </Button>
-            <Button onClick={() => scrollToId("sources")}>
-              <Database className="h-4 w-4" />
-              Sources
-            </Button>
-          </div>
-        }
+        // action={
+        //   <div className="flex gap-2">
+        //     <Button variant="outline" onClick={() => scrollToId("scores")}>
+        //       <Calculator className="h-4 w-4" />
+        //       Scores
+        //     </Button>
+        //     <Button variant="outline" onClick={() => scrollToId("metrics")}>
+        //       <BarChart3 className="h-4 w-4" />
+        //       Metrics
+        //     </Button>
+        //     <Button onClick={() => scrollToId("sources")}>
+        //       <Database className="h-4 w-4" />
+        //       Sources
+        //     </Button>
+        //   </div>
+        // }
       >
-        <div className="flex flex-wrap gap-2">
+        {/* <div className="flex flex-wrap gap-2">
           <Pill icon={MessageCircle}>Community reviews</Pill>
           <Pill icon={Database}>Public datasets</Pill>
           <Pill icon={RefreshCcw}>Weekly refresh</Pill>
           <Pill icon={AlertTriangle}>Unknown if missing</Pill>
-        </div>
+        </div> */}
 
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <MiniCard icon={Database} title="Data sources">
@@ -172,10 +172,10 @@ export default function Methodology() {
             . (This is the “overall vibe” from reviewers.)
           </FormulaRow>
 
-          <FormulaRow label="Safety score (0–100)">
-            A simplified score derived from reported crime statistics. Higher
-            generally means safer. It’s meant for comparison — not real-time
-            safety monitoring.
+          <FormulaRow label="Safety score (0–10)">
+            A simplified safety indicator derived from reported crime
+            statistics. Higher generally means safer. It’s meant for comparison
+            — not real-time monitoring.
           </FormulaRow>
 
           <FormulaRow label="Livability score (0–100)">
@@ -222,7 +222,7 @@ export default function Methodology() {
             comparison).
           </StatCard>
 
-          <StatCard icon={Shield} title="Safety score" badge="0–100">
+          <StatCard icon={Shield} title="Safety score" badge="0–10">
             A simplified safety indicator derived from crime statistics. Higher
             generally means safer.
           </StatCard>
@@ -259,7 +259,7 @@ export default function Methodology() {
           <MiniCard icon={Shield} title="California OpenJustice">
             Reported crime statistics are transformed into a simplified{" "}
             <span className="font-medium text-slate-700">
-              Safety score (0–100)
+              Safety score (0–10)
             </span>{" "}
             for comparison.
           </MiniCard>

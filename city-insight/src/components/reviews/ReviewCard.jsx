@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 
+import { fmtDateTime } from "@/lib/datetime";
+import { fmtDate } from "@/lib/datetime";
+
 import { Pencil, User as UserIcon, MapPin, Trash2 } from "lucide-react";
 import { clampRating10, avgFromCategories } from "@/lib/ratings";
 
@@ -23,6 +26,36 @@ export function ratingLine(ratings) {
   return order
     .map((k) => `${k[0].toUpperCase() + k.slice(1)}: ${ratings?.[k] ?? "—"}/10`)
     .join(" • ");
+}
+
+function TimestampLine({ createdAtIso, updatedAtIso, showTime = false }) {
+  const createdLabel = createdAtIso
+    ? showTime
+      ? fmtDateTime(createdAtIso)
+      : fmtDate(createdAtIso)
+    : null;
+
+  const updatedLabel = updatedAtIso
+    ? showTime
+      ? fmtDateTime(updatedAtIso)
+      : fmtDate(updatedAtIso)
+    : null;
+
+  if (!createdLabel && !updatedLabel) return null;
+
+  const showEdited =
+    Boolean(updatedAtIso) &&
+    Boolean(createdAtIso) &&
+    updatedAtIso !== createdAtIso;
+
+  return (
+    <div className="text-[11px] text-slate-500">
+      {createdLabel ? <span>Posted {createdLabel}</span> : null}
+      {showEdited ? (
+        <span className="ml-2">• Edited {updatedLabel}</span>
+      ) : null}
+    </div>
+  );
 }
 
 // --------------------------------------------------
@@ -132,6 +165,7 @@ export default function ReviewCard({
   // Display rules
   const displayTitle = title || (variant === "account" ? "You" : "Anonymous");
   const shouldShowIdentity = showIdentity ?? variant !== "account";
+  const hideIdentity = variant === "account";
 
   const citySlug = review?.cityId || null;
   const cityText = cityLabel || citySlug;
@@ -155,15 +189,43 @@ export default function ReviewCard({
       <CardContent className={isList ? "px-6 py-5" : "px-6 py-4"}>
         <div className="grid gap-4 md:grid-cols-[240px_1fr] md:grid-rows-[auto_1fr] md:items-start md:gap-y-3">
           {/* 1) HEADER (mobile first, desktop right col row 1) */}
-          <div className="order-1 flex flex-wrap items-center gap-2 md:order-none md:col-start-2 md:row-start-1 md:border-l md:border-slate-200 md:pl-6">
-            {shouldShowIdentity ? (
-              <div className="flex min-w-0 items-center gap-2 font-semibold text-slate-900">
-                <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white">
-                  <UserIcon className="h-4 w-4 text-slate-400" />
-                </span>
-                <span className="truncate">{displayTitle}</span>
-              </div>
+          <div className="order-1 flex flex-col gap-2 md:order-none md:col-start-2 md:row-start-1 md:border-l md:border-slate-200 md:pl-6">
+            {/* Avatar + Name (row) — hidden in account variant */}
+            {variant !== "account" ? (
+              <>
+                <div className="flex min-w-0 items-center gap-2 font-semibold text-slate-900">
+                  <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white">
+                    <UserIcon className="h-4 w-4 text-slate-400" />
+                  </span>
+
+                  <span className="truncate">{displayTitle}</span>
+
+                  <span className="hidden lg:inline text-slate-300">|</span>
+                  <div className="hidden lg:block whitespace-nowrap">
+                    <TimestampLine
+                      createdAtIso={review?.createdAtIso}
+                      updatedAtIso={review?.updatedAtIso}
+                    />
+                  </div>
+                </div>
+
+                {/* Default: timestamps under name (mobile + md) */}
+                <div className="whitespace-nowrap lg:hidden">
+                  <TimestampLine
+                    createdAtIso={review?.createdAtIso}
+                    updatedAtIso={review?.updatedAtIso}
+                  />
+                </div>
+              </>
             ) : null}
+
+            {/* Default: timestamps under name (mobile + md) */}
+            <div className="whitespace-nowrap lg:hidden">
+              <TimestampLine
+                createdAtIso={review?.createdAtIso}
+                updatedAtIso={review?.updatedAtIso}
+              />
+            </div>
 
             {showCity && cityText && citySlug ? (
               <Link

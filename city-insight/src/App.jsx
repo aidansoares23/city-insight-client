@@ -29,7 +29,7 @@ function RequireAuth({ children }) {
 }
 
 export default function App() {
-  const { status, message } = useApiStatus();
+  const { status } = useApiStatus();
 
   return (
     <div>
