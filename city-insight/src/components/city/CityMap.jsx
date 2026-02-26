@@ -31,8 +31,9 @@ export default function CityMap({ cityName, state, lat, lng, zoom = 11 }) {
         </button>
       </div>
 
-      <div className="h-[300px] w-full">
+      <div className="relative z-0 h-[300px] w-full">
         <MapContainer
+          className="z-0"
           center={[lat, lng]}
           zoom={zoom}
           scrollWheelZoom={false}

@@ -220,12 +220,15 @@ export default function ReviewCard({
             ) : null}
 
             {/* Default: timestamps under name (mobile + md) */}
-            <div className="whitespace-nowrap lg:hidden">
-              <TimestampLine
-                createdAtIso={review?.createdAtIso}
-                updatedAtIso={review?.updatedAtIso}
-              />
-            </div>
+            {/* Account variant still needs timestamps since header is hidden */}
+            {variant === "account" ? (
+              <div className="whitespace-nowrap">
+                <TimestampLine
+                  createdAtIso={review?.createdAtIso}
+                  updatedAtIso={review?.updatedAtIso}
+                />
+              </div>
+            ) : null}
 
             {showCity && cityText && citySlug ? (
               <Link
