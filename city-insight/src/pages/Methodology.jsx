@@ -2,7 +2,6 @@
 import PageHero from "@/components/layout/PageHero";
 import SectionCard from "@/components/layout/SectionCard";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 import {
@@ -20,11 +19,16 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-function Pill({ icon: Icon, children }) {
+function MiniCard({ icon: Icon, title, children }) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-slate-700 shadow-xs">
-      {Icon ? <Icon className="h-4 w-4 text-slate-500" /> : null}
-      <span>{children}</span>
+    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+      <div className="flex items-center gap-2">
+        {Icon ? <Icon className="h-5 w-5 text-slate-600" /> : null}
+        <div className="text-sm font-semibold text-slate-900">{title}</div>
+      </div>
+      <div className="mt-2 text-sm leading-relaxed text-slate-600">
+        {children}
+      </div>
     </div>
   );
 }
@@ -42,20 +46,6 @@ function StatCard({ icon: Icon, title, badge, children }) {
   );
 }
 
-function MiniCard({ icon: Icon, title, children }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-      <div className="flex items-center gap-2">
-        {Icon ? <Icon className="h-5 w-5 text-slate-600" /> : null}
-        <div className="text-sm font-semibold text-slate-900">{title}</div>
-      </div>
-      <div className="mt-2 text-sm leading-relaxed text-slate-600">
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function FormulaRow({ label, children }) {
   return (
     <div className="flex flex-col gap-1 rounded-2xl border border-slate-200 bg-white px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
@@ -68,55 +58,27 @@ function FormulaRow({ label, children }) {
 export default function Methodology() {
   usePageTitle("How It Works");
 
-  const scrollToId = (id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   return (
     <div className="space-y-6">
       <PageHero
         title="How it works"
-        description="City Insight helps you compare cities using a mix of community reviews and a few public metrics. It’s designed for quick exploration — not as a real-time authority."
+        description="City Insight helps you compare cities using a mix of community reviews and a few public metrics. It's designed for quick exploration — not as a real-time authority."
       />
 
+      {/* At a glance */}
       <SectionCard
         title="At a glance"
         icon={Info}
         subtitle="The quick version: what we show, where it comes from, and how often it updates."
-        // action={
-        //   <div className="flex gap-2">
-        //     <Button variant="outline" onClick={() => scrollToId("scores")}>
-        //       <Calculator className="h-4 w-4" />
-        //       Scores
-        //     </Button>
-        //     <Button variant="outline" onClick={() => scrollToId("metrics")}>
-        //       <BarChart3 className="h-4 w-4" />
-        //       Metrics
-        //     </Button>
-        //     <Button onClick={() => scrollToId("sources")}>
-        //       <Database className="h-4 w-4" />
-        //       Sources
-        //     </Button>
-        //   </div>
-        // }
       >
-        {/* <div className="flex flex-wrap gap-2">
-          <Pill icon={MessageCircle}>Community reviews</Pill>
-          <Pill icon={Database}>Public datasets</Pill>
-          <Pill icon={RefreshCcw}>Weekly refresh</Pill>
-          <Pill icon={AlertTriangle}>Unknown if missing</Pill>
-        </div> */}
-
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <MiniCard icon={Database} title="Data sources">
             <ul className="list-disc pl-5">
               <li>
                 <span className="font-medium text-slate-700">
-                  Population & rent:
+                  Population &amp; rent:
                 </span>{" "}
-                U.S. Census (ACS, 3-year estimates)
+                U.S. Census (ACS, 5-year estimates)
               </li>
               <li>
                 <span className="font-medium text-slate-700">
@@ -126,7 +88,7 @@ export default function Methodology() {
               </li>
               <li>
                 <span className="font-medium text-slate-700">Reviews:</span>{" "}
-                users (1–10 ratings + written notes)
+                users (1–10 ratings across 5 categories + written notes)
               </li>
             </ul>
           </MiniCard>
@@ -134,13 +96,14 @@ export default function Methodology() {
           <MiniCard icon={RefreshCcw} title="Update cadence">
             Public datasets refresh{" "}
             <span className="font-medium text-slate-700">once per week</span>.
-            Review averages update whenever new reviews are posted, edited, or
-            deleted.
+            Review averages update instantly whenever a review is posted,
+            edited, or deleted.
           </MiniCard>
 
           <MiniCard icon={Calculator} title="What we calculate">
-            We summarize reviews into city averages, and we combine reviews +
-            safety into a single{" "}
+            We maintain running city averages across all review categories and
+            combine reviews, objective safety, and rent affordability into a
+            single{" "}
             <span className="font-medium text-slate-700">Livability score</span>{" "}
             for quick comparison.
           </MiniCard>
@@ -148,8 +111,8 @@ export default function Methodology() {
           <MiniCard icon={CheckCircle2} title="If something is missing">
             We show it as{" "}
             <span className="font-medium text-slate-700">Unknown</span> (—)
-            instead of guessing. Some scores may rely more heavily on available
-            data.
+            instead of guessing. Livability scores automatically reweight
+            available signals when any input is absent.
           </MiniCard>
         </div>
       </SectionCard>
@@ -163,30 +126,51 @@ export default function Methodology() {
         subtitle="Simple recipes for the numbers you see most often."
       >
         <div className="space-y-3">
-          <FormulaRow label="Overall rating (1–10)">
-            The average of the four category ratings:
+          <FormulaRow label="Review ratings (1–10)">
+            Reviewers independently rate five categories:{" "}
             <span className="font-medium text-slate-700">
-              {" "}
-              safety, cost, traffic, cleanliness
-            </span>
-            . (This is the “overall vibe” from reviewers.)
+              safety, cost, traffic, cleanliness,
+            </span>{" "}
+            and <span className="font-medium text-slate-700">overall</span>.
+            Each is a direct input — overall is not computed from the others.
+            City averages update in real time as reviews come in.
           </FormulaRow>
 
           <FormulaRow label="Safety score (0–10)">
-            A simplified safety indicator derived from reported crime
-            statistics. Higher generally means safer. It’s meant for comparison
-            — not real-time monitoring.
+            Derived from reported crime data: violent and property crime counts
+            are averaged over 3 years, combined as a{" "}
+            <span className="font-medium text-slate-700">weighted average</span>{" "}
+            (violent crimes weighted 3×), then normalized per 100k residents.
+            The resulting crime index is mapped linearly to a 0–10 scale. Higher
+            means safer.
           </FormulaRow>
 
           <FormulaRow label="Livability score (0–100)">
-            A blended “at a glance” score using:
-            <span className="font-medium text-slate-700">
-              {" "}
-              review sentiment (overall rating)
-            </span>{" "}
-            +{" "}
-            <span className="font-medium text-slate-700">objective safety</span>
-            . If one input is missing, the score leans more on what’s available.
+            A blended score built from up to three signals:
+            <ul className="mt-2 list-disc pl-5">
+              <li>
+                <span className="font-medium text-slate-700">
+                  50% — review overall rating
+                </span>{" "}
+                (community sentiment, scaled 1–10 → 0–100)
+              </li>
+              <li>
+                <span className="font-medium text-slate-700">
+                  35% — objective safety score
+                </span>{" "}
+                (from crime pipeline, 0–10 → 0–100)
+              </li>
+              <li>
+                <span className="font-medium text-slate-700">
+                  15% — rent affordability
+                </span>{" "}
+                (lower median rent = higher score)
+              </li>
+            </ul>
+            <span className="mt-2 block text-slate-500">
+              If any signal is missing, the remaining weights are renormalized
+              so the score still reflects what's available.
+            </span>
           </FormulaRow>
         </div>
 
@@ -213,23 +197,25 @@ export default function Methodology() {
       >
         <div className="grid gap-3 md:grid-cols-2">
           <StatCard icon={Users} title="Population" badge="People">
-            Estimated number of people living in the city (useful context for
-            comparing places).
+            Estimated number of people living in the city. Useful context for
+            comparing places of different sizes.
           </StatCard>
 
           <StatCard icon={Home} title="Median rent" badge="$/month">
-            A typical monthly rent estimate (useful for cost-of-living
-            comparison).
+            A typical monthly rent estimate from Census data. Also contributes
+            to the Livability score — more affordable cities score higher.
           </StatCard>
 
           <StatCard icon={Shield} title="Safety score" badge="0–10">
-            A simplified safety indicator derived from crime statistics. Higher
-            generally means safer.
+            A simplified indicator derived from a weighted average of violent
+            and property crime rates per 100k residents. Higher means safer.
+            Averaged over 3 years of data to reduce year-to-year noise.
           </StatCard>
 
           <StatCard icon={MessageCircle} title="Review ratings" badge="1–10">
-            Community ratings for safety, cost, traffic, and cleanliness — plus
-            an overall average.
+            Community ratings across five independent categories: safety, cost,
+            traffic, cleanliness, and overall. Each city average updates the
+            moment a review is submitted or changed.
           </StatCard>
         </div>
       </SectionCard>
@@ -247,32 +233,35 @@ export default function Methodology() {
             <div>
               <div>
                 <span className="font-medium text-slate-700">Population:</span>{" "}
-                ACS 3-year estimate
+                ACS 5-year estimate
               </div>
               <div className="mt-1">
                 <span className="font-medium text-slate-700">Median rent:</span>{" "}
-                ACS 3-year median
+                ACS 5-year median gross rent
               </div>
             </div>
           </MiniCard>
 
           <MiniCard icon={Shield} title="California OpenJustice">
-            Reported crime statistics are transformed into a simplified{" "}
+            Reported violent and property crime counts are transformed into a{" "}
             <span className="font-medium text-slate-700">
               Safety score (0–10)
             </span>{" "}
-            for comparison.
+            using a weighted-average crime index per 100k residents, averaged
+            across 3 years.
           </MiniCard>
 
           <MiniCard icon={MessageCircle} title="Community reviews">
-            Reviews are submitted by users. We compute city averages so you can
-            quickly see the trend.
+            Submitted by signed-in users. One review per user per city (edits
+            replace the previous). City averages are maintained in real time —
+            every create, edit, or delete immediately updates the city's stats.
           </MiniCard>
 
           <MiniCard icon={RefreshCcw} title="Refresh schedule">
-            Public datasets refresh{" "}
+            Public datasets (Census, crime) refresh{" "}
             <span className="font-medium text-slate-700">weekly</span>. Review
-            averages update as reviews are added.
+            averages and Livability scores update instantly with each review
+            change.
           </MiniCard>
         </div>
 
@@ -280,7 +269,7 @@ export default function Methodology() {
         <div className="mt-4 rounded-2xl border border-slate-200 bg-white px-4 py-4">
           <div className="flex flex-wrap items-center gap-2">
             <div className="text-sm font-semibold text-slate-900">
-              Privacy & sign-in
+              Privacy &amp; sign-in
             </div>
             <Badge variant="secondary">Google</Badge>
             <Badge variant="secondary">Secure session</Badge>
@@ -290,7 +279,7 @@ export default function Methodology() {
           <p className="mt-2 text-sm text-slate-600">
             Signing in lets you write reviews and manage your account. We only
             use basic profile info (name/email/photo) to label your reviews — we
-            don’t access your Google password or private data.
+            don't access your Google password or private data.
           </p>
 
           <details className="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
@@ -299,15 +288,20 @@ export default function Methodology() {
             </summary>
             <div className="mt-2 space-y-2 text-sm text-slate-600">
               <p>
-                After Google sign-in, the server creates a secure session using
-                an HTTP-only cookie. That cookie is sent automatically on
-                requests like{" "}
-                <span className="font-medium text-slate-700">/api/me</span>.
+                After Google sign-in, the server verifies your ID token and
+                creates a signed session stored in an HTTP-only cookie (
+                <span className="font-medium text-slate-700">ci_session</span>
+                ). That cookie is sent automatically on subsequent requests.
               </p>
               <p>
-                Because it’s HTTP-only, the session cookie isn’t accessible to
-                JavaScript (reduces XSS token theft risk). Logging out clears
-                the session.
+                Because it's HTTP-only, the session cookie isn't accessible to
+                JavaScript, reducing XSS token-theft risk. State-changing
+                requests also require an{" "}
+                <span className="font-medium text-slate-700">
+                  X-Requested-With
+                </span>{" "}
+                header as a lightweight CSRF guard. Logging out clears the
+                session immediately.
               </p>
             </div>
           </details>
