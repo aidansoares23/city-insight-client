@@ -286,14 +286,18 @@ export default function CityDetail() {
       const newReviews = res.data?.reviews || [];
       const newCursor = res.data?.nextCursor || null;
 
-      setPublicReviews((prev) => [...prev, ...newReviews]);
-      setNextCursor(newCursor);
+      const existingIds = new Set(publicReviews.map((r) => r?.id).filter(Boolean));
+      const unique = newReviews.filter((r) => !r?.id || !existingIds.has(r.id));
+
+      setPublicReviews((prev) => [...prev, ...unique]);
+      // If no new unique reviews came back, pagination is exhausted or cursor is stuck
+      setNextCursor(unique.length > 0 ? newCursor : null);
     } catch (e) {
       console.error(e);
     } finally {
       setIsLoadingMore(false);
     }
-  }, [slug, nextCursor, isLoadingMore]);
+  }, [slug, nextCursor, isLoadingMore, publicReviews]);
 
   // -----------------------------
   // Derived: "Your Review" state machine
@@ -362,11 +366,15 @@ export default function CityDetail() {
     if (!slug) return;
     try {
       await deleteMyReviewApi(slug);
+      const deletedId = myReview?.id;
       setMyReview(null);
+      if (deletedId) {
+        setPublicReviews((prev) => prev.filter((r) => r?.id !== deletedId));
+      }
     } catch (err) {
       console.error(err);
     }
-  }, [slug]);
+  }, [slug, myReview?.id]);
 
   // -----------------------------
   // Early returns
