@@ -29,24 +29,27 @@ export function ratingLine(ratings) {
 }
 
 function TimestampLine({ createdAtIso, updatedAtIso, showTime = false }) {
-  const createdLabel = createdAtIso
+  const createdRaw = createdAtIso;
+  const updatedRaw = updatedAtIso;
+
+  const createdLabel = createdRaw
     ? showTime
-      ? fmtDateTime(createdAtIso)
-      : fmtDate(createdAtIso)
+      ? fmtDateTime(createdRaw)
+      : fmtDate(createdRaw)
     : null;
 
-  const updatedLabel = updatedAtIso
+  const updatedLabel = updatedRaw
     ? showTime
-      ? fmtDateTime(updatedAtIso)
-      : fmtDate(updatedAtIso)
+      ? fmtDateTime(updatedRaw)
+      : fmtDate(updatedRaw)
     : null;
 
   if (!createdLabel && !updatedLabel) return null;
 
   const showEdited =
-    Boolean(updatedAtIso) &&
-    Boolean(createdAtIso) &&
-    updatedAtIso !== createdAtIso;
+    Boolean(updatedRaw) &&
+    Boolean(createdRaw) &&
+    updatedRaw !== createdRaw;
 
   return (
     <div className="text-[11px] text-slate-500">
@@ -203,8 +206,8 @@ export default function ReviewCard({
                   <span className="hidden lg:inline text-slate-300">|</span>
                   <div className="hidden lg:block whitespace-nowrap">
                     <TimestampLine
-                      createdAtIso={review?.createdAtIso}
-                      updatedAtIso={review?.updatedAtIso}
+                      createdAtIso={review?.createdAt ?? review?.createdAtIso}
+                      updatedAtIso={review?.updatedAt ?? review?.updatedAtIso}
                     />
                   </div>
                 </div>

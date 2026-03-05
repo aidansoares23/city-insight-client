@@ -290,7 +290,7 @@ export default function Account() {
                   const citySlug = review?.cityId || "unknown-city";
                   const key =
                     review?.id ||
-                    `${citySlug}__${review?.updatedAtIso || review?.createdAtIso || idx}`;
+                    `${citySlug}__${review?.updatedAt ?? review?.updatedAtIso ?? review?.createdAt ?? review?.createdAtIso ?? idx}`;
 
                   const cityLabel =
                     review?.cityName ||

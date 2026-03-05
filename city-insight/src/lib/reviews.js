@@ -1,11 +1,12 @@
 import api from "@/services/api";
 
 // Cursor pagination query builder for GET /api/cities/:slug/reviews
+// nextCursor shape from API: { id: string, createdAt: ISO string }
 export function buildReviewsQuery({ pageSize = 10, cursor } = {}) {
   const qs = new URLSearchParams({ pageSize: String(pageSize) });
 
-  if (cursor?.id) qs.set("cursorId", cursor.id);
-  if (cursor?.createdAtIso) qs.set("cursorCreatedAtIso", cursor.createdAtIso);
+  if (cursor?.id) qs.set("id", cursor.id);
+  if (cursor?.createdAt) qs.set("createdAt", cursor.createdAt);
 
   return qs.toString();
 }

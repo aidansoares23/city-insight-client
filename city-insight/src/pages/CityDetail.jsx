@@ -160,7 +160,7 @@ export default function CityDetail() {
       stats?.livabilityScore ??
       null;
 
-    // backend guarantees out of 10, keep normalization in case older data sneaks in
+    // livability.score is 0–100; toOutOf10 divides by 10 to get 0.0–10.0
     return toOutOf10(raw);
   }, [livability, stats]);
 
