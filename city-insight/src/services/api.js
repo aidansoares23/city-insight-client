@@ -1,10 +1,12 @@
 // src/services/api.js
 import axios from "axios";
-import { setApiStatus } from "../state/apiStatus";
+import { setApiStatus } from "@/state/apiStatus";
 
 const api = axios.create({
-  // baseURL: import.meta.env.VITE_API_URL,
-  baseURL: "/api",
+  // Use VITE_API_URL only for production (https). Local dev uses the Vite proxy at /api.
+  baseURL: import.meta.env.VITE_API_URL?.startsWith("https")
+    ? import.meta.env.VITE_API_URL
+    : "/api",
   timeout: 15000,
   withCredentials: true, // cookie auth
 });
@@ -70,12 +72,8 @@ function looksLikeColdStart(error) {
   return code === "ECONNABORTED" || status === 502 || status === 503 || !status;
 }
 
-// CSRF-lite header for state-changing requests (and safe on GET)
-api.interceptors.request.use((config) => {
-  config.headers = config.headers || {};
-  config.headers["X-Requested-With"] = "XMLHttpRequest";
-  return config;
-});
+// CSRF-lite header required by backend for all requests
+api.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
 api.interceptors.response.use(
   (res) => res,

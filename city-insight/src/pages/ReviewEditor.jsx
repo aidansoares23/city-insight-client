@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../auth/authContext";
+import { useAuth } from "@/auth/authContext";
 
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/dialog";
 import PageHero from "@/components/layout/PageHero";
 import { BackLink } from "@/components/ui/back-link";
 import SectionCard from "@/components/layout/SectionCard";
@@ -92,6 +93,7 @@ export default function ReviewEditor() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   const pageTitle =
     authLoading || isLoading
@@ -204,19 +206,17 @@ export default function ReviewEditor() {
     [slug, form, navigate, returnTo],
   );
 
-  const onDelete = useCallback(async () => {
+  const onDelete = useCallback(() => {
+    if (!slug || mode !== "edit") return;
+    setConfirmDeleteOpen(true);
+  }, [slug, mode]);
+
+  const executeDelete = useCallback(async () => {
     if (!slug) return;
-    if (mode !== "edit") return;
-
-    const ok = window.confirm("Delete your review? This cannot be undone.");
-    if (!ok) return;
-
     setIsDeleting(true);
     setErrorMsg("");
-
     try {
       await deleteMyReview(slug);
-
       navigate(returnTo, {
         replace: true,
         state: { reviewDeleted: true, citySlug: slug },
@@ -228,7 +228,7 @@ export default function ReviewEditor() {
     } finally {
       setIsDeleting(false);
     }
-  }, [slug, mode, navigate, returnTo]);
+  }, [slug, navigate, returnTo]);
 
   // -----------------------------
   // Render gates
@@ -246,6 +246,15 @@ export default function ReviewEditor() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={setConfirmDeleteOpen}
+        title="Delete your review?"
+        description="This cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={executeDelete}
+      />
+
       <div className="flex items-center justify-between">
         <BackLink onClick={() => navigate(returnTo)}>Back</BackLink>
       </div>

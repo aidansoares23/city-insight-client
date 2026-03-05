@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { useAuth } from "../auth/authContext";
+import { useAuth } from "@/auth/authContext";
 
-import { Button } from "../components/ui/button";
-import { Card, CardContent } from "../components/ui/card";
-import ReviewCard from "../components/reviews/ReviewCard";
-import { usePageTitle } from "../hooks/usePageTitle";
-import PageHero from "../components/layout/PageHero";
-import { Loading } from "../components/ui/loading";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/dialog";
+import ReviewCard from "@/components/reviews/ReviewCard";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import PageHero from "@/components/layout/PageHero";
+import { Loading } from "@/components/ui/loading";
 
 import { ShieldCheck, Mail, Calendar, Trash2 } from "lucide-react";
 
@@ -55,6 +56,8 @@ export default function Account() {
   const [myReviews, setMyReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [pendingDeleteSlug, setPendingDeleteSlug] = useState(null);
 
   // Page title
   usePageTitle(authLoading ? "Account" : user ? "Account" : "Sign in");
@@ -106,22 +109,24 @@ export default function Account() {
   // -----------------------------
   // Actions
   // -----------------------------
-  const onDeleteReview = useCallback(async (citySlug) => {
+  const onDeleteReview = useCallback((citySlug) => {
     if (!citySlug) return;
+    setPendingDeleteSlug(citySlug);
+    setDeleteConfirmOpen(true);
+  }, []);
 
-    const ok = window.confirm("Delete your review? This cannot be undone.");
-    if (!ok) return;
-
+  const onConfirmDelete = useCallback(async () => {
+    if (!pendingDeleteSlug) return;
     try {
-      await deleteMyReview(citySlug);
-
-      // Optimistic UI update
-      setMyReviews((prev) => prev.filter((r) => r?.cityId !== citySlug));
+      await deleteMyReview(pendingDeleteSlug);
+      setMyReviews((prev) => prev.filter((r) => r?.cityId !== pendingDeleteSlug));
     } catch (e) {
       console.error(e);
       setErrorMsg("Failed to delete review.");
+    } finally {
+      setPendingDeleteSlug(null);
     }
-  }, []);
+  }, [pendingDeleteSlug]);
 
   // -----------------------------
   // Render gates
@@ -140,6 +145,14 @@ export default function Account() {
 
   return (
     <>
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Delete review?"
+        description="This cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={onConfirmDelete}
+      />
       <PageHero
         title="Account"
         description="Manage your profile and reviews."

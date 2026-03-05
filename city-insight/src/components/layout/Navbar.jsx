@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, Link } from "react-router-dom";
-import { useAuth } from "../../auth/authContext";
-import { Button } from "../../components/ui/button";
+import { useAuth } from "@/auth/authContext";
+import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
 function PillNavLink({ to, children }) {
@@ -34,7 +34,7 @@ function MobileNavLink({ to, onClick, children }) {
           "flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors",
           isActive
             ? "bg-sky-300 text-slate-900 ring-1 ring-sky-200"
-            : "text-slate-800 hover:bg-red-200",
+            : "text-slate-800 hover:bg-sky-200",
         ].join(" ")
       }
     >

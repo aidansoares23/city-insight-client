@@ -1,8 +1,8 @@
 import { GoogleLogin } from "@react-oauth/google";
-import { useAuth } from "../auth/authContext";
+import { useAuth } from "@/auth/authContext";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import SectionCard from "@/components/layout/SectionCard";
 import PageHero from "@/components/layout/PageHero";

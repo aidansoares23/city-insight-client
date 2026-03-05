@@ -1,10 +1,11 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import api from "../services/api";
-import { useAuth } from "../auth/authContext";
+import api from "@/services/api";
+import { useAuth } from "@/auth/authContext";
 
-import { Button } from "../components/ui/button";
-import ReviewCard from "../components/reviews/ReviewCard";
+import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/dialog";
+import ReviewCard from "@/components/reviews/ReviewCard";
 import { BackLink } from "@/components/ui/back-link";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import SectionCard from "@/components/layout/SectionCard";
@@ -34,12 +35,12 @@ import {
   clamp01,
   safeNumOrNull,
   toOutOf10,
-} from "../lib/format";
-import { fmtDateTime } from "../lib/datetime";
+} from "@/lib/format";
+import { fmtDateTime } from "@/lib/datetime";
 import {
   buildReviewsQuery,
   deleteMyReview as deleteMyReviewApi,
-} from "../lib/reviews";
+} from "@/lib/reviews";
 
 // =====================================================
 // Small UI pieces
@@ -128,6 +129,7 @@ export default function CityDetail() {
 
   const [nextCursor, setNextCursor] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   // -----------------------------
   // Derived: convenience selectors
@@ -350,6 +352,23 @@ export default function CityDetail() {
   }, [avgRatings, metrics]);
 
   // -----------------------------
+  // Actions
+  // -----------------------------
+  const deleteMyReview = useCallback(() => {
+    setConfirmDeleteOpen(true);
+  }, []);
+
+  const executeDelete = useCallback(async () => {
+    if (!slug) return;
+    try {
+      await deleteMyReviewApi(slug);
+      setMyReview(null);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [slug]);
+
+  // -----------------------------
   // Early returns
   // -----------------------------
   if (isCityLoading) return <Loading />;
@@ -378,23 +397,6 @@ export default function CityDetail() {
   const description =
     city?.description || city?.tagline || "Brief description coming soon";
 
-  // -----------------------------
-  // Actions
-  // -----------------------------
-  async function deleteMyReview() {
-    if (!slug) return;
-
-    const ok = window.confirm("Delete your review? This cannot be undone.");
-    if (!ok) return;
-
-    try {
-      await deleteMyReviewApi(slug);
-      setMyReview(null);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
   // "Your Review" header button
   const myReviewAction =
     myReviewState === "auth_loading" ||
@@ -411,6 +413,15 @@ export default function CityDetail() {
 
   return (
     <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={setConfirmDeleteOpen}
+        title="Delete your review?"
+        description="This cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={executeDelete}
+      />
+
       <BackLink onClick={() => navigate("/cities")}>
         Back to all cities
       </BackLink>
@@ -499,30 +510,24 @@ export default function CityDetail() {
       {/* =====================================================
     LOCATION
     ====================================================== */}
-      {Number.isFinite(lat) && Number.isFinite(lng) ? (
-        <SectionCard
-          icon={MapPin}
-          title="Location"
-          subtitle="Where this city is on the map."
-        >
+      <SectionCard
+        icon={MapPin}
+        title="Location"
+        subtitle="Where this city is on the map."
+      >
+        {Number.isFinite(lat) && Number.isFinite(lng) ? (
           <CityMap
             cityName={city?.name}
             state={city?.state}
             lat={lat}
             lng={lng}
           />
-        </SectionCard>
-      ) : (
-        <SectionCard
-          icon={MapPin}
-          title="Location"
-          subtitle="Where this city is on the map."
-        >
+        ) : (
           <div className="text-sm text-slate-600">
             Map coming soon (missing latitude/longitude for this city).
           </div>
-        </SectionCard>
-      )}
+        )}
+      </SectionCard>
 
       {/* =====================================================
           USER REVIEWS AVERAGED

@@ -1,25 +1,6 @@
 import { Link } from "react-router-dom";
-import { Card, CardContent } from "../../components/ui/card";
-
-function fmtScoreOutOf10(x) {
-  if (x == null) return null;
-  const outOf10 = Math.round((Number(x) / 10) * 10) / 10;
-  return Number.isFinite(outOf10) ? outOf10 : null;
-}
-
-function fmtMoney(x) {
-  if (x == null) return "—";
-  const n = Number(x);
-  if (!Number.isFinite(n)) return "—";
-  return `$${Math.round(n).toLocaleString()}`;
-}
-
-function fmtSafety10(x) {
-  if (x == null) return "—";
-  const n = Number(x);
-  if (!Number.isFinite(n)) return "—";
-  return (Math.round(n * 10) / 10).toFixed(1);
-}
+import { Card, CardContent } from "@/components/ui/card";
+import { fmtMoney, fmtNum, toOutOf10 } from "@/lib/format";
 
 function scoreTone(outOf10) {
   if (outOf10 == null) {
@@ -68,7 +49,7 @@ function Stat({ label, value }) {
 }
 
 export default function CityCard({ city }) {
-  const score = fmtScoreOutOf10(city?.livabilityScore);
+  const score = toOutOf10(city?.livabilityScore);
   const tone = scoreTone(score);
 
   const cityLine = [city?.name || "—", city?.state || null]
@@ -112,7 +93,7 @@ export default function CityCard({ city }) {
               label="Safety"
               value={
                 city?.safetyScore != null
-                  ? `${fmtSafety10(city.safetyScore)}/10`
+                  ? `${fmtNum(city.safetyScore, { digits: 1 })}/10`
                   : "—"
               }
             />

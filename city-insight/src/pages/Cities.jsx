@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import api from "../services/api";
-import CityCard from "../components/city/CityCard";
-import { Input } from "../components/ui/input";
-import { usePageTitle } from "../hooks/usePageTitle";
-import { Loading } from "../components/ui/loading";
-import PageHero from "../components/layout/PageHero";
-import SectionCard from "../components/layout/SectionCard";
+import api from "@/services/api";
+import CityCard from "@/components/city/CityCard";
+import { Input } from "@/components/ui/input";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { Loading } from "@/components/ui/loading";
+import PageHero from "@/components/layout/PageHero";
+import SectionCard from "@/components/layout/SectionCard";
 
 export default function Cities() {
   const [cities, setCities] = useState([]);
@@ -90,9 +90,7 @@ export default function Cities() {
     }
   }, [cities, q, sort]);
 
-  const title = q.trim() ? "Cities" : "Cities";
-
-  usePageTitle(title);
+  usePageTitle("Cities");
 
   return (
     <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
