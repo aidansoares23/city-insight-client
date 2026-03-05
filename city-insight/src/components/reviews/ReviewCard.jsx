@@ -490,46 +490,44 @@ export default function ReviewCard({
         <div className="grid gap-4 md:grid-cols-[240px_1fr] md:grid-rows-[auto_1fr] md:items-start md:gap-y-3">
           {/* HEADER */}
           <div className="order-1 flex flex-col gap-2 md:order-none md:col-start-2 md:row-start-1 md:border-l md:border-slate-200 md:pl-6">
-            {variant !== "account" && (
-              <>
-                <div className="flex min-w-0 items-center gap-2 font-semibold text-slate-900">
-                  <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white">
-                    <UserIcon className="h-4 w-4 text-slate-400" />
-                  </span>
+            <div className="flex min-w-0 items-center gap-2 font-semibold text-slate-900">
+              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white">
+                {variant === "account"
+                  ? <MapPin className="h-4 w-4 text-slate-400" />
+                  : <UserIcon className="h-4 w-4 text-slate-400" />}
+              </span>
 
-                  <span className="truncate">{displayTitle}</span>
+              {variant === "account" && cityText && citySlug ? (
+                <Link
+                  to={`/cities/${citySlug}`}
+                  className="truncate underline"
+                >
+                  {cityText}
+                </Link>
+              ) : (
+                <span className="truncate">{displayTitle}</span>
+              )}
 
-                  <span className="hidden lg:inline text-slate-300">|</span>
+              <span className="hidden lg:inline text-slate-300">|</span>
 
-                  <div className="hidden lg:block whitespace-nowrap">
-                    <TimestampLine
-                      createdAtIso={createdAtIso}
-                      updatedAtIso={updatedAtIso}
-                      isEdited={isEdited}
-                    />
-                  </div>
-                </div>
-
-                <div className="whitespace-nowrap lg:hidden">
-                  <TimestampLine
-                    createdAtIso={createdAtIso}
-                    updatedAtIso={updatedAtIso}
-                  />
-                </div>
-              </>
-            )}
-
-            {variant === "account" && (
-              <div className="whitespace-nowrap">
+              <div className="hidden lg:block whitespace-nowrap">
                 <TimestampLine
                   createdAtIso={createdAtIso}
                   updatedAtIso={updatedAtIso}
                   isEdited={isEdited}
                 />
               </div>
-            )}
+            </div>
 
-            {showCity && cityText && citySlug && (
+            <div className="whitespace-nowrap lg:hidden">
+              <TimestampLine
+                createdAtIso={createdAtIso}
+                updatedAtIso={updatedAtIso}
+                isEdited={isEdited}
+              />
+            </div>
+
+            {variant !== "account" && showCity && cityText && citySlug && (
               <Link
                 to={`/cities/${citySlug}`}
                 className="inline-flex min-w-0 items-center gap-2 font-semibold text-slate-900"
