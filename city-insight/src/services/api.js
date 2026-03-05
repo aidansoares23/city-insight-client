@@ -3,10 +3,7 @@ import axios from "axios";
 import { setApiStatus } from "@/state/apiStatus";
 
 const api = axios.create({
-  // Use VITE_API_URL only for production (https). Local dev uses the Vite proxy at /api.
-  baseURL: import.meta.env.VITE_API_URL?.startsWith("https")
-    ? import.meta.env.VITE_API_URL
-    : "/api",
+  baseURL: "/api",
   timeout: 15000,
   withCredentials: true, // cookie auth
 });
