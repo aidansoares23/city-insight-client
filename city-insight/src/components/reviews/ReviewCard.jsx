@@ -524,6 +524,7 @@ export default function ReviewCard({
                 <TimestampLine
                   createdAtIso={createdAtIso}
                   updatedAtIso={updatedAtIso}
+                  isEdited={isEdited}
                 />
               </div>
             )}
