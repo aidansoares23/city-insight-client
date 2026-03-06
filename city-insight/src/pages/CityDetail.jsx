@@ -31,7 +31,6 @@ import {
 
 import {
   fmtMoney,
-  fmtNum,
   clamp01,
   safeNumOrNull,
   toOutOf10,
@@ -42,9 +41,6 @@ import {
   deleteMyReview as deleteMyReviewApi,
 } from "@/lib/reviews";
 
-// =====================================================
-// Small UI pieces
-// =====================================================
 function fmtOutOf10(x) {
   const n = safeNumOrNull(x);
   return n == null ? "—" : `${n.toFixed(1)}/10`;
@@ -96,31 +92,18 @@ function RatingRow({ label, value, icon: Icon }) {
   );
 }
 
-// =====================================================
-// Page
-// =====================================================
 export default function CityDetail() {
-  // -----------------------------
-  // Router + auth context
-  // -----------------------------
   const { slug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { user, loading: authLoading } = useAuth();
 
-  // Used for login redirect return
   const returnTo = `${location.pathname}${location.search}${location.hash}`;
 
-  // -----------------------------
-  // City details state
-  // -----------------------------
   const [cityData, setCityData] = useState(null);
   const [cityError, setCityError] = useState("");
   const [isCityLoading, setIsCityLoading] = useState(true);
 
-  // -----------------------------
-  // Reviews state
-  // -----------------------------
   const [myReview, setMyReview] = useState(null);
   const [isMyReviewLoading, setIsMyReviewLoading] = useState(false);
 
@@ -131,27 +114,19 @@ export default function CityDetail() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
-  // -----------------------------
-  // Derived: convenience selectors
-  // -----------------------------
   const city = cityData?.city ?? null;
   const stats = cityData?.stats ?? null;
   const metrics = cityData?.metrics ?? null;
   const livability = cityData?.livability ?? null;
 
-  // Some payloads store averages nested (stats.averages), some flatten them (stats)
+  // averages can be nested under stats.averages or flat on stats
   const avgRatings = stats?.averages ?? stats ?? {};
 
-  // -----------------------------
-  // Page title
-  // -----------------------------
   usePageTitle(
     city?.name && city?.state ? `${city.name}, ${city.state}` : null,
   );
 
-  // -----------------------------
-  // Hero score (0–10)
-  // -----------------------------
+  // livability.score is 0–100; toOutOf10 divides by 10 to get 0.0–10.0
   const heroScore = useMemo(() => {
     const raw =
       (livability && typeof livability === "object"
@@ -159,21 +134,13 @@ export default function CityDetail() {
         : null) ??
       stats?.livabilityScore ??
       null;
-
-    // livability.score is 0–100; toOutOf10 divides by 10 to get 0.0–10.0
     return toOutOf10(raw);
   }, [livability, stats]);
 
-  // -----------------------------
-  // Login helper
-  // -----------------------------
   const goLoginAndReturn = useCallback(() => {
     navigate("/login", { state: { returnTo } });
   }, [navigate, returnTo]);
 
-  // -----------------------------
-  // Fetch: city details
-  // -----------------------------
   useEffect(() => {
     if (!slug) return;
 
@@ -203,9 +170,6 @@ export default function CityDetail() {
     };
   }, [slug]);
 
-  // -----------------------------
-  // Fetch: public reviews (first page)
-  // -----------------------------
   useEffect(() => {
     if (!slug) return;
 
@@ -237,9 +201,6 @@ export default function CityDetail() {
     };
   }, [slug]);
 
-  // -----------------------------
-  // Fetch: my review (only when signed in)
-  // -----------------------------
   useEffect(() => {
     if (!slug) return;
 
@@ -272,9 +233,6 @@ export default function CityDetail() {
     };
   }, [user, slug]);
 
-  // -----------------------------
-  // Pagination: load more public reviews
-  // -----------------------------
   const loadMore = useCallback(async () => {
     if (!slug || !nextCursor || isLoadingMore) return;
 
@@ -290,7 +248,6 @@ export default function CityDetail() {
       const unique = newReviews.filter((r) => !r?.id || !existingIds.has(r.id));
 
       setPublicReviews((prev) => [...prev, ...unique]);
-      // If no new unique reviews came back, pagination is exhausted or cursor is stuck
       setNextCursor(unique.length > 0 ? newCursor : null);
     } catch (e) {
       console.error(e);
@@ -299,9 +256,6 @@ export default function CityDetail() {
     }
   }, [slug, nextCursor, isLoadingMore, publicReviews]);
 
-  // -----------------------------
-  // Derived: "Your Review" state machine
-  // -----------------------------
   const hasMyReview = !!myReview?.id;
 
   const myReviewState = useMemo(() => {
@@ -312,17 +266,11 @@ export default function CityDetail() {
     return "no_review";
   }, [authLoading, user, isMyReviewLoading, hasMyReview]);
 
-  // -----------------------------
-  // Derived: remove my review from public list so it doesn't appear twice
-  // -----------------------------
   const publicReviewsExcludingMine = useMemo(() => {
     if (!myReview?.id) return publicReviews;
     return publicReviews.filter((r) => r?.id !== myReview.id);
   }, [publicReviews, myReview]);
 
-  // -----------------------------
-  // Insights (perception vs reality chart rows)
-  // -----------------------------
   const insights = useMemo(() => {
     const userSafety = safeNumOrNull(avgRatings?.safety);
     const userCost = safeNumOrNull(avgRatings?.cost);
@@ -355,9 +303,6 @@ export default function CityDetail() {
     };
   }, [avgRatings, metrics]);
 
-  // -----------------------------
-  // Actions
-  // -----------------------------
   const deleteMyReview = useCallback(() => {
     setConfirmDeleteOpen(true);
   }, []);
@@ -376,9 +321,6 @@ export default function CityDetail() {
     }
   }, [slug, myReview?.id]);
 
-  // -----------------------------
-  // Early returns
-  // -----------------------------
   if (isCityLoading) return <Loading />;
 
   if (cityError) {
@@ -396,16 +338,12 @@ export default function CityDetail() {
   const lat = safeNumOrNull(city?.lat);
   const lng = safeNumOrNull(city?.lng);
 
-  // -----------------------------
-  // Display strings
-  // -----------------------------
   const cityLine = [city?.name || "—", city?.state || null]
     .filter(Boolean)
     .join(", ");
   const description =
     city?.description || city?.tagline || "Brief description coming soon";
 
-  // "Your Review" header button
   const myReviewAction =
     myReviewState === "auth_loading" ||
     myReviewState === "review_loading" ? null : myReviewState ===
@@ -434,9 +372,6 @@ export default function CityDetail() {
         Back to all cities
       </BackLink>
 
-      {/* =====================================================
-          HEADER
-      ====================================================== */}
       <PageHero
         title={cityLine}
         description={description}
@@ -458,9 +393,6 @@ export default function CityDetail() {
         asideFooter={`Based on ${stats?.count ?? "—"} reviews & city metrics`}
       />
 
-      {/* =====================================================
-          OBJECTIVE CITY METRICS
-      ====================================================== */}
       <SectionCard
         icon={BarChart3}
         title="Metrics"
@@ -515,9 +447,6 @@ export default function CityDetail() {
         </div>
       </SectionCard>
 
-      {/* =====================================================
-    LOCATION
-    ====================================================== */}
       <SectionCard
         icon={MapPin}
         title="Location"
@@ -537,9 +466,6 @@ export default function CityDetail() {
         )}
       </SectionCard>
 
-      {/* =====================================================
-          USER REVIEWS AVERAGED
-      ====================================================== */}
       <SectionCard
         icon={Star}
         title="Average User Ratings"
@@ -558,9 +484,6 @@ export default function CityDetail() {
         </div>
       </SectionCard>
 
-      {/* =====================================================
-          VISUALIZED INSIGHTS
-      ====================================================== */}
       <SectionCard
         icon={BarChart3}
         title="Insights"
@@ -572,9 +495,6 @@ export default function CityDetail() {
         </div>
       </SectionCard>
 
-      {/* =====================================================
-          USER'S REVIEW
-      ====================================================== */}
       <SectionCard
         icon={UserIcon}
         title="Your Review"
@@ -604,9 +524,6 @@ export default function CityDetail() {
         )}
       </SectionCard>
 
-      {/* =====================================================
-          ALL PUBLIC REVIEWS
-      ====================================================== */}
       <SectionCard
         icon={MessageCircle}
         title="Reviews"
