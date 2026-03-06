@@ -2,33 +2,34 @@
 
 A React SPA for exploring and comparing California cities using objective metrics and community reviews.
 
-**Live app:** https://city-insight-server.onrender.com *(backend on free tier — cold starts take ~30 seconds)*
+**Live app:** https://city-insight-client.vercel.app/
 
 ---
 
 ## What it does
 
-- **Browse cities** — view a list of California cities with livability scores
-- **City detail pages** — see objective metrics (safety score, median rent, population), an interactive Leaflet map, user review averages, and a perception-vs-reality chart
-- **Write reviews** — authenticated users rate cities 1–10 across safety, cost, traffic, cleanliness, and overall, plus a written comment
-- **Google OAuth** — sign in via Google; auth is backed by an httpOnly session cookie (no tokens in localStorage)
-- **Methodology page** — transparent explanation of how scores are calculated
+- **Browse cities** — view California cities with livability scores and search/filter by name
+- **City detail pages** — objective metrics (safety score, median rent, population), an interactive Leaflet map, user review averages, and a perception-vs-reality chart comparing community sentiment to public data
+- **Write reviews** — authenticated users rate cities 1–10 across safety, cost, traffic, and cleanliness; an overall score is derived automatically
+- **Account page** — view and manage your own reviews across all cities
+- **Google OAuth** — sign in via Google; auth is backed by an httpOnly session cookie with no tokens in localStorage
+- **Methodology page** — transparent, step-by-step explanation of how every score is calculated
 
 ---
 
 ## Tech stack
 
-| Layer | Technology |
-|---|---|
-| Framework | React 19 + Vite 7 |
-| Routing | React Router v7 |
-| Styling | Tailwind CSS v4 |
-| UI primitives | Radix UI + shadcn/ui components |
-| Charts | Recharts |
-| Maps | Leaflet + React Leaflet |
-| HTTP client | Axios (with cold-start retry logic) |
-| Auth | Google OAuth (`@react-oauth/google`) + server-side session cookie |
-| Icons | Lucide React |
+| Layer         | Technology                                                        |
+| ------------- | ----------------------------------------------------------------- |
+| Framework     | React 19 + Vite 7                                                 |
+| Routing       | React Router v7                                                   |
+| Styling       | Tailwind CSS v4                                                   |
+| UI primitives | Radix UI + shadcn/ui components                                   |
+| Charts        | Recharts                                                          |
+| Maps          | Leaflet + React Leaflet                                           |
+| HTTP client   | Axios                                                             |
+| Auth          | Google OAuth (`@react-oauth/google`) + server-side session cookie |
+| Icons         | Lucide React                                                      |
 
 ---
 
@@ -41,7 +42,7 @@ src/
 ├── auth/
 │   └── authContext.jsx       # AuthContext + useAuth hook (Google login, session bootstrap)
 ├── services/
-│   └── api.js                # Axios instance, cold-start wake logic, CSRF header
+│   └── api.js                # Axios instance, CSRF header
 ├── state/
 │   └── apiStatus.jsx         # Global API status atom (ok / waking / down)
 ├── hooks/
@@ -50,8 +51,8 @@ src/
 ├── lib/
 │   ├── cities.js             # City list fetching helpers
 │   ├── reviews.js            # Review CRUD helpers
-│   ├── ratings.js            # Rating utilities
-│   ├── format.js             # Number/money formatters
+│   ├── ratings.js            # Rating utilities (clamp, average)
+│   ├── format.js             # Number/money/score formatters
 │   ├── datetime.js           # Date formatting
 │   └── routing.js            # Safe returnTo URL validation
 ├── pages/
@@ -64,7 +65,7 @@ src/
 │   ├── Methodology.jsx       # How scores are calculated
 │   └── NotFound.jsx          # 404
 ├── components/
-│   ├── layout/               # Layout, Navbar, PageHero, SectionCard, ApiOverlay
+│   ├── layout/               # Layout, Navbar, PageHero, SectionCard, ApiOverlay, ErrorBoundary
 │   ├── city/                 # CityCard, CityMap, PerceptionVsRealityChart
 │   ├── reviews/              # ReviewCard
 │   └── ui/                   # Button, Card, Badge, Dialog, Input, Loading, etc.
@@ -80,7 +81,7 @@ src/
 
 - **Node.js** >= 18
 - **npm** (or your preferred package manager)
-- The **City Insight backend** running at `http://localhost:3000` — or use the hosted URL (see step 2)
+- The **City Insight backend** running at `http://localhost:3000`
 
 ### 1. Install dependencies
 
@@ -91,20 +92,17 @@ npm install
 
 ### 2. Configure environment variables
 
-Create (or edit) `.env` in the `city-insight/` directory:
+Create `.env` in the `city-insight/` directory:
 
 ```env
-# Point at local backend (default)
+# Point at local backend
 VITE_API_URL=http://localhost:3000
-
-# OR point at the hosted backend (no local server needed)
-# VITE_API_URL=https://city-insight-server.onrender.com
 
 # Your Google OAuth client ID (required for sign-in to work)
 VITE_GOOGLE_CLIENT_ID=your-google-client-id-here
 ```
 
-> **Note:** When `VITE_API_URL` starts with `http://` (local), the Vite dev server proxies `/api/*` and `/health` to `localhost:3000` so cookies work on the same origin. When pointing at the `https://` hosted URL, requests go directly to the remote server.
+> **Note:** When `VITE_API_URL` starts with `http://` (local), the Vite dev server proxies `/api/*` and `/health` to `localhost:3000` so cookies work on the same origin.
 
 ### 3. Start the dev server
 
@@ -114,7 +112,7 @@ npm run dev
 
 The app will be available at **http://localhost:5173** (default Vite port).
 
-### 4. (Optional) Build for production
+### 4. Build for production
 
 ```bash
 npm run build      # outputs to dist/
@@ -125,10 +123,10 @@ npm run preview    # serve the production build locally
 
 ## Environment variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `VITE_API_URL` | Yes | Backend base URL. Use `http://localhost:3000` for local dev or the hosted `https://` URL for production. |
-| `VITE_GOOGLE_CLIENT_ID` | Yes | Google OAuth 2.0 client ID. Used by `@react-oauth/google` to render the sign-in button. |
+| Variable                | Required | Description                                                                             |
+| ----------------------- | -------- | --------------------------------------------------------------------------------------- |
+| `VITE_API_URL`          | Yes      | Backend base URL. Use `http://localhost:3000` for local dev.                            |
+| `VITE_GOOGLE_CLIENT_ID` | Yes      | Google OAuth 2.0 client ID. Used by `@react-oauth/google` to render the sign-in button. |
 
 ---
 
@@ -136,24 +134,14 @@ npm run preview    # serve the production build locally
 
 1. User clicks **Continue with Google** — Google returns an ID token to the browser.
 2. Frontend POSTs the token to `POST /api/auth/login`.
-3. Backend verifies the token and sets an **httpOnly session cookie** (`ci_session`).
-4. Frontend calls `GET /api/me` to load the user record from the DB.
+3. Backend verifies the token and sets an **httpOnly session cookie** (`ci_session`, 7-day expiry).
+4. Frontend calls `GET /api/me` to load the user record.
 5. All subsequent requests include the cookie automatically (`withCredentials: true`).
 6. Logging out calls `POST /api/auth/logout`, clearing the server-side session.
 
+State-changing requests (POST/PUT/PATCH/DELETE) also send an `X-Requested-With: XMLHttpRequest` header as a lightweight CSRF guard.
+
 Protected routes (`/account`, `/cities/:slug/review`) redirect unauthenticated users to `/login` with a `returnTo` param, so users land back where they started after signing in.
-
----
-
-## Backend cold-start handling
-
-The hosted backend runs on Render's free tier and spins down after inactivity. The `api.js` service layer detects cold-start signatures (502/503, network timeout, no response) and:
-
-1. Shows an `ApiOverlay` banner: *"Waking up City Insight backend..."*
-2. Polls `/health` with exponential back-off (up to 60 seconds)
-3. Automatically retries the original failed request once the server is up
-
-This is transparent to the user — they see the banner while waiting and get their data once it resolves.
 
 ---
 
