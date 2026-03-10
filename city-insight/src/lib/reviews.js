@@ -37,3 +37,8 @@ export function deleteMyReview(citySlug) {
   if (!citySlug) throw new Error("deleteMyReview: missing citySlug");
   return api.delete(`/cities/${citySlug}/reviews/me`);
 }
+
+// DELETE the current user's account (and all their reviews)
+export function deleteMyAccount() {
+  return api.delete("/me");
+}

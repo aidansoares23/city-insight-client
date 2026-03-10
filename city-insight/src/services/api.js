@@ -72,10 +72,26 @@ function looksLikeColdStart(error) {
 // CSRF-lite header required by backend for all requests
 api.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
+let rateLimitTimer = null;
+
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
+
+    if (error.response?.status === 429) {
+      const retryAfter = parseInt(error.response.headers["retry-after"] || "60", 10);
+      setApiStatus({
+        status: "rate-limited",
+        message: `Too many requests. Please wait ${retryAfter} seconds before trying again.`,
+      });
+      clearTimeout(rateLimitTimer);
+      rateLimitTimer = setTimeout(() => {
+        setApiStatus({ status: "ok", message: "" });
+        rateLimitTimer = null;
+      }, retryAfter * 1000);
+      return Promise.reject(error);
+    }
 
     if (!looksLikeColdStart(error)) {
       setApiStatus({

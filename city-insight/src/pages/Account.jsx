@@ -14,7 +14,7 @@ import { ShieldCheck, Mail, Calendar, Trash2 } from "lucide-react";
 import { fmtDateTime } from "@/lib/datetime";
 import { initialsFromUser } from "@/lib/format";
 import { prettyCityFromSlug } from "@/lib/cities";
-import { fetchMyReviews, deleteMyReview } from "@/lib/reviews";
+import { fetchMyReviews, deleteMyReview, deleteMyAccount } from "@/lib/reviews";
 
 // -----------------------------
 // Small UI helpers (kept local)
@@ -51,13 +51,14 @@ function Avatar({ user }) {
 }
 
 export default function Account() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
 
   const [myReviews, setMyReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [pendingDeleteSlug, setPendingDeleteSlug] = useState(null);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
   // Page title
   usePageTitle(authLoading ? "Account" : user ? "Account" : "Sign in");
@@ -128,6 +129,16 @@ export default function Account() {
     }
   }, [pendingDeleteSlug]);
 
+  const onConfirmDeleteAccount = useCallback(async () => {
+    try {
+      await deleteMyAccount();
+      await logout();
+    } catch (e) {
+      console.error(e);
+      setErrorMsg("Failed to delete account.");
+    }
+  }, [logout]);
+
   // -----------------------------
   // Render gates
   // -----------------------------
@@ -152,6 +163,14 @@ export default function Account() {
         description="This cannot be undone."
         confirmLabel="Delete"
         onConfirm={onConfirmDelete}
+      />
+      <ConfirmDialog
+        open={deleteAccountOpen}
+        onOpenChange={setDeleteAccountOpen}
+        title="Delete your account?"
+        description="This will permanently delete your account and all your reviews. This cannot be undone."
+        confirmLabel="Delete account"
+        onConfirm={onConfirmDeleteAccount}
       />
       <PageHero
         title="Account"
@@ -333,7 +352,7 @@ export default function Account() {
 
               <Button
                 variant="danger"
-                onClick={() => alert("Account deletion is not enabled yet.")}
+                onClick={() => setDeleteAccountOpen(true)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete account

@@ -29,7 +29,7 @@ function RequireAuth({ children }) {
 }
 
 export default function App() {
-  const { status } = useApiStatus();
+  const { status, message } = useApiStatus();
 
   return (
     <div>
@@ -40,6 +40,15 @@ export default function App() {
         message="The free tier sleeps when idle. First request can take ~30 seconds."
         hint="If it stalls, refresh and try again."
       />
+
+      {status === "rate-limited" && (
+        <div
+          role="alert"
+          className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm text-amber-800 shadow-md"
+        >
+          {message || "Too many requests. Please slow down."}
+        </div>
+      )}
 
       <Routes>
         <Route element={<Layout />}>

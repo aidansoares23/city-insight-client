@@ -294,10 +294,10 @@ export default function CityDetail() {
       costRows: [
         {
           key: "cost",
-          label: "Cost | Lower is better",
+          label: "Rent affordability | Higher is better",
           user: userCost,
           objective: objCost,
-          polarity: "higher_is_worse",
+          polarity: "higher_is_better",
         },
       ],
     };

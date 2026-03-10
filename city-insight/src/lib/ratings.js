@@ -42,6 +42,41 @@ export function derivedOverall(ratings, keys = RATING_KEYS) {
   return clampInt(avg, 1, 10);
 }
 
+/**
+ * Shared 3-tier color tokens for any score out of 10.
+ * Good  ≥ 7  → emerald
+ * Ok    ≥ 4  → amber
+ * Poor  < 4  → rose
+ *
+ * Returns an object with Tailwind class strings for common contexts:
+ *   pill   – filled pill (CityCard livability badge)
+ *   badge  – light badge with border (ReviewCard overall block)
+ */
+export function scoreColor(outOf10) {
+  if (outOf10 == null) {
+    return {
+      pill:  "bg-slate-100 text-slate-700",
+      badge: "bg-slate-100 text-slate-500 border-slate-200",
+    };
+  }
+  if (outOf10 >= 7) {
+    return {
+      pill:  "bg-emerald-100 text-emerald-800",
+      badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    };
+  }
+  if (outOf10 >= 4) {
+    return {
+      pill:  "bg-amber-100 text-amber-800",
+      badge: "bg-amber-50 text-amber-700 border-amber-200",
+    };
+  }
+  return {
+    pill:  "bg-rose-100 text-rose-800",
+    badge: "bg-rose-50 text-rose-700 border-rose-200",
+  };
+}
+
 /** ReviewEditor form shape */
 export function makeEmptyReviewForm(defaultRating = DEFAULT_RATING) {
   return {

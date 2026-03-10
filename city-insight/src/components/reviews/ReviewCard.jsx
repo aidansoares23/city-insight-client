@@ -8,7 +8,7 @@ import { fmtDateTime } from "@/lib/datetime";
 import { fmtDate } from "@/lib/datetime";
 
 import { Pencil, User as UserIcon, MapPin, Trash2 } from "lucide-react";
-import { clampRating10, avgFromCategories } from "@/lib/ratings";
+import { clampRating10, avgFromCategories, scoreColor } from "@/lib/ratings";
 
 function tinyPct(value) {
   const n = Number(value);
@@ -79,20 +79,17 @@ function CommentBlock({ text, clampChars = 180 }) {
 }
 
 function OverallBlock({ score }) {
-  return (
-    <div className="flex items-center gap-4">
-      <div className="w-8 text-right">
-        <div className="text-2xl font-semibold text-slate-900 tabular-nums">
-          {score == null ? "—" : score}
-        </div>
-      </div>
+  const { badge: badgeClass } = scoreColor(score);
 
-      <div>
-        <div className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
-          Overall
-        </div>
-        <div className="text-xs text-slate-500">Avg of 4 ratings</div>
-      </div>
+  return (
+    <div className={`inline-flex items-baseline gap-1 rounded-lg border px-3 py-1.5 ${badgeClass}`}>
+      <span className="text-2xl font-bold tabular-nums leading-none">
+        {score == null ? "—" : score}
+      </span>
+      <span className="text-xs font-medium opacity-50">/10</span>
+      <span className="ml-1 text-[10px] font-semibold uppercase tracking-wide opacity-60">
+        Overall
+      </span>
     </div>
   );
 }

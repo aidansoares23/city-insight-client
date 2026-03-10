@@ -1,41 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { fmtMoney, fmtNum, toOutOf10 } from "@/lib/format";
-
-function scoreTone(outOf10) {
-  if (outOf10 == null) {
-    return {
-      pill: "bg-slate-100 text-slate-700",
-      hero: "bg-slate-50",
-    };
-  }
-
-  if (outOf10 >= 7.5) {
-    return {
-      pill: "bg-emerald-100 text-emerald-800",
-      hero: "bg-emerald-50",
-    };
-  }
-
-  if (outOf10 >= 5.5) {
-    return {
-      pill: "bg-slate-200 text-slate-900",
-      hero: "bg-slate-50",
-    };
-  }
-
-  if (outOf10 >= 4) {
-    return {
-      pill: "bg-amber-100 text-amber-800",
-      hero: "bg-amber-50",
-    };
-  }
-
-  return {
-    pill: "bg-rose-100 text-rose-800",
-    hero: "bg-rose-50",
-  };
-}
+import { scoreColor } from "@/lib/ratings";
 
 function Stat({ label, value }) {
   return (
@@ -50,7 +16,7 @@ function Stat({ label, value }) {
 
 export default function CityCard({ city }) {
   const score = toOutOf10(city?.livabilityScore);
-  const tone = scoreTone(score);
+  const tone = scoreColor(score);
 
   const cityLine = [city?.name || "—", city?.state || null]
     .filter(Boolean)

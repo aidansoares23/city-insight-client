@@ -1,5 +1,5 @@
 let state = {
-  status: "ok", // "ok" | "waking" | "down"
+  status: "ok", // "ok" | "waking" | "down" | "rate-limited"
   message: "",
 };
 
