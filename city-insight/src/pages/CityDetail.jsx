@@ -29,12 +29,7 @@ import {
   Users,
 } from "lucide-react";
 
-import {
-  fmtMoney,
-  clamp01,
-  safeNumOrNull,
-  toOutOf10,
-} from "@/lib/format";
+import { fmtMoney, clamp01, safeNumOrNull, toOutOf10 } from "@/lib/format";
 import { fmtDateTime } from "@/lib/datetime";
 import {
   buildReviewsQuery,
@@ -244,7 +239,9 @@ export default function CityDetail() {
       const newReviews = res.data?.reviews || [];
       const newCursor = res.data?.nextCursor || null;
 
-      const existingIds = new Set(publicReviews.map((r) => r?.id).filter(Boolean));
+      const existingIds = new Set(
+        publicReviews.map((r) => r?.id).filter(Boolean),
+      );
       const unique = newReviews.filter((r) => !r?.id || !existingIds.has(r.id));
 
       setPublicReviews((prev) => [...prev, ...unique]);
@@ -273,7 +270,7 @@ export default function CityDetail() {
 
   const insights = useMemo(() => {
     const userSafety = safeNumOrNull(avgRatings?.safety);
-    const userCost = safeNumOrNull(avgRatings?.cost);
+    const userAffordability = safeNumOrNull(avgRatings?.affordability);
 
     const objSafety =
       metrics?.safetyScore != null ? safeNumOrNull(metrics.safetyScore) : null;
@@ -285,7 +282,7 @@ export default function CityDetail() {
       safetyRows: [
         {
           key: "safety",
-          label: "Safety | Higher is better",
+          label: "Safety",
           user: userSafety,
           objective: Number.isFinite(objSafety) ? objSafety : null,
           polarity: "higher_is_better",
@@ -293,9 +290,9 @@ export default function CityDetail() {
       ],
       costRows: [
         {
-          key: "cost",
-          label: "Rent affordability | Higher is better",
-          user: userCost,
+          key: "affordability",
+          label: "Affordability",
+          user: userAffordability,
           objective: objCost,
           polarity: "higher_is_better",
         },
@@ -473,8 +470,16 @@ export default function CityDetail() {
       >
         <div className="space-y-4">
           <RatingRow label="Safety" value={avgRatings?.safety} icon={Shield} />
-          <RatingRow label="Cost" value={avgRatings?.cost} icon={Home} />
-          <RatingRow label="Traffic" value={avgRatings?.traffic} icon={Car} />
+          <RatingRow
+            label="Affordability"
+            value={avgRatings?.affordability}
+            icon={Home}
+          />
+          <RatingRow
+            label="Walkability"
+            value={avgRatings?.walkability}
+            icon={Car}
+          />
           <RatingRow
             label="Cleanliness"
             value={avgRatings?.cleanliness}

@@ -6,6 +6,7 @@ import { usePageTitle } from "@/hooks/usePageTitle";
 import { Loading } from "@/components/ui/loading";
 import PageHero from "@/components/layout/PageHero";
 import SectionCard from "@/components/layout/SectionCard";
+import CitiesMap from "@/components/city/CitiesMap";
 
 export default function Cities() {
   const [cities, setCities] = useState([]);
@@ -153,6 +154,9 @@ export default function Cities() {
             ))}
           </div>
         )}
+      </SectionCard>
+      <SectionCard title="Map View" subtitle="See all cities in a single map">
+        <CitiesMap cities={cities} />
       </SectionCard>
     </div>
   );

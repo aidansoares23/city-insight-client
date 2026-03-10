@@ -1,4 +1,4 @@
-export const RATING_KEYS = ["safety", "cost", "traffic", "cleanliness"];
+export const RATING_KEYS = ["safety", "affordability", "walkability", "cleanliness"];
 export const DEFAULT_RATING = 6;
 
 /** Clamp and coerce to an integer */
@@ -82,8 +82,8 @@ export function makeEmptyReviewForm(defaultRating = DEFAULT_RATING) {
   return {
     ratings: {
       safety: defaultRating,
-      cost: defaultRating,
-      traffic: defaultRating,
+      affordability: defaultRating,
+      walkability: defaultRating,
       cleanliness: defaultRating,
     },
     comment: "",
@@ -95,8 +95,8 @@ export function normalizeReviewToForm(review, defaultRating = DEFAULT_RATING) {
   return {
     ratings: {
       safety: clampRating10OrDefault(review?.ratings?.safety, defaultRating),
-      cost: clampRating10OrDefault(review?.ratings?.cost, defaultRating),
-      traffic: clampRating10OrDefault(review?.ratings?.traffic, defaultRating),
+      affordability: clampRating10OrDefault(review?.ratings?.affordability, defaultRating),
+      walkability: clampRating10OrDefault(review?.ratings?.walkability, defaultRating),
       cleanliness: clampRating10OrDefault(
         review?.ratings?.cleanliness,
         defaultRating,

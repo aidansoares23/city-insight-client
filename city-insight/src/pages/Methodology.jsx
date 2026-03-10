@@ -324,7 +324,7 @@ export default function Methodology() {
           <FormulaRow label="Review ratings (1–10)">
             Reviewers rate four categories:{" "}
             <span className="font-medium text-slate-700">
-              safety, cost, traffic,
+              safety, affordability, walkability,
             </span>{" "}
             and{" "}
             <span className="font-medium text-slate-700">cleanliness</span>.
@@ -515,7 +515,7 @@ export default function Methodology() {
             title="Review ratings"
             badge="1–10 integer"
           >
-            Four integer ratings per review: safety, cost, traffic, and
+            Four integer ratings per review: safety, affordability, walkability, and
             cleanliness. An overall score is automatically derived as their
             average (rounded to the nearest integer). Each city's per-category
             average updates in real time on every review change. Optional

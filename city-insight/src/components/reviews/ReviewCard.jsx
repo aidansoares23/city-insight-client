@@ -18,7 +18,7 @@ function tinyPct(value) {
 
 export function ratingLine(ratings) {
   if (!ratings || typeof ratings !== "object") return "—";
-  const order = ["overall", "safety", "cost", "traffic", "cleanliness"];
+  const order = ["overall", "safety", "affordability", "walkability", "cleanliness"];
   return order
     .map((k) => `${k[0].toUpperCase() + k.slice(1)}: ${ratings?.[k] ?? "—"}/10`)
     .join(" • ");
@@ -97,8 +97,8 @@ function OverallBlock({ score }) {
 function MiniBars({ ratings, barClassName = "bg-blue-500/35" }) {
   const items = [
     ["Safety", clampRating10(ratings?.safety)],
-    ["Cost", clampRating10(ratings?.cost)],
-    ["Traffic", clampRating10(ratings?.traffic)],
+    ["Affordability", clampRating10(ratings?.affordability)],
+    ["Walkability", clampRating10(ratings?.walkability)],
     ["Cleanliness", clampRating10(ratings?.cleanliness)],
   ];
 

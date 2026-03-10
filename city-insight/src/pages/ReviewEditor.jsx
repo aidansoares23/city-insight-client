@@ -31,12 +31,12 @@ import { fetchMyReview, upsertMyReview, deleteMyReview } from "@/lib/reviews";
 // -----------------------------
 // Constants (page-level)
 // -----------------------------
-const RATING_KEYS = ["safety", "cost", "traffic", "cleanliness"];
+const RATING_KEYS = ["safety", "affordability", "walkability", "cleanliness"];
 
 const RATING_LABELS = {
   safety: "Safety",
-  cost: "Cost",
-  traffic: "Traffic",
+  affordability: "Affordability",
+  walkability: "Walkability",
   cleanliness: "Cleanliness",
 };
 
