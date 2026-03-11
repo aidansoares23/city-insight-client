@@ -4,7 +4,7 @@ export function usePageTitle(title) {
   useEffect(() => {
     if (!title) return;
 
-    document.title = `${title} — City Insight`;
+    document.title = `${title} | City Insight`;
 
     return () => {
       document.title = "City Insight";

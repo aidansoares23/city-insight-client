@@ -20,7 +20,7 @@ import {
   Car,
   BarChart3,
   Trash2,
-  Home,
+  DollarSign,
   Info,
   MessageCircle,
   Shield,
@@ -420,7 +420,7 @@ export default function CityDetail() {
           />
           <MetricCard
             title="Median rent"
-            icon={Home}
+            icon={DollarSign}
             value={
               metrics?.medianRent != null ? fmtMoney(metrics.medianRent) : "—"
             }
@@ -473,7 +473,7 @@ export default function CityDetail() {
           <RatingRow
             label="Affordability"
             value={avgRatings?.affordability}
-            icon={Home}
+            icon={DollarSign}
           />
           <RatingRow
             label="Walkability"

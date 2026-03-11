@@ -32,7 +32,7 @@ function InfoRow({ icon: Icon, label, value }) {
 }
 
 function Avatar({ user }) {
-  const src = user?.picture || user?.photoURL; // support either shape
+  const src = user?.picture;
   if (src) {
     return (
       <img
@@ -120,7 +120,9 @@ export default function Account() {
     if (!pendingDeleteSlug) return;
     try {
       await deleteMyReview(pendingDeleteSlug);
-      setMyReviews((prev) => prev.filter((r) => r?.cityId !== pendingDeleteSlug));
+      setMyReviews((prev) =>
+        prev.filter((r) => r?.cityId !== pendingDeleteSlug),
+      );
     } catch (e) {
       console.error(e);
       setErrorMsg("Failed to delete review.");

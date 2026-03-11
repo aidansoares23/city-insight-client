@@ -17,7 +17,6 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 
-// ✅ extracted libs
 import { safeReturnTo } from "@/lib/routing";
 import { prettyCityFromSlug } from "@/lib/cities";
 import {
@@ -28,9 +27,6 @@ import {
 } from "@/lib/ratings";
 import { fetchMyReview, upsertMyReview, deleteMyReview } from "@/lib/reviews";
 
-// -----------------------------
-// Constants (page-level)
-// -----------------------------
 const RATING_KEYS = ["safety", "affordability", "walkability", "cleanliness"];
 
 const RATING_LABELS = {
@@ -42,10 +38,7 @@ const RATING_LABELS = {
 
 const COMMENT_MAX = 800;
 
-/**
- * One slider row.
- * (Removed the extra “progress hint” bar to avoid the double-bar look.)
- */
+// One slider row.
 function RatingRow({ label, value, onChange }) {
   const safeV = Number.isFinite(Number(value)) ? Number(value) : 0;
 
@@ -102,9 +95,7 @@ export default function ReviewEditor() {
 
   usePageTitle(pageTitle);
 
-  // -----------------------------
   // Load my review (if any)
-  // -----------------------------
   useEffect(() => {
     if (authLoading) return;
     if (!slug) return;
@@ -151,9 +142,7 @@ export default function ReviewEditor() {
     };
   }, [user, slug, authLoading]);
 
-  // -----------------------------
   // Form setters
-  // -----------------------------
   const setRating = useCallback((key, value) => {
     setForm((prev) => ({
       ...prev,
@@ -168,9 +157,7 @@ export default function ReviewEditor() {
     setForm((prev) => ({ ...prev, comment: value }));
   }, []);
 
-  // -----------------------------
   // Submit / delete
-  // -----------------------------
   const onSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -230,9 +217,7 @@ export default function ReviewEditor() {
     }
   }, [slug, navigate, returnTo]);
 
-  // -----------------------------
   // Render gates
-  // -----------------------------
   if (authLoading || isLoading) {
     return <div className="text-sm text-slate-600">Loading…</div>;
   }
