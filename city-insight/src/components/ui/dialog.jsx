@@ -129,7 +129,17 @@ function ConfirmDialog({
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   onConfirm,
+  requireConfirmText,
 }) {
+  const [inputValue, setInputValue] = React.useState("");
+
+  // Reset input when dialog opens/closes
+  React.useEffect(() => {
+    if (!open) setInputValue("");
+  }, [open]);
+
+  const confirmed = !requireConfirmText || inputValue === requireConfirmText;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false}>
@@ -139,12 +149,27 @@ function ConfirmDialog({
             <DialogDescription>{description}</DialogDescription>
           ) : null}
         </DialogHeader>
+        {requireConfirmText && (
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm text-slate-600">
+              Type <span className="font-semibold text-slate-900">{requireConfirmText}</span> to confirm
+            </label>
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-200"
+              autoComplete="off"
+            />
+          </div>
+        )}
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="secondary">{cancelLabel}</Button>
           </DialogClose>
           <Button
             variant="danger"
+            disabled={!confirmed}
             onClick={() => {
               onOpenChange(false);
               onConfirm();

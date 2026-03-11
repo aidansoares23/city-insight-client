@@ -19,8 +19,6 @@ import {
   Lock,
   AlertTriangle,
   CheckCircle2,
-  ArrowRight,
-  ArrowDown,
   Star,
 } from "lucide-react";
 
@@ -28,12 +26,16 @@ import {
 
 function MiniCard({ icon: Icon, title, children }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-      <div className="flex items-center gap-2">
-        {Icon ? <Icon className="h-5 w-5 text-slate-600" /> : null}
+    <div className="rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4">
+      <div className="flex items-center gap-2.5">
+        {Icon ? (
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--secondary))]">
+            <Icon className="h-4 w-4 text-[hsl(var(--foreground))]" />
+          </div>
+        ) : null}
         <div className="text-sm font-semibold text-slate-900">{title}</div>
       </div>
-      <div className="mt-2 text-sm leading-relaxed text-slate-600">
+      <div className="mt-2.5 text-sm leading-relaxed text-slate-600">
         {children}
       </div>
     </div>
@@ -42,13 +44,17 @@ function MiniCard({ icon: Icon, title, children }) {
 
 function StatCard({ icon: Icon, title, badge, children }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+    <div className="rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4">
       <div className="flex flex-wrap items-center gap-2">
-        {Icon ? <Icon className="h-5 w-5 text-slate-600" /> : null}
+        {Icon ? (
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--secondary))]">
+            <Icon className="h-4 w-4 text-[hsl(var(--foreground))]" />
+          </div>
+        ) : null}
         <div className="font-medium text-slate-900">{title}</div>
         {badge ? <Badge variant="secondary">{badge}</Badge> : null}
       </div>
-      <p className="mt-2 text-sm leading-relaxed text-slate-600">{children}</p>
+      <p className="mt-2.5 text-sm leading-relaxed text-slate-600">{children}</p>
     </div>
   );
 }
@@ -56,7 +62,7 @@ function StatCard({ icon: Icon, title, badge, children }) {
 /** Inline code style for numbers / field names inside prose. */
 function Mono({ children }) {
   return (
-    <span className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.78rem] text-slate-700">
+    <span className="rounded bg-[hsl(var(--muted))] px-1 py-0.5 font-mono text-[0.78rem] text-slate-700">
       {children}
     </span>
   );
@@ -65,7 +71,7 @@ function Mono({ children }) {
 /** Indented formula block — shows the actual math. */
 function FormulaBlock({ children }) {
   return (
-    <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-xs leading-relaxed text-slate-700">
+    <div className="mt-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-4 py-3 font-mono text-xs leading-relaxed text-slate-700">
       {children}
     </div>
   );
@@ -74,8 +80,9 @@ function FormulaBlock({ children }) {
 /** One row in the formula section — label left, detail right. */
 function FormulaRow({ label, children }) {
   return (
-    <div className="flex flex-col gap-1 rounded-2xl border border-slate-200 bg-white px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
-      <div className="shrink-0 text-sm font-semibold text-slate-900 sm:w-[30%]">
+    <div className="flex flex-col gap-1 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="shrink-0 text-sm font-semibold text-slate-900 sm:w-[30%] flex items-center gap-2">
+        <span className="inline-block h-4 w-0.5 rounded-full bg-[hsl(var(--primary))] shrink-0" />
         {label}
       </div>
       <div className="text-sm leading-relaxed text-slate-600 sm:w-[66%]">
@@ -85,36 +92,82 @@ function FormulaRow({ label, children }) {
   );
 }
 
-/** One step in the pipeline flow. */
-function PipelineStep({ icon: Icon, label, sub, step }) {
-  return (
-    <div className="flex flex-col items-center gap-1.5 text-center">
-      <div className="relative">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <Icon className="h-5 w-5 text-slate-600" />
-        </div>
-        {step != null && (
-          <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-slate-800 text-[9px] font-bold text-white">
-            {step}
-          </span>
-        )}
-      </div>
-      <div className="text-xs font-semibold leading-tight text-slate-800">
-        {label}
-      </div>
-      {sub ? (
-        <div className="text-[11px] leading-tight text-slate-500">{sub}</div>
-      ) : null}
-    </div>
-  );
-}
-
-function PipelineArrow() {
+/** Connected stepper pipeline. */
+function Pipeline({ steps }) {
   return (
     <>
-      <ArrowRight className="hidden h-4 w-4 shrink-0 text-slate-300 sm:block" />
-      <div className="flex justify-center sm:hidden">
-        <ArrowDown className="h-4 w-4 text-slate-300" />
+      {/* Desktop: horizontal connected stepper */}
+      <div className="hidden sm:flex items-start">
+        {steps.map((step, i) => (
+          <div key={i} className="flex flex-1 items-start min-w-0">
+            {/* connector + circle row */}
+            <div className="flex flex-col items-center w-full gap-3">
+              <div className="relative flex w-full items-center">
+                {/* left line */}
+                <div
+                  className={`h-px flex-1 ${i === 0 ? "bg-transparent" : "bg-[hsl(var(--primary)/0.35)]"}`}
+                />
+                {/* numbered circle */}
+                <div className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--foreground))] text-xs font-bold text-white shadow-sm">
+                  {i + 1}
+                </div>
+                {/* right line */}
+                <div
+                  className={`h-px flex-1 ${i === steps.length - 1 ? "bg-transparent" : "bg-[hsl(var(--primary)/0.35)]"}`}
+                />
+              </div>
+
+              {/* icon bubble */}
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--secondary))]">
+                <step.icon className="h-5 w-5 text-[hsl(var(--foreground))]" />
+              </div>
+
+              {/* label */}
+              <div className="px-2 text-center">
+                <div className="text-xs font-semibold leading-tight text-slate-800">
+                  {step.label}
+                </div>
+                {step.sub && (
+                  <div className="mt-0.5 text-[11px] leading-tight text-slate-500">
+                    {step.sub}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Mobile: vertical timeline */}
+      <div className="sm:hidden space-y-1">
+        {steps.map((step, i) => (
+          <div key={i} className="flex gap-3">
+            {/* timeline column */}
+            <div className="flex flex-col items-center">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--foreground))] text-[10px] font-bold text-white">
+                {i + 1}
+              </div>
+              {i < steps.length - 1 && (
+                <div className="my-1 w-px flex-1 bg-[hsl(var(--primary)/0.35)] min-h-[20px]" />
+              )}
+            </div>
+
+            {/* content */}
+            <div className="flex items-center gap-3 pb-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--secondary))]">
+                <step.icon className="h-4 w-4 text-[hsl(var(--foreground))]" />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-slate-800">
+                  {step.label}
+                </div>
+                {step.sub && (
+                  <div className="text-[11px] text-slate-500">{step.sub}</div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </>
   );
@@ -123,7 +176,7 @@ function PipelineArrow() {
 /** Weight bar used inside the livability blend table. */
 function WeightBar({ pct, color = "bg-blue-400" }) {
   return (
-    <div className="mt-1 h-1.5 w-full rounded-full bg-slate-100">
+    <div className="mt-1 h-1.5 w-full rounded-full bg-[hsl(var(--muted))]">
       <div
         className={`h-1.5 rounded-full ${color}`}
         style={{ width: `${pct}%` }}
@@ -137,7 +190,7 @@ function JumpLink({ href, children }) {
   return (
     <a
       href={href}
-      className="text-xs text-slate-500 underline-offset-2 hover:text-slate-800 hover:underline transition-colors"
+      className="rounded-md px-2 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-[hsl(var(--secondary))] hover:text-slate-900"
     >
       {children}
     </a>
@@ -157,16 +210,12 @@ export default function Methodology() {
       />
 
       {/* ── Jump nav ───────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span className="text-xs font-medium text-slate-400">On this page:</span>
+      <div className="flex flex-wrap items-center gap-1 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
+        <span className="mr-1 text-xs font-medium text-slate-400">Jump to:</span>
         <JumpLink href="#glance">At a glance</JumpLink>
-        <span className="text-slate-300 text-xs">·</span>
         <JumpLink href="#pipeline">Data pipeline</JumpLink>
-        <span className="text-slate-300 text-xs">·</span>
         <JumpLink href="#scores">Score formulas</JumpLink>
-        <span className="text-slate-300 text-xs">·</span>
         <JumpLink href="#metrics">Metrics glossary</JumpLink>
-        <span className="text-slate-300 text-xs">·</span>
         <JumpLink href="#sources">Sources</JumpLink>
       </div>
 
@@ -238,36 +287,15 @@ export default function Methodology() {
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
               Weekly — objective metrics
             </p>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-6">
-              <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-2">
-                <PipelineStep
-                  step={1}
-                  icon={Users}
-                  label="Census & Crime"
-                  sub="Population, rent, crime counts"
-                />
-                <PipelineArrow />
-                <PipelineStep
-                  step={2}
-                  icon={Calculator}
-                  label="Normalize"
-                  sub="Rates per 100k residents"
-                />
-                <PipelineArrow />
-                <PipelineStep
-                  step={3}
-                  icon={Shield}
-                  label="Safety score"
-                  sub="0–10, weighted formula"
-                />
-                <PipelineArrow />
-                <PipelineStep
-                  step={4}
-                  icon={BarChart3}
-                  label="Livability"
-                  sub="0–100 blended score"
-                />
-              </div>
+            <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-5 py-6">
+              <Pipeline
+                steps={[
+                  { icon: Users,      label: "Census & Crime",  sub: "Population, rent, crime counts" },
+                  { icon: Calculator, label: "Normalize",        sub: "Rates per 100k residents" },
+                  { icon: Shield,     label: "Safety score",    sub: "0–10, weighted formula" },
+                  { icon: BarChart3,  label: "Livability",      sub: "0–100 blended score" },
+                ]}
+              />
             </div>
           </div>
 
@@ -276,36 +304,15 @@ export default function Methodology() {
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
               Real-time — community reviews
             </p>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-6">
-              <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-2">
-                <PipelineStep
-                  step={1}
-                  icon={Star}
-                  label="Review submitted"
-                  sub="Create, edit, or delete"
-                />
-                <PipelineArrow />
-                <PipelineStep
-                  step={2}
-                  icon={Database}
-                  label="Scores updated"
-                  sub="Instant, atomic write"
-                />
-                <PipelineArrow />
-                <PipelineStep
-                  step={3}
-                  icon={Calculator}
-                  label="Averages"
-                  sub="Running totals → avg"
-                />
-                <PipelineArrow />
-                <PipelineStep
-                  step={4}
-                  icon={BarChart3}
-                  label="Livability"
-                  sub="Instantly recomputed"
-                />
-              </div>
+            <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-5 py-6">
+              <Pipeline
+                steps={[
+                  { icon: Star,       label: "Review submitted", sub: "Create, edit, or delete" },
+                  { icon: Database,   label: "Scores updated",   sub: "Instant, atomic write" },
+                  { icon: Calculator, label: "Averages",         sub: "Running totals → avg" },
+                  { icon: BarChart3,  label: "Livability",       sub: "Instantly recomputed" },
+                ]}
+              />
             </div>
           </div>
         </div>
@@ -396,7 +403,7 @@ export default function Methodology() {
 
             <div className="mt-3 space-y-2">
               {/* Signal 1 */}
-              <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
+              <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
                 <div className="flex items-center justify-between text-xs font-semibold text-slate-800">
                   <span>Community overall rating</span>
                   <Badge variant="secondary">50 %</Badge>
@@ -409,7 +416,7 @@ export default function Methodology() {
               </div>
 
               {/* Signal 2 */}
-              <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
+              <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
                 <div className="flex items-center justify-between text-xs font-semibold text-slate-800">
                   <span>Objective safety score</span>
                   <Badge variant="secondary">35 %</Badge>
@@ -422,7 +429,7 @@ export default function Methodology() {
               </div>
 
               {/* Signal 3 */}
-              <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
+              <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
                 <div className="flex items-center justify-between text-xs font-semibold text-slate-800">
                   <span>Rent affordability</span>
                   <Badge variant="secondary">15 %</Badge>
@@ -451,17 +458,17 @@ export default function Methodology() {
             </FormulaBlock>
 
             {/* Worked example */}
-            <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
-              <div className="mb-1.5 text-xs font-semibold text-blue-800">
+            <div className="mt-3 rounded-xl border border-[hsl(var(--secondary))] bg-[hsl(var(--secondary)/0.3)] px-4 py-3">
+              <div className="mb-1.5 text-xs font-semibold text-[hsl(var(--foreground))]">
                 Worked example
               </div>
-              <div className="space-y-0.5 font-mono text-xs text-blue-700">
+              <div className="space-y-0.5 font-mono text-xs text-slate-700">
                 <div>overallAvg = 7.2 → reviewScore = 72</div>
                 <div>safetyScore = 6.8 → safetyPts = 68</div>
                 <div>medianRent = $2,100 → rentScore = 40</div>
-                <div className="mt-1 border-t border-blue-200 pt-1">
+                <div className="mt-1 border-t border-[hsl(var(--border))] pt-1">
                   livability = round(72×0.50 + 68×0.35 + 40×0.15) ={" "}
-                  <span className="font-bold">68</span>
+                  <span className="font-bold">66</span>
                 </div>
               </div>
             </div>
@@ -581,9 +588,11 @@ export default function Methodology() {
         </div>
 
         {/* Privacy */}
-        <div className="mt-4 rounded-2xl border border-slate-200 bg-white px-4 py-4">
+        <div className="mt-4 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4">
           <div className="flex flex-wrap items-center gap-2">
-            <Lock className="h-4 w-4 text-slate-500" />
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--secondary))]">
+              <Lock className="h-4 w-4 text-[hsl(var(--foreground))]" />
+            </div>
             <div className="text-sm font-semibold text-slate-900">
               Sign-in &amp; privacy
             </div>
@@ -598,7 +607,7 @@ export default function Methodology() {
             anything beyond that scope.
           </p>
 
-          <details className="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <details className="mt-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-4 py-3">
             <summary className="cursor-pointer text-sm font-semibold text-slate-900">
               Technical details
             </summary>
@@ -623,7 +632,7 @@ export default function Methodology() {
       </SectionCard>
 
       {/* ── Bottom CTA ─────────────────────────────────────────────────── */}
-      <div className="flex flex-col items-center gap-3 pb-10 pt-2 text-center">
+      <div className="flex flex-col items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-6 py-8 text-center">
         <p className="text-sm text-slate-600">
           Now you know how it works — go see for yourself.
         </p>

@@ -173,6 +173,7 @@ export default function Account() {
         description="This will permanently delete your account and all your reviews. This cannot be undone."
         confirmLabel="Delete account"
         onConfirm={onConfirmDeleteAccount}
+        requireConfirmText="delete my account"
       />
       <PageHero
         title="Account"

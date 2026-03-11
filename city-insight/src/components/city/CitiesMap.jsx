@@ -19,7 +19,7 @@ export default function CitiesMap({ cities = [] }) {
   const center = [Number(mapped[0].lat), Number(mapped[0].lng)];
 
   return (
-    <div className="relative z-0 h-[400px] w-full overflow-hidden rounded-xl">
+    <div className="relative z-0 h-[500px] w-full overflow-hidden rounded-xl">
       <MapContainer
         className="z-0"
         center={center}

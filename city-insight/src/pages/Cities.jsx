@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { LayoutGrid, Map } from "lucide-react";
 import api from "@/services/api";
 import CityCard from "@/components/city/CityCard";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ export default function Cities() {
   const [sort, setSort] = useState("livability_desc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [view, setView] = useState("grid");
 
   useEffect(() => {
     let alive = true;
@@ -107,37 +109,69 @@ export default function Cities() {
             ? "Loading cities…"
             : error
               ? "Couldn’t load cities."
-              : `${filtered.length} matches`
+              : view === "grid"
+                ? `${filtered.length} matches`
+                : `${cities.length} cities on map`
         }
         action={
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-600">Sort</span>
-              <select
-                className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-200/60"
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
-              >
-                <option value="livability_desc">Livability: High to low</option>
-                <option value="safety_desc">Safety: High to low</option>
-                <option value="rent_asc">Rent: Low to high</option>
-                <option value="rent_desc">Rent: High to low</option>
-                <option value="reviews_desc">Most reviewed</option>
-                <option value="name_asc">Name: A to Z</option>
-              </select>
-            </div>
+            {view === "grid" && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-slate-600">Sort</span>
+                <select
+                  className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-200/60"
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                >
+                  <option value="livability_desc">Livability: High to low</option>
+                  <option value="safety_desc">Safety: High to low</option>
+                  <option value="rent_asc">Rent: Low to high</option>
+                  <option value="rent_desc">Rent: High to low</option>
+                  <option value="reviews_desc">Most reviewed</option>
+                  <option value="name_asc">Name: A to Z</option>
+                </select>
+              </div>
+            )}
 
-            <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search by city or state…"
-              className="h-10 w-full sm:w-72 bg-white border-slate-300 focus:border-sky-400 focus:ring-sky-400"
-            />
+            {view === "grid" && (
+              <Input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search by city or state…"
+                className="h-10 w-full sm:w-72 bg-white border-slate-300 focus:border-sky-400 focus:ring-sky-400"
+              />
+            )}
+
+            <div className="flex items-center rounded-md border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <button
+                onClick={() => setView("grid")}
+                className={`flex items-center gap-1.5 px-3 h-10 text-sm transition ${
+                  view === "grid"
+                    ? "bg-slate-900 text-white"
+                    : "text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Grid
+              </button>
+              <button
+                onClick={() => setView("map")}
+                className={`flex items-center gap-1.5 px-3 h-10 text-sm transition border-l border-slate-200 ${
+                  view === "map"
+                    ? "bg-slate-900 text-white"
+                    : "text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                <Map className="h-4 w-4" />
+                Map
+              </button>
+            </div>
           </div>
         }
       >
-        {loading ? (
-          // <div className="text-sm text-slate-600">Loading…</div>
+        {view === "map" ? (
+          <CitiesMap cities={cities} />
+        ) : loading ? (
           <Loading />
         ) : error ? (
           <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
@@ -154,9 +188,6 @@ export default function Cities() {
             ))}
           </div>
         )}
-      </SectionCard>
-      <SectionCard title="Map View" subtitle="See all cities in a single map">
-        <CitiesMap cities={cities} />
       </SectionCard>
     </div>
   );

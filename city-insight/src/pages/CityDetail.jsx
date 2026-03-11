@@ -43,7 +43,7 @@ function fmtOutOf10(x) {
 
 function MetricCard({ title, icon: Icon, value, subtitle }) {
   return (
-    <div className="rounded-2xl border border-slate-200/70 bg-white px-6 py-5 shadow-xl">
+    <div className="rounded-2xl border border-slate-300/70 bg-white px-6 py-5 shadow-l">
       <div className="flex items-center gap-3">
         {Icon ? (
           <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
