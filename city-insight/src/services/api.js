@@ -9,7 +9,7 @@ const api = axios.create({
 });
 
 function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 let wakeInFlight = null;

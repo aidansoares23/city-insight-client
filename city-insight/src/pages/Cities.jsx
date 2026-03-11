@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { LayoutGrid, Map } from "lucide-react";
+import { LayoutGrid, Map, X } from "lucide-react";
 import api from "@/services/api";
 import CityCard from "@/components/city/CityCard";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import CitiesMap from "@/components/city/CitiesMap";
 
 export default function Cities() {
   const [cities, setCities] = useState([]);
-  const [q, setQ] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [sort, setSort] = useState("livability_desc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -42,34 +42,34 @@ export default function Cities() {
   }, []);
 
   const filtered = useMemo(() => {
-    const query = q.trim().toLowerCase();
+    const query = searchInput.trim().toLowerCase();
 
     let list = query
-      ? cities.filter((c) =>
-          `${c.name || ""} ${c.state || ""} ${c.slug || ""}`
+      ? cities.filter((city) =>
+          `${city.name || ""} ${city.state || ""} ${city.slug || ""}`
             .toLowerCase()
             .includes(query),
         )
       : cities;
 
-    const num = (x) => (Number.isFinite(Number(x)) ? Number(x) : null);
+    const toNum = (value) => (Number.isFinite(Number(value)) ? Number(value) : null);
 
     const desc = (a, b) => {
-      const av = num(a),
-        bv = num(b);
-      if (av == null && bv == null) return 0;
-      if (av == null) return 1;
-      if (bv == null) return -1;
-      return bv - av;
+      const aNum = toNum(a),
+        bNum = toNum(b);
+      if (aNum == null && bNum == null) return 0;
+      if (aNum == null) return 1;
+      if (bNum == null) return -1;
+      return bNum - aNum;
     };
 
     const asc = (a, b) => {
-      const av = num(a),
-        bv = num(b);
-      if (av == null && bv == null) return 0;
-      if (av == null) return 1;
-      if (bv == null) return -1;
-      return av - bv;
+      const aNum = toNum(a),
+        bNum = toNum(b);
+      if (aNum == null && bNum == null) return 0;
+      if (aNum == null) return 1;
+      if (bNum == null) return -1;
+      return aNum - bNum;
     };
 
     switch (sort) {
@@ -91,7 +91,7 @@ export default function Cities() {
           String(a.name || "").localeCompare(String(b.name || "")),
         );
     }
-  }, [cities, q, sort]);
+  }, [cities, searchInput, sort]);
 
   usePageTitle("Cities");
 
@@ -108,7 +108,7 @@ export default function Cities() {
           loading
             ? "Loading cities…"
             : error
-              ? "Couldn’t load cities."
+              ? "Couldn't load cities."
               : view === "grid"
                 ? `${filtered.length} matches`
                 : `${cities.length} cities on map`
@@ -134,15 +134,27 @@ export default function Cities() {
             )}
 
             {view === "grid" && (
-              <Input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Search by city or state…"
-                className="h-10 w-full sm:w-72 bg-white border-slate-300 focus:border-sky-400 focus:ring-sky-400"
-              />
+              <div className="relative w-full sm:w-72">
+                <Input
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Search by city or state…"
+                  className={`h-10 w-full bg-white border-slate-300 focus:border-sky-400 focus:ring-sky-400 ${searchInput ? "pr-8" : ""}`}
+                />
+                {searchInput && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchInput("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    aria-label="Clear search"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
             )}
 
-            <div className="flex items-center rounded-md border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div className="flex w-fit items-center rounded-md border border-slate-200 bg-white shadow-sm overflow-hidden">
               <button
                 onClick={() => setView("grid")}
                 className={`flex items-center gap-1.5 px-3 h-10 text-sm transition ${
@@ -183,8 +195,8 @@ export default function Cities() {
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4 sm:pb-6">
-            {filtered.map((c) => (
-              <CityCard key={c.slug} city={c} />
+            {filtered.map((city) => (
+              <CityCard key={city.slug} city={city} />
             ))}
           </div>
         )}

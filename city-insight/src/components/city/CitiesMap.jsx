@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export default function CitiesMap({ cities = [] }) {
   // Only keep cities that have valid coordinates
   const mapped = cities.filter(
-    (c) => Number.isFinite(Number(c.lat)) && Number.isFinite(Number(c.lng)),
+    (city) => Number.isFinite(Number(city.lat)) && Number.isFinite(Number(city.lng)),
   );
 
   if (mapped.length === 0) {
@@ -32,16 +32,16 @@ export default function CitiesMap({ cities = [] }) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
-        {mapped.map((c) => (
-          <Marker key={c.slug} position={[Number(c.lat), Number(c.lng)]}>
+        {mapped.map((city) => (
+          <Marker key={city.slug} position={[Number(city.lat), Number(city.lng)]}>
             <Popup>
               <div className="text-sm">
-                <div className="font-semibold">{c.name}</div>
-                {c.state ? (
-                  <div className="text-slate-600">{c.state}</div>
+                <div className="font-semibold">{city.name}</div>
+                {city.state ? (
+                  <div className="text-slate-600">{city.state}</div>
                 ) : null}
                 <Link
-                  to={`/cities/${c.slug}`}
+                  to={`/cities/${city.slug}`}
                   className="text-sky-600 hover:underline"
                 >
                   View details →

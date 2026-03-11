@@ -20,14 +20,13 @@ import {
 import { safeReturnTo } from "@/lib/routing";
 import { prettyCityFromSlug } from "@/lib/cities";
 import {
+  RATING_KEYS,
   clampRating10,
   derivedOverall,
   makeEmptyReviewForm,
   normalizeReviewToForm,
 } from "@/lib/ratings";
 import { fetchMyReview, upsertMyReview, deleteMyReview } from "@/lib/reviews";
-
-const RATING_KEYS = ["safety", "affordability", "walkability", "cleanliness"];
 
 const RATING_LABELS = {
   safety: "Safety",
@@ -38,9 +37,8 @@ const RATING_LABELS = {
 
 const COMMENT_MAX = 800;
 
-// One slider row.
 function RatingRow({ label, value, onChange }) {
-  const safeV = Number.isFinite(Number(value)) ? Number(value) : 0;
+  const safeValue = Number.isFinite(Number(value)) ? Number(value) : 0;
 
   return (
     <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[160px_1fr_72px] sm:gap-4">
@@ -52,13 +50,13 @@ function RatingRow({ label, value, onChange }) {
         min="1"
         max="10"
         step="1"
-        value={safeV}
+        value={safeValue}
         onChange={(e) => onChange(e.target.value)}
         aria-label={`${label} rating`}
       />
 
       <div className="text-right text-sm font-semibold text-slate-900 tabular-nums">
-        {safeV}/10
+        {safeValue}/10
       </div>
     </div>
   );
@@ -70,7 +68,6 @@ export default function ReviewEditor() {
   const location = useLocation();
   const { user, loading: authLoading } = useAuth();
 
-  // Prefer router-state returnTo; fallback to city page
   const returnTo = useMemo(() => {
     const fromState = safeReturnTo(location.state?.returnTo);
     return fromState || (slug ? `/cities/${slug}` : "/cities");
@@ -78,7 +75,6 @@ export default function ReviewEditor() {
 
   const cityLabel = useMemo(() => prettyCityFromSlug(slug), [slug]);
 
-  // create | edit
   const [mode, setMode] = useState("create");
 
   const [form, setForm] = useState(() => makeEmptyReviewForm());
@@ -95,12 +91,10 @@ export default function ReviewEditor() {
 
   usePageTitle(pageTitle);
 
-  // Load my review (if any)
   useEffect(() => {
     if (authLoading) return;
     if (!slug) return;
 
-    // If signed out, show create mode with empty form
     if (!user) {
       setMode("create");
       setForm(makeEmptyReviewForm());
@@ -142,7 +136,6 @@ export default function ReviewEditor() {
     };
   }, [user, slug, authLoading]);
 
-  // Form setters
   const setRating = useCallback((key, value) => {
     setForm((prev) => ({
       ...prev,
@@ -157,7 +150,6 @@ export default function ReviewEditor() {
     setForm((prev) => ({ ...prev, comment: value }));
   }, []);
 
-  // Submit / delete
   const onSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -170,7 +162,7 @@ export default function ReviewEditor() {
         const payload = {
           ratings: {
             ...form.ratings,
-            overall: derivedOverall(form.ratings), // ✅ shared logic
+            overall: derivedOverall(form.ratings),
           },
           comment: form.comment?.trim() ? form.comment.trim() : null,
         };
@@ -182,9 +174,9 @@ export default function ReviewEditor() {
           replace: true,
           state: { reviewSaved: true, created, citySlug: slug },
         });
-      } catch (e2) {
+      } catch (err) {
         setErrorMsg(
-          e2?.response?.data?.error?.message || "Failed to save review.",
+          err?.response?.data?.error?.message || "Failed to save review.",
         );
       } finally {
         setIsSaving(false);
@@ -208,16 +200,15 @@ export default function ReviewEditor() {
         replace: true,
         state: { reviewDeleted: true, citySlug: slug },
       });
-    } catch (e2) {
+    } catch (err) {
       setErrorMsg(
-        e2?.response?.data?.error?.message || "Failed to delete review.",
+        err?.response?.data?.error?.message || "Failed to delete review.",
       );
     } finally {
       setIsDeleting(false);
     }
   }, [slug, navigate, returnTo]);
 
-  // Render gates
   if (authLoading || isLoading) {
     return <div className="text-sm text-slate-600">Loading…</div>;
   }
@@ -273,21 +264,19 @@ export default function ReviewEditor() {
           }
         >
           <div className="space-y-6">
-            {/* Sliders */}
             <div className="space-y-4">
-              {RATING_KEYS.map((k) => (
+              {RATING_KEYS.map((key) => (
                 <RatingRow
-                  key={k}
-                  label={RATING_LABELS[k] ?? k}
-                  value={form.ratings[k]}
-                  onChange={(v) => setRating(k, v)}
+                  key={key}
+                  label={RATING_LABELS[key] ?? key}
+                  value={form.ratings[key]}
+                  onChange={(newValue) => setRating(key, newValue)}
                 />
               ))}
             </div>
 
             <div className="h-px bg-slate-100" />
 
-            {/* Comments */}
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-900">
                 Additional Comments (Optional)
@@ -309,7 +298,6 @@ export default function ReviewEditor() {
 
             <div className="h-px bg-slate-100" />
 
-            {/* Actions */}
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <Button type="submit" variant="primary" disabled={isBusy}>
                 <Save className="mr-2 h-4 w-4" />

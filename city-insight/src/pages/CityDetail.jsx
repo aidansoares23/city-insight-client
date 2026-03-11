@@ -36,9 +36,9 @@ import {
   deleteMyReview as deleteMyReviewApi,
 } from "@/lib/reviews";
 
-function fmtOutOf10(x) {
-  const n = safeNumOrNull(x);
-  return n == null ? "—" : `${n.toFixed(1)}/10`;
+function fmtOutOf10(value) {
+  const num = safeNumOrNull(value);
+  return num == null ? "—" : `${num.toFixed(1)}/10`;
 }
 
 function MetricCard({ title, icon: Icon, value, subtitle }) {
@@ -63,7 +63,7 @@ function MetricCard({ title, icon: Icon, value, subtitle }) {
 }
 
 function RatingRow({ label, value, icon: Icon }) {
-  const safeValue = safeNumOrNull(value); // 0–10
+  const safeValue = safeNumOrNull(value);
   const pct = safeValue == null ? 0 : clamp01(safeValue / 10) * 100;
 
   return (
@@ -240,9 +240,9 @@ export default function CityDetail() {
       const newCursor = res.data?.nextCursor || null;
 
       const existingIds = new Set(
-        publicReviews.map((r) => r?.id).filter(Boolean),
+        publicReviews.map((review) => review?.id).filter(Boolean),
       );
-      const unique = newReviews.filter((r) => !r?.id || !existingIds.has(r.id));
+      const unique = newReviews.filter((review) => !review?.id || !existingIds.has(review.id));
 
       setPublicReviews((prev) => [...prev, ...unique]);
       setNextCursor(unique.length > 0 ? newCursor : null);
@@ -265,7 +265,7 @@ export default function CityDetail() {
 
   const publicReviewsExcludingMine = useMemo(() => {
     if (!myReview?.id) return publicReviews;
-    return publicReviews.filter((r) => r?.id !== myReview.id);
+    return publicReviews.filter((review) => review?.id !== myReview.id);
   }, [publicReviews, myReview]);
 
   const insights = useMemo(() => {
@@ -311,7 +311,7 @@ export default function CityDetail() {
       const deletedId = myReview?.id;
       setMyReview(null);
       if (deletedId) {
-        setPublicReviews((prev) => prev.filter((r) => r?.id !== deletedId));
+        setPublicReviews((prev) => prev.filter((review) => review?.id !== deletedId));
       }
     } catch (err) {
       console.error(err);
@@ -332,14 +332,14 @@ export default function CityDetail() {
     return <div className="text-sm text-slate-600">City not found.</div>;
   }
 
-  const lat = safeNumOrNull(city?.lat);
-  const lng = safeNumOrNull(city?.lng);
+  const lat = safeNumOrNull(city.lat);
+  const lng = safeNumOrNull(city.lng);
 
-  const cityLine = [city?.name || "—", city?.state || null]
+  const cityLine = [city.name || "—", city.state || null]
     .filter(Boolean)
     .join(", ");
   const description =
-    city?.description || city?.tagline || "Brief description coming soon";
+    city.description || city.tagline || "Brief description coming soon";
 
   const myReviewAction =
     myReviewState === "auth_loading" ||
@@ -451,8 +451,8 @@ export default function CityDetail() {
       >
         {Number.isFinite(lat) && Number.isFinite(lng) ? (
           <CityMap
-            cityName={city?.name}
-            state={city?.state}
+            cityName={city.name}
+            state={city.state}
             lat={lat}
             lng={lng}
           />
@@ -516,7 +516,7 @@ export default function CityDetail() {
           <div className="text-sm text-slate-600">Loading your review…</div>
         ) : myReviewState === "no_review" ? (
           <div className="text-sm text-slate-600">
-            You haven’t reviewed this city yet.
+            You haven't reviewed this city yet.
           </div>
         ) : (
           <ReviewCard
@@ -542,10 +542,10 @@ export default function CityDetail() {
           <div className="text-sm text-slate-600">No reviews yet.</div>
         ) : (
           <div className="space-y-4">
-            {publicReviewsExcludingMine.map((r, idx) => (
+            {publicReviewsExcludingMine.map((review, idx) => (
               <ReviewCard
-                key={r?.id || `${r?.cityId || slug}__${r?.createdAtIso || idx}`}
-                review={r}
+                key={review?.id || `${review?.cityId || slug}__${review?.createdAtIso || idx}`}
+                review={review}
                 variant="list"
                 title="Anonymous"
               />

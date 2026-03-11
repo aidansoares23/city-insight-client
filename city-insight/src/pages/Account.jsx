@@ -16,9 +16,6 @@ import { initialsFromUser } from "@/lib/format";
 import { prettyCityFromSlug } from "@/lib/cities";
 import { fetchMyReviews, deleteMyReview, deleteMyAccount } from "@/lib/reviews";
 
-// -----------------------------
-// Small UI helpers (kept local)
-// -----------------------------
 function InfoRow({ icon: Icon, label, value }) {
   return (
     <div className="grid grid-cols-[20px_1fr] items-start gap-3 text-sm">
@@ -60,56 +57,41 @@ export default function Account() {
   const [pendingDeleteSlug, setPendingDeleteSlug] = useState(null);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
-  // Page title
   usePageTitle(authLoading ? "Account" : user ? "Account" : "Sign in");
 
-  // -----------------------------
-  // Data loading
-  // -----------------------------
   useEffect(() => {
     if (!user) return;
 
-    let cancelled = false;
+    let alive = true;
     setErrorMsg("");
     setReviewsLoading(true);
 
     fetchMyReviews({ limit: 50 })
       .then((reviews) => {
-        if (cancelled) return;
-        setMyReviews(reviews);
+        if (alive) setMyReviews(reviews);
       })
       .catch((e) => {
-        if (cancelled) return;
-        setErrorMsg(
-          e?.response?.data?.error?.message || "Failed to load reviews",
-        );
+        if (alive)
+          setErrorMsg(
+            e?.response?.data?.error?.message || "Failed to load reviews",
+          );
       })
       .finally(() => {
-        if (cancelled) return;
-        setReviewsLoading(false);
+        if (alive) setReviewsLoading(false);
       });
 
     return () => {
-      cancelled = true;
+      alive = false;
     };
   }, [user]);
 
-  // -----------------------------
-  // Derived stats
-  // -----------------------------
-  const stats = useMemo(() => {
+  const citiesReviewed = useMemo(() => {
     const uniqueCities = new Set(
-      myReviews.map((r) => r?.cityId).filter(Boolean),
+      myReviews.map((review) => review?.cityId).filter(Boolean),
     );
-    return {
-      reviewCount: myReviews.length,
-      citiesReviewed: uniqueCities.size,
-    };
+    return uniqueCities.size;
   }, [myReviews]);
 
-  // -----------------------------
-  // Actions
-  // -----------------------------
   const onDeleteReview = useCallback((citySlug) => {
     if (!citySlug) return;
     setPendingDeleteSlug(citySlug);
@@ -121,7 +103,7 @@ export default function Account() {
     try {
       await deleteMyReview(pendingDeleteSlug);
       setMyReviews((prev) =>
-        prev.filter((r) => r?.cityId !== pendingDeleteSlug),
+        prev.filter((review) => review?.cityId !== pendingDeleteSlug),
       );
     } catch (e) {
       console.error(e);
@@ -141,9 +123,6 @@ export default function Account() {
     }
   }, [logout]);
 
-  // -----------------------------
-  // Render gates
-  // -----------------------------
   if (authLoading) return <Loading />;
 
   if (!user) {
@@ -153,8 +132,8 @@ export default function Account() {
   // Support either user shape:
   // - legacy: user.metadata.createdAt / lastSignInTime
   // - current: user.createdAt / updatedAt
-  const createdAt = user?.metadata?.createdAt ?? user?.createdAt;
-  const lastSignIn = user?.metadata?.lastSignInTime ?? user?.updatedAt;
+  const createdAt = user.metadata?.createdAt ?? user.createdAt;
+  const lastSignIn = user.metadata?.lastSignInTime ?? user.updatedAt;
 
   return (
     <>
@@ -186,11 +165,7 @@ export default function Account() {
       />
 
       <div className="space-y-6 animate-in py-6 fade-in slide-in-from-bottom-2 duration-300">
-        {/* -----------------------------
-            Profile
-        ------------------------------ */}
         <Card className="overflow-hidden border-slate-200 bg-white p-0">
-          {/* Header */}
           <div className="relative bg-[hsl(var(--secondary))] px-6 py-6">
             <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5" />
             <div className="flex items-start justify-between gap-4">
@@ -205,10 +180,8 @@ export default function Account() {
             </div>
           </div>
 
-          {/* Body */}
           <CardContent className="bg-white px-6 py-5">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-              {/* Identity */}
               <div className="flex min-w-0 items-start gap-4">
                 <div className="shrink-0">
                   <Avatar user={user} />
@@ -216,29 +189,27 @@ export default function Account() {
 
                 <div className="min-w-0">
                   <div className="truncate text-base font-semibold text-slate-900">
-                    {user?.displayName || "Unnamed user"}
+                    {user.displayName || "Unnamed user"}
                   </div>
                   <div className="truncate text-sm text-slate-600">
-                    {user?.email || "—"}
+                    {user.email || "—"}
                   </div>
 
-                  {/* Quick stats */}
                   <div className="mt-3 flex flex-wrap gap-2">
                     <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                      {stats.citiesReviewed}{" "}
-                      {stats.citiesReviewed === 1 ? "city" : "cities"} reviewed
+                      {citiesReviewed}{" "}
+                      {citiesReviewed === 1 ? "city" : "cities"} reviewed
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Details */}
               <div className="grid w-full gap-3 sm:max-w-sm">
-                <InfoRow icon={Mail} label="Email" value={user?.email || "—"} />
+                <InfoRow icon={Mail} label="Email" value={user.email || "—"} />
                 <InfoRow
                   icon={ShieldCheck}
                   label="Email verified"
-                  value={user?.emailVerified ? "Yes" : "No"}
+                  value={user.emailVerified ? "Yes" : "No"}
                 />
                 <InfoRow
                   icon={Calendar}
@@ -255,11 +226,7 @@ export default function Account() {
           </CardContent>
         </Card>
 
-        {/* -----------------------------
-            Your Reviews
-        ------------------------------ */}
         <Card className="overflow-hidden border-slate-200 bg-white p-0 shadow-l transition-transform duration-200 hover:-translate-y-0.5">
-          {/* Header */}
           <div className="relative bg-[hsl(var(--secondary))] px-6 py-6">
             <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5" />
             <div className="flex items-start justify-between gap-4">
@@ -274,7 +241,6 @@ export default function Account() {
             </div>
           </div>
 
-          {/* Body */}
           <CardContent className="bg-white px-6 py-5">
             {reviewsLoading ? (
               <div className="text-sm text-slate-600">Loading reviews…</div>
@@ -295,7 +261,7 @@ export default function Account() {
                         No reviews yet.
                       </div>
                       <div className="mt-1 text-sm text-slate-600">
-                        Leave a city review and it’ll show up here.
+                        Leave a city review and it'll show up here.
                       </div>
                     </div>
                   </div>
@@ -305,11 +271,11 @@ export default function Account() {
 
             {!reviewsLoading && !errorMsg && myReviews.length > 0 ? (
               <div className="space-y-3">
-                {myReviews.map((review, idx) => {
+                {myReviews.map((review, index) => {
                   const citySlug = review?.cityId || "unknown-city";
                   const key =
                     review?.id ||
-                    `${citySlug}__${review?.updatedAt ?? review?.updatedAtIso ?? review?.createdAt ?? review?.createdAtIso ?? idx}`;
+                    `${citySlug}__${review?.updatedAt ?? review?.updatedAtIso ?? review?.createdAt ?? review?.createdAtIso ?? index}`;
 
                   const cityLabel =
                     review?.cityName ||
@@ -335,9 +301,6 @@ export default function Account() {
           </CardContent>
         </Card>
 
-        {/* -----------------------------
-            Danger Zone
-        ------------------------------ */}
         <Card className="border-slate-200/70 bg-white shadow-black-xl ring-1 ring-rose-100/40">
           <CardContent className="px-6 py-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

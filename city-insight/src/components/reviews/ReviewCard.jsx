@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-import { fmtDateTime } from "@/lib/datetime";
-import { fmtDate } from "@/lib/datetime";
+import { fmtDateTime, fmtDate } from "@/lib/datetime";
+import { clamp01 } from "@/lib/format";
 
 import { Pencil, User as UserIcon, MapPin, Trash2 } from "lucide-react";
 import { clampRating10, avgFromCategories, scoreColor } from "@/lib/ratings";
@@ -13,14 +13,14 @@ import { clampRating10, avgFromCategories, scoreColor } from "@/lib/ratings";
 function tinyPct(value) {
   const n = Number(value);
   if (!Number.isFinite(n)) return 0;
-  return (Math.max(0, Math.min(10, n)) / 10) * 100;
+  return clamp01(n / 10) * 100;
 }
 
 export function ratingLine(ratings) {
   if (!ratings || typeof ratings !== "object") return "—";
   const order = ["overall", "safety", "affordability", "walkability", "cleanliness"];
   return order
-    .map((k) => `${k[0].toUpperCase() + k.slice(1)}: ${ratings?.[k] ?? "—"}/10`)
+    .map((key) => `${key[0].toUpperCase() + key.slice(1)}: ${ratings?.[key] ?? "—"}/10`)
     .join(" • ");
 }
 
@@ -68,7 +68,7 @@ function CommentBlock({ text, clampChars = 180 }) {
       {isLong ? (
         <button
           type="button"
-          onClick={() => setOpen((x) => !x)}
+          onClick={() => setOpen((isOpen) => !isOpen)}
           className="text-xs font-semibold text-slate-700 underline decoration-slate-300 underline-offset-4 hover:text-slate-900"
         >
           {open ? "Show less" : "Read more"}
@@ -104,7 +104,7 @@ function MiniBars({ ratings, barClassName = "bg-blue-500/35" }) {
 
   return (
     <div className="grid gap-2">
-      {items.map(([label, val]) => (
+      {items.map(([label, rating]) => (
         <div
           key={label}
           className="grid grid-cols-[90px_1fr_44px] items-center gap-2"
@@ -115,14 +115,14 @@ function MiniBars({ ratings, barClassName = "bg-blue-500/35" }) {
             <div
               className={`h-full rounded-full transition-[width] duration-300 ${barClassName}`}
               style={{
-                width: `${tinyPct(val)}%`,
-                opacity: val == null ? 0.2 : 1,
+                width: `${tinyPct(rating)}%`,
+                opacity: rating == null ? 0.2 : 1,
               }}
             />
           </div>
 
           <div className="text-right text-xs font-semibold text-slate-900 tabular-nums">
-            {val == null ? "—" : `${val}/10`}
+            {rating == null ? "—" : `${rating}/10`}
           </div>
         </div>
       ))}

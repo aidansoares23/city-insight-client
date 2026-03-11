@@ -10,6 +10,7 @@ export function clampInt(value, lo, hi) {
 
 /** Clamp to 1..10, return null if non-numeric (useful for display) */
 export function clampRating10(value) {
+  if (value == null) return null;
   const n = Number(value);
   if (!Number.isFinite(n)) return null;
   return Math.max(1, Math.min(10, n));
@@ -17,6 +18,7 @@ export function clampRating10(value) {
 
 /** Clamp to 1..10 always returning a number (useful for form state) */
 export function clampRating10OrDefault(value, fallback = DEFAULT_RATING) {
+  if (value == null) return fallback;
   const n = Number(value);
   if (!Number.isFinite(n)) return fallback;
   return clampInt(n, 1, 10);
