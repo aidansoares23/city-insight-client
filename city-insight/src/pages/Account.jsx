@@ -290,9 +290,6 @@ export default function Account() {
               <Card className="border-slate-200/70 shadow-sm ring-1 ring-blue-100/30">
                 <CardContent className="px-6 py-5">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5">
-                      <span className="inline-block h-5 w-1 rounded-full bg-blue-500/60" />
-                    </div>
                     <div>
                       <div className="text-base font-semibold text-slate-900">
                         No reviews yet.
