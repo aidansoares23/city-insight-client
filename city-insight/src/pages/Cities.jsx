@@ -1,21 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
-import { LayoutGrid, Map } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { LayoutGrid, Map, GitCompareArrows } from "lucide-react";
 import api from "@/services/api";
 import CityCard from "@/components/city/CityCard";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { Loading } from "@/components/ui/loading";
 import PageHero from "@/components/layout/PageHero";
 import SectionCard from "@/components/layout/SectionCard";
 import CitiesMap from "@/components/city/CitiesMap";
 
+const MAX_COMPARE = 4;
+
 export default function Cities() {
+  const navigate = useNavigate();
   const [cities, setCities] = useState([]);
   const [q, setQ] = useState("");
   const [sort, setSort] = useState("livability_desc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [view, setView] = useState("grid");
+  const [compareMode, setCompareMode] = useState(false);
+  const [selectedSlugs, setSelectedSlugs] = useState(new Set());
 
   useEffect(() => {
     let alive = true;
@@ -95,6 +102,30 @@ export default function Cities() {
 
   usePageTitle("Cities");
 
+  function toggleCompareMode() {
+    setCompareMode((prev) => {
+      if (prev) setSelectedSlugs(new Set());
+      return !prev;
+    });
+  }
+
+  function toggleSelect(slug) {
+    setSelectedSlugs((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) {
+        next.delete(slug);
+      } else if (next.size < MAX_COMPARE) {
+        next.add(slug);
+      }
+      return next;
+    });
+  }
+
+  function goCompare() {
+    if (selectedSlugs.size < 2) return;
+    navigate(`/compare?cities=${[...selectedSlugs].join(",")}`);
+  }
+
   return (
     <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
       <PageHero
@@ -115,7 +146,7 @@ export default function Cities() {
         }
         action={
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            {view === "grid" && (
+            {view === "grid" && !compareMode && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-slate-600">Sort</span>
                 <select
@@ -133,7 +164,7 @@ export default function Cities() {
               </div>
             )}
 
-            {view === "grid" && (
+            {view === "grid" && !compareMode && (
               <Input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
@@ -144,9 +175,9 @@ export default function Cities() {
 
             <div className="flex items-center rounded-md border border-slate-200 bg-white shadow-sm overflow-hidden">
               <button
-                onClick={() => setView("grid")}
+                onClick={() => { setView("grid"); setCompareMode(false); setSelectedSlugs(new Set()); }}
                 className={`flex items-center gap-1.5 px-3 h-10 text-sm transition ${
-                  view === "grid"
+                  view === "grid" && !compareMode
                     ? "bg-slate-900 text-white"
                     : "text-slate-600 hover:bg-slate-50"
                 }`}
@@ -155,7 +186,7 @@ export default function Cities() {
                 Grid
               </button>
               <button
-                onClick={() => setView("map")}
+                onClick={() => { setView("map"); setCompareMode(false); setSelectedSlugs(new Set()); }}
                 className={`flex items-center gap-1.5 px-3 h-10 text-sm transition border-l border-slate-200 ${
                   view === "map"
                     ? "bg-slate-900 text-white"
@@ -165,10 +196,27 @@ export default function Cities() {
                 <Map className="h-4 w-4" />
                 Map
               </button>
+              <button
+                onClick={() => { setView("grid"); toggleCompareMode(); }}
+                className={`flex items-center gap-1.5 px-3 h-10 text-sm transition border-l border-slate-200 ${
+                  compareMode
+                    ? "bg-slate-900 text-white"
+                    : "text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                <GitCompareArrows className="h-4 w-4" />
+                Compare
+              </button>
             </div>
           </div>
         }
       >
+        {compareMode && (
+          <div className="mb-4 rounded-lg border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">
+            Select 2–{MAX_COMPARE} cities to compare. {selectedSlugs.size > 0 ? `${selectedSlugs.size} selected.` : ""}
+          </div>
+        )}
+
         {view === "map" ? (
           <CitiesMap cities={cities} />
         ) : loading ? (
@@ -184,11 +232,32 @@ export default function Cities() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4 sm:pb-6">
             {filtered.map((c) => (
-              <CityCard key={c.slug} city={c} />
+              <CityCard
+                key={c.slug}
+                city={c}
+                compareMode={compareMode}
+                selected={selectedSlugs.has(c.slug)}
+                onToggle={() => toggleSelect(c.slug)}
+                disableToggle={!selectedSlugs.has(c.slug) && selectedSlugs.size >= MAX_COMPARE}
+              />
             ))}
           </div>
         )}
       </SectionCard>
+
+      {/* Sticky compare bar */}
+      {compareMode && selectedSlugs.size >= 2 && (
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2">
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3 shadow-xl">
+            <span className="text-sm text-slate-700">
+              {selectedSlugs.size} cities selected
+            </span>
+            <Button onClick={goCompare} size="sm">
+              Compare →
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

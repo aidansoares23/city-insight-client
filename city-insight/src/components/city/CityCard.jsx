@@ -14,7 +14,7 @@ function Stat({ label, value }) {
   );
 }
 
-export default function CityCard({ city }) {
+export default function CityCard({ city, compareMode = false, selected = false, onToggle, disableToggle = false }) {
   const score = toOutOf10(city?.livabilityScore);
   const tone = scoreColor(score);
 
@@ -22,12 +22,49 @@ export default function CityCard({ city }) {
     .filter(Boolean)
     .join(", ");
 
+  const cardBorder = compareMode
+    ? selected
+      ? "border-sky-400 ring-2 ring-sky-300"
+      : "border-slate-200/70"
+    : "border-slate-200/70";
+
+  if (compareMode) {
+    return (
+      <Card
+        className={`group overflow-hidden bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md p-0 cursor-pointer ${cardBorder} ${disableToggle && !selected ? "opacity-50" : ""}`}
+        onClick={!disableToggle || selected ? onToggle : undefined}
+      >
+        <div className="relative">
+          <div className="absolute top-2 right-2 z-10">
+            <input
+              type="checkbox"
+              readOnly
+              checked={selected}
+              className="h-4 w-4 accent-sky-500 cursor-pointer"
+              tabIndex={-1}
+            />
+          </div>
+          <CardInner city={city} cityLine={cityLine} score={score} tone={tone} />
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card className="group overflow-hidden border-slate-200/70 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md p-0">
       <Link
         to={`/cities/${city?.slug || ""}`}
         className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
       >
+        <CardInner city={city} cityLine={cityLine} score={score} tone={tone} />
+      </Link>
+    </Card>
+  );
+}
+
+function CardInner({ city, cityLine, score, tone }) {
+  return (
+    <>
         {/* HERO SECTION — tinted background */}
         <div className="bg-[hsl(var(--secondary))] px-3 py-3 border-b border-sky-100">
           <div className="flex items-start justify-between gap-3">
@@ -71,7 +108,6 @@ export default function CityCard({ city }) {
             View details →
           </div>
         </CardContent>
-      </Link>
-    </Card>
+    </>
   );
 }

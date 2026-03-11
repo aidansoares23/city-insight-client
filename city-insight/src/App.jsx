@@ -11,6 +11,7 @@ import { useAuth } from "./auth/authContext";
 import ReviewEditor from "./pages/ReviewEditor";
 import Methodology from "./pages/Methodology";
 import NotFound from "./pages/NotFound";
+import Compare from "./pages/Compare";
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/cities" element={<Cities />} />
           <Route path="/cities/:slug" element={<CityDetail />} />
+          <Route path="/compare" element={<Compare />} />
           <Route path="/methodology" element={<Methodology />} />
 
           {/* Dedicated login route */}
