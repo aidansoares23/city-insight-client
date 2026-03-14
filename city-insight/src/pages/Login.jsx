@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "@/auth/authContext";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -16,6 +17,7 @@ export default function Login() {
   const location = useLocation();
 
   const returnTo = safeReturnTo(location.state?.returnTo) || "/account";
+  const [error, setError] = useState("");
 
   usePageTitle(user ? "Signed in" : "Sign in");
 
@@ -108,9 +110,13 @@ export default function Login() {
                           navigate(returnTo, { replace: true });
                         } catch (e) {
                           console.error(e);
+                          setError("Sign-in failed. Please try again.");
                         }
                       }}
-                      onError={() => console.error("Google Login Error")}
+                      onError={() => {
+                        console.error("Google Login Error");
+                        setError("Sign-in failed. Please try again.");
+                      }}
                       size="large"
                       text="continue_with"
                       shape="pill"
@@ -119,6 +125,12 @@ export default function Login() {
                     />
                   </div>
                 </div>
+
+                {error ? (
+                  <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                    {error}
+                  </div>
+                ) : null}
 
                 {/* trust text, tighter + matches your design language */}
                 <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs leading-relaxed text-slate-600">

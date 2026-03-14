@@ -1,9 +1,3 @@
-// Normalizes common timestamp shapes into a JS Date (or null).
-// Supports:
-// - Firestore Timestamp (value.toDate())
-// - Firestore-like { _seconds } or { seconds }
-// - Date
-// - ISO string / epoch ms
 export function toDate(value) {
   if (value == null) return null;
 

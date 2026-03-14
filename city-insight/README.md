@@ -10,8 +10,8 @@ A React SPA for exploring and comparing California cities using objective metric
 
 - **Browse cities** — view California cities with livability scores and search/filter by name
 - **City detail pages** — objective metrics (safety score, median rent, population), an interactive Leaflet map, user review averages, and a perception-vs-reality chart comparing community sentiment to public data
-- **Write reviews** — authenticated users rate cities 1–10 across safety, cost, traffic, and cleanliness; an overall score is derived automatically
-- **Account page** — view and manage your own reviews across all cities
+- **Write reviews** — authenticated users rate cities 1–10 across safety, affordability, walkability, and cleanliness; an overall score is derived automatically
+- **Account page** — view, edit, and delete your own reviews across all cities; option to delete your account entirely
 - **Google OAuth** — sign in via Google; auth is backed by an httpOnly session cookie with no tokens in localStorage
 - **Methodology page** — transparent, step-by-step explanation of how every score is calculated
 
@@ -30,6 +30,8 @@ A React SPA for exploring and comparing California cities using objective metric
 | HTTP client   | Axios                                                             |
 | Auth          | Google OAuth (`@react-oauth/google`) + server-side session cookie |
 | Icons         | Lucide React                                                      |
+| Class utils   | clsx + tailwind-merge                                             |
+| Testing       | Vitest                                                            |
 
 ---
 
@@ -42,31 +44,34 @@ src/
 ├── auth/
 │   └── authContext.jsx       # AuthContext + useAuth hook (Google login, session bootstrap)
 ├── services/
-│   └── api.js                # Axios instance, CSRF header
+│   └── api.js                # Axios instance, CSRF header, cold-start retry logic
 ├── state/
 │   └── apiStatus.jsx         # Global API status atom (ok / waking / down)
 ├── hooks/
 │   ├── useApiStatus.jsx      # Subscribes to API status state
 │   └── usePageTitle.jsx      # Sets document.title per page
 ├── lib/
-│   ├── cities.js             # City list fetching helpers
+│   ├── cities.js             # City slug parsing (prettyCityFromSlug)
 │   ├── reviews.js            # Review CRUD helpers
 │   ├── ratings.js            # Rating utilities (clamp, average)
 │   ├── format.js             # Number/money/score formatters
 │   ├── datetime.js           # Date formatting
-│   └── routing.js            # Safe returnTo URL validation
+│   ├── routing.js            # Safe returnTo URL validation
+│   └── leafletIcon.js        # Leaflet default marker icon fix for Vite
 ├── pages/
 │   ├── Home.jsx              # Landing page
-│   ├── Cities.jsx            # City list / search
+│   ├── Cities.jsx            # City list with search and grid/map toggle
 │   ├── CityDetail.jsx        # Full city page (metrics, map, reviews, insights)
 │   ├── ReviewEditor.jsx      # Create / edit a review (protected)
-│   ├── Account.jsx           # User's reviews (protected)
+│   ├── Account.jsx           # User profile, review management, account deletion (protected)
 │   ├── Login.jsx             # Google sign-in page
 │   ├── Methodology.jsx       # How scores are calculated
 │   └── NotFound.jsx          # 404
+├── utils/
+│   └── utils.js              # cn() helper (clsx + tailwind-merge)
 ├── components/
 │   ├── layout/               # Layout, Navbar, PageHero, SectionCard, ApiOverlay, ErrorBoundary
-│   ├── city/                 # CityCard, CityMap, PerceptionVsRealityChart
+│   ├── city/                 # CityCard, CityMap, CitiesMap, PerceptionVsRealityChart
 │   ├── reviews/              # ReviewCard
 │   └── ui/                   # Button, Card, Badge, Dialog, Input, Loading, etc.
 └── styles/
@@ -142,6 +147,29 @@ npm run preview    # serve the production build locally
 State-changing requests (POST/PUT/PATCH/DELETE) also send an `X-Requested-With: XMLHttpRequest` header as a lightweight CSRF guard.
 
 Protected routes (`/account`, `/cities/:slug/review`) redirect unauthenticated users to `/login` with a `returnTo` param, so users land back where they started after signing in.
+
+---
+
+## Cold-start handling
+
+The backend runs on a free-tier host that sleeps when idle. The Axios response interceptor in `src/services/api.js` detects cold-start failures (502, 503, or connection timeout) and:
+
+1. Sets the global API status to `"waking"` — the `ApiOverlay` component shows a "waking up" message to the user.
+2. Starts polling `GET /health` with exponential backoff (max 60 s).
+3. Automatically retries the original request once the server responds.
+
+Rate-limit responses (429) are also handled: a dismissible alert is shown and auto-clears after the `Retry-After` window.
+
+---
+
+## Testing
+
+```bash
+npm run test        # run Vitest in watch mode
+npm run test:run    # run once and exit
+```
+
+Unit tests live alongside the files they cover (e.g., `src/lib/ratings.test.js`). They cover utility functions in `src/lib/` such as rating clamping, averaging, and formatting helpers.
 
 ---
 

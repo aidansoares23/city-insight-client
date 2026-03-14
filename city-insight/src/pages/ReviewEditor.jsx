@@ -79,7 +79,7 @@ export default function ReviewEditor() {
 
   const [form, setForm] = useState(() => makeEmptyReviewForm());
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -99,13 +99,13 @@ export default function ReviewEditor() {
       setMode("create");
       setForm(makeEmptyReviewForm());
       setIsLoading(false);
-      setErrorMsg("");
+      setError("");
       return;
     }
 
     let alive = true;
     setIsLoading(true);
-    setErrorMsg("");
+    setError("");
 
     fetchMyReview(slug)
       .then((review) => {
@@ -122,7 +122,7 @@ export default function ReviewEditor() {
       })
       .catch((e) => {
         if (!alive) return;
-        setErrorMsg(
+        setError(
           e?.response?.data?.error?.message || "Failed to load your review.",
         );
       })
@@ -156,7 +156,7 @@ export default function ReviewEditor() {
       if (!slug) return;
 
       setIsSaving(true);
-      setErrorMsg("");
+      setError("");
 
       try {
         const payload = {
@@ -175,7 +175,7 @@ export default function ReviewEditor() {
           state: { reviewSaved: true, created, citySlug: slug },
         });
       } catch (err) {
-        setErrorMsg(
+        setError(
           err?.response?.data?.error?.message || "Failed to save review.",
         );
       } finally {
@@ -193,7 +193,7 @@ export default function ReviewEditor() {
   const executeDelete = useCallback(async () => {
     if (!slug) return;
     setIsDeleting(true);
-    setErrorMsg("");
+    setError("");
     try {
       await deleteMyReview(slug);
       navigate(returnTo, {
@@ -201,7 +201,7 @@ export default function ReviewEditor() {
         state: { reviewDeleted: true, citySlug: slug },
       });
     } catch (err) {
-      setErrorMsg(
+      setError(
         err?.response?.data?.error?.message || "Failed to delete review.",
       );
     } finally {
@@ -246,9 +246,9 @@ export default function ReviewEditor() {
         }
       />
 
-      {errorMsg ? (
+      {error ? (
         <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-          {errorMsg}
+          {error}
         </div>
       ) : null}
 

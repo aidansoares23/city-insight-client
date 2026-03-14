@@ -35,7 +35,6 @@ export default function App() {
     <div>
       <ApiOverlay
         show={status === "waking"}
-        // optional overrides
         title="Waking up City Insight backend…"
         message="The free tier sleeps when idle. First request can take ~30 seconds."
         hint="If it stalls, refresh and try again."
@@ -57,10 +56,8 @@ export default function App() {
           <Route path="/cities/:slug" element={<CityDetail />} />
           <Route path="/methodology" element={<Methodology />} />
 
-          {/* Dedicated login route */}
           <Route path="/login" element={<Login />} />
 
-          {/* Account page shows reviews, protected */}
           <Route
             path="/account"
             element={

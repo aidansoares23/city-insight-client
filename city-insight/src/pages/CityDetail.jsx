@@ -96,7 +96,7 @@ export default function CityDetail() {
   const returnTo = `${location.pathname}${location.search}${location.hash}`;
 
   const [cityData, setCityData] = useState(null);
-  const [cityError, setCityError] = useState("");
+  const [error, setError] = useState("");
   const [isCityLoading, setIsCityLoading] = useState(true);
 
   const [myReview, setMyReview] = useState(null);
@@ -104,6 +104,7 @@ export default function CityDetail() {
 
   const [publicReviews, setPublicReviews] = useState([]);
   const [isPublicLoading, setIsPublicLoading] = useState(false);
+  const [reviewsError, setReviewsError] = useState("");
 
   const [nextCursor, setNextCursor] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -140,7 +141,7 @@ export default function CityDetail() {
     if (!slug) return;
 
     let alive = true;
-    setCityError("");
+    setError("");
     setIsCityLoading(true);
     setCityData(null);
 
@@ -153,7 +154,7 @@ export default function CityDetail() {
       .catch((err) => {
         console.error(err);
         if (!alive) return;
-        setCityError("Failed to load city details.");
+        setError("Failed to load city details.");
       })
       .finally(() => {
         if (!alive) return;
@@ -172,6 +173,7 @@ export default function CityDetail() {
     setIsPublicLoading(true);
     setPublicReviews([]);
     setNextCursor(null);
+    setReviewsError("");
 
     api
       .get(`/cities/${slug}/reviews?pageSize=10`)
@@ -183,8 +185,7 @@ export default function CityDetail() {
       .catch((err) => {
         console.error(err);
         if (!alive) return;
-        setPublicReviews([]);
-        setNextCursor(null);
+        setReviewsError("Failed to load reviews.");
       })
       .finally(() => {
         if (!alive) return;
@@ -248,6 +249,7 @@ export default function CityDetail() {
       setNextCursor(unique.length > 0 ? newCursor : null);
     } catch (e) {
       console.error(e);
+      setReviewsError("Couldn't load more reviews.");
     } finally {
       setIsLoadingMore(false);
     }
@@ -315,15 +317,16 @@ export default function CityDetail() {
       }
     } catch (err) {
       console.error(err);
+      setReviewsError("Failed to delete review.");
     }
   }, [slug, myReview?.id]);
 
   if (isCityLoading) return <Loading />;
 
-  if (cityError) {
+  if (error) {
     return (
       <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-        {cityError}
+        {error}
       </div>
     );
   }
@@ -538,9 +541,15 @@ export default function CityDetail() {
           <div className="text-sm text-slate-600">Loading reviews…</div>
         ) : null}
 
-        {!isPublicLoading && publicReviewsExcludingMine.length === 0 ? (
+        {reviewsError ? (
+          <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+            {reviewsError}
+          </div>
+        ) : null}
+
+        {!isPublicLoading && !reviewsError && publicReviewsExcludingMine.length === 0 ? (
           <div className="text-sm text-slate-600">No reviews yet.</div>
-        ) : (
+        ) : !reviewsError ? (
           <div className="space-y-4">
             {publicReviewsExcludingMine.map((review, idx) => (
               <ReviewCard
@@ -551,7 +560,7 @@ export default function CityDetail() {
               />
             ))}
           </div>
-        )}
+        ) : null}
 
         <div className="pt-4">
           {nextCursor ? (

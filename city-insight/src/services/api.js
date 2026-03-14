@@ -1,11 +1,10 @@
-// src/services/api.js
 import axios from "axios";
 import { setApiStatus } from "@/state/apiStatus";
 
 const api = axios.create({
   baseURL: "/api",
   timeout: 15000,
-  withCredentials: true, // cookie auth
+  withCredentials: true,
 });
 
 function sleep(ms) {
@@ -63,9 +62,9 @@ async function wakeServer({ maxWaitMs = 60000 } = {}) {
   }
 }
 
-function looksLikeColdStart(error) {
-  const code = error.code;
-  const status = error.response?.status;
+function looksLikeColdStart(err) {
+  const code = err.code;
+  const status = err.response?.status;
   return code === "ECONNABORTED" || status === 502 || status === 503 || !status;
 }
 
@@ -94,10 +93,6 @@ api.interceptors.response.use(
     }
 
     if (!looksLikeColdStart(error)) {
-      setApiStatus({
-        status: "down",
-        message: "Backend is currently unavailable. Please try again later.",
-      });
       return Promise.reject(error);
     }
 

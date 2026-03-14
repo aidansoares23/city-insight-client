@@ -16,13 +16,6 @@ function tinyPct(value) {
   return clamp01(n / 10) * 100;
 }
 
-export function ratingLine(ratings) {
-  if (!ratings || typeof ratings !== "object") return "—";
-  const order = ["overall", "safety", "affordability", "walkability", "cleanliness"];
-  return order
-    .map((key) => `${key[0].toUpperCase() + key.slice(1)}: ${ratings?.[key] ?? "—"}/10`)
-    .join(" • ");
-}
 
 function TimestampLine({ createdAtIso, updatedAtIso, isEdited = false, showTime = false }) {
   const createdLabel = createdAtIso

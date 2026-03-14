@@ -51,8 +51,8 @@ export default function Account() {
   const { user, loading: authLoading, logout } = useAuth();
 
   const [myReviews, setMyReviews] = useState([]);
-  const [reviewsLoading, setReviewsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [isReviewsLoading, setIsReviewsLoading] = useState(false);
+  const [error, setError] = useState("");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [pendingDeleteSlug, setPendingDeleteSlug] = useState(null);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
@@ -63,8 +63,8 @@ export default function Account() {
     if (!user) return;
 
     let alive = true;
-    setErrorMsg("");
-    setReviewsLoading(true);
+    setError("");
+    setIsReviewsLoading(true);
 
     fetchMyReviews({ limit: 50 })
       .then((reviews) => {
@@ -72,12 +72,12 @@ export default function Account() {
       })
       .catch((e) => {
         if (alive)
-          setErrorMsg(
+          setError(
             e?.response?.data?.error?.message || "Failed to load reviews",
           );
       })
       .finally(() => {
-        if (alive) setReviewsLoading(false);
+        if (alive) setIsReviewsLoading(false);
       });
 
     return () => {
@@ -107,7 +107,7 @@ export default function Account() {
       );
     } catch (e) {
       console.error(e);
-      setErrorMsg("Failed to delete review.");
+      setError("Failed to delete review.");
     } finally {
       setPendingDeleteSlug(null);
     }
@@ -119,7 +119,7 @@ export default function Account() {
       await logout();
     } catch (e) {
       console.error(e);
-      setErrorMsg("Failed to delete account.");
+      setError("Failed to delete account.");
     }
   }, [logout]);
 
@@ -242,17 +242,17 @@ export default function Account() {
           </div>
 
           <CardContent className="bg-white px-6 py-5">
-            {reviewsLoading ? (
+            {isReviewsLoading ? (
               <div className="text-sm text-slate-600">Loading reviews…</div>
             ) : null}
 
-            {errorMsg ? (
+            {error ? (
               <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-                {errorMsg}
+                {error}
               </div>
             ) : null}
 
-            {!reviewsLoading && !errorMsg && myReviews.length === 0 ? (
+            {!isReviewsLoading && !error && myReviews.length === 0 ? (
               <Card className="border-slate-200/70 shadow-sm ring-1 ring-blue-100/30">
                 <CardContent className="px-6 py-5">
                   <div className="flex items-start gap-3">
@@ -269,7 +269,7 @@ export default function Account() {
               </Card>
             ) : null}
 
-            {!reviewsLoading && !errorMsg && myReviews.length > 0 ? (
+            {!isReviewsLoading && !error && myReviews.length > 0 ? (
               <div className="space-y-3">
                 {myReviews.map((review, index) => {
                   const citySlug = review?.cityId || "unknown-city";
