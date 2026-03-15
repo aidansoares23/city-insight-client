@@ -127,14 +127,14 @@ export default function Navbar() {
         <div className="ml-auto sm:hidden">
           <Button
             variant="outline"
-            className="rounded-full px-3"
+            className="rounded-full px-9"
             type="button"
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {open ? <X className="size-7" /> : <Menu className="size-7" />}
           </Button>
         </div>
       </div>

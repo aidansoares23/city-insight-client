@@ -10,8 +10,8 @@ import api from "@/services/api";
 export function buildReviewsQuery({ pageSize = 10, cursor } = {}) {
   const qs = new URLSearchParams({ pageSize: String(pageSize) });
 
-  if (cursor?.id) qs.set("id", cursor.id);
-  if (cursor?.createdAt) qs.set("createdAt", cursor.createdAt);
+  if (cursor?.id) qs.set("cursorId", cursor.id);
+  if (cursor?.createdAt) qs.set("cursorCreatedAt", cursor.createdAt);
 
   return qs.toString();
 }

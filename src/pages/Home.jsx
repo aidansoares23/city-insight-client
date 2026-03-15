@@ -6,7 +6,7 @@ import { MapPin, Shield, DollarSign, ArrowRight } from "lucide-react";
 export default function Home() {
   return (
     <div className="container mx-auto px-4 sm:px-6">
-      <div className="py-10 sm:py-14">
+      <div className="py-10 sm:py-4">
         <div className="mx-auto w-full max-w-5xl text-center">
           <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/70 p-6 shadow-sm backdrop-blur sm:p-10 lg:p-12">
             <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/50" />

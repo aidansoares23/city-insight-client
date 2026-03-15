@@ -8,8 +8,8 @@ A React SPA for exploring and comparing California cities using objective metric
 
 ## What it does
 
-- **Browse cities** — view California cities with livability scores and search/filter by name
-- **City detail pages** — objective metrics (safety score, median rent, population), an interactive Leaflet map, user review averages, and a perception-vs-reality chart comparing community sentiment to public data
+- **Browse cities** — view California cities with livability scores; search by name and sort by livability, safety, rent, review count, or name; toggle between grid and map views
+- **City detail pages** — objective metrics (safety score, median rent, population), an interactive Leaflet map, paginated user reviews with averages, and a perception-vs-reality chart comparing community sentiment to public data
 - **Write reviews** — authenticated users rate cities 1–10 across safety, affordability, walkability, and cleanliness; an overall score is derived automatically
 - **Account page** — view, edit, and delete your own reviews across all cities; option to delete your account entirely
 - **Google OAuth** — sign in via Google; auth is backed by an httpOnly session cookie with no tokens in localStorage
@@ -46,7 +46,7 @@ src/
 ├── services/
 │   └── api.js                # Axios instance, CSRF header, cold-start retry logic
 ├── state/
-│   └── apiStatus.jsx         # Global API status atom (ok / waking / down)
+│   └── apiStatus.jsx         # Global API status atom (ok / waking / down / rate-limited)
 ├── hooks/
 │   ├── useApiStatus.jsx      # Subscribes to API status state
 │   └── usePageTitle.jsx      # Sets document.title per page
@@ -91,13 +91,13 @@ src/
 ### 1. Install dependencies
 
 ```bash
-cd city-insight
+cd city-insight-client
 npm install
 ```
 
 ### 2. Configure environment variables
 
-Create `.env` in the `city-insight/` directory:
+Create `.env` in the `city-insight-client/` directory:
 
 ```env
 # Point at local backend
@@ -152,9 +152,9 @@ Protected routes (`/account`, `/cities/:slug/review`) redirect unauthenticated u
 
 ## Cold-start handling
 
-The backend runs on a free-tier host that sleeps when idle. The Axios response interceptor in `src/services/api.js` detects cold-start failures (502, 503, or connection timeout) and:
+The backend runs on a free-tier host that sleeps when idle. The Axios response interceptor in `src/services/api.js` detects cold-start failures (502, 503, or connection timeout) and sets the global API status to one of `"ok"` | `"waking"` | `"down"` | `"rate-limited"`. On a cold start it:
 
-1. Sets the global API status to `"waking"` — the `ApiOverlay` component shows a "waking up" message to the user.
+1. Sets the global API status to `"waking"` — the `ApiOverlay` component shows a "Waking up City Insight backend…" message to the user.
 2. Starts polling `GET /health` with exponential backoff (max 60 s).
 3. Automatically retries the original request once the server responds.
 
