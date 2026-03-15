@@ -311,7 +311,7 @@ export default function Methodology() {
               <Pipeline
                 steps={[
                   { icon: Star,       label: "Review submitted", sub: "Create, edit, or delete" },
-                  { icon: Database,   label: "Scores updated",   sub: "Instant, atomic write" },
+                  { icon: Database,   label: "Scores updated",   sub: "Scores saved immediately" },
                   { icon: Calculator, label: "Averages",         sub: "Running totals → avg" },
                   { icon: BarChart3,  label: "Livability",       sub: "Instantly recomputed" },
                 ]}
@@ -511,6 +511,14 @@ export default function Methodology() {
             affordability signal in the Livability score — cities below
             $3,500/mo earn proportional points; above that the rent signal
             contributes 0.
+          </StatCard>
+
+          <StatCard icon={Calculator} title="Affordability score" badge="0–10">
+            Census median rent converted to a 0–10 scale: $0/mo → 10,
+            $3,500/mo → 0. Scores above the ceiling floor at 0. This is the
+            objective counterpart to the community's affordability rating,
+            shown side-by-side on city pages so you can compare what residents
+            feel against what the rent data says.
           </StatCard>
 
           <StatCard icon={Shield} title="Safety score" badge="0–10">
