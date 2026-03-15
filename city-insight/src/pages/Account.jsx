@@ -16,6 +16,7 @@ import { initialsFromUser } from "@/lib/format";
 import { prettyCityFromSlug } from "@/lib/cities";
 import { fetchMyReviews, deleteMyReview, deleteMyAccount } from "@/lib/reviews";
 
+/** Labelled info row with an icon for displaying user profile fields. */
 function InfoRow({ icon: Icon, label, value }) {
   return (
     <div className="grid grid-cols-[20px_1fr] items-start gap-3 text-sm">
@@ -28,6 +29,7 @@ function InfoRow({ icon: Icon, label, value }) {
   );
 }
 
+/** Renders the user's profile picture, or a fallback initials circle if no picture is set. */
 function Avatar({ user }) {
   const src = user?.picture;
   if (src) {
@@ -47,6 +49,7 @@ function Avatar({ user }) {
   );
 }
 
+/** User account page showing profile info, review list with edit/delete, and an account-deletion option. */
 export default function Account() {
   const { user, loading: authLoading, logout } = useAuth();
 

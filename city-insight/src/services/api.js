@@ -7,12 +7,14 @@ const api = axios.create({
   withCredentials: true,
 });
 
+/** Returns a promise that resolves after `ms` milliseconds. */
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 let wakeInFlight = null;
 
+/** GETs `{baseURL}/health` directly via `fetch` (bypasses the axios interceptor). Throws if not ok. */
 async function rawHealthCheck(baseURL) {
   const url = `${baseURL.replace(/\/$/, "")}/health`;
   const res = await fetch(url, { method: "GET" });
@@ -20,6 +22,12 @@ async function rawHealthCheck(baseURL) {
   return true;
 }
 
+/**
+ * Polls the health endpoint with exponential back-off until the server responds
+ * or `maxWaitMs` elapses. Updates global API status throughout.
+ * Deduplicates concurrent calls — only one wake attempt runs at a time.
+ * @returns {Promise<boolean>} `true` if the server came up, `false` if it timed out.
+ */
 async function wakeServer({ maxWaitMs = 60000 } = {}) {
   if (wakeInFlight) return wakeInFlight;
 
@@ -62,6 +70,7 @@ async function wakeServer({ maxWaitMs = 60000 } = {}) {
   }
 }
 
+/** Returns true if an axios error looks like a cold-start / service-unavailable condition. */
 function looksLikeColdStart(err) {
   const code = err.code;
   const status = err.response?.status;
@@ -113,6 +122,7 @@ api.interceptors.response.use(
   },
 );
 
+/** Manually triggers a server wake-up attempt (e.g. from a "Retry" button). */
 export async function retryWakeNow() {
   return wakeServer({ maxWaitMs: 60000 });
 }

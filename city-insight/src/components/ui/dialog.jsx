@@ -5,22 +5,27 @@ import { Dialog as DialogPrimitive } from "radix-ui";
 import { cn } from "@/utils/utils";
 import { Button } from "@/components/ui/button";
 
+/** Radix Dialog root — manages open/close state. */
 function Dialog({ ...props }) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
 
+/** Element that opens the dialog when activated. */
 function DialogTrigger({ ...props }) {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
 }
 
+/** Renders dialog content into a portal outside the current DOM subtree. */
 function DialogPortal({ ...props }) {
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
 }
 
+/** Element that closes the dialog when activated. */
 function DialogClose({ ...props }) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
+/** Semi-transparent backdrop rendered behind the dialog content. */
 function DialogOverlay({ className, ...props }) {
   return (
     <DialogPrimitive.Overlay
@@ -34,6 +39,7 @@ function DialogOverlay({ className, ...props }) {
   );
 }
 
+/** Centred dialog panel with enter/exit animations and an optional close button (`showCloseButton`, default `true`). */
 function DialogContent({
   className,
   children,
@@ -66,6 +72,7 @@ function DialogContent({
   );
 }
 
+/** Dialog header section; stacks title and description vertically. */
 function DialogHeader({ className, ...props }) {
   return (
     <div
@@ -76,6 +83,7 @@ function DialogHeader({ className, ...props }) {
   );
 }
 
+/** Dialog footer with right-aligned action buttons; pass `showCloseButton` to add a built-in close button. */
 function DialogFooter({
   className,
   showCloseButton = false,
@@ -101,6 +109,7 @@ function DialogFooter({
   );
 }
 
+/** Semibold dialog title, linked to the dialog for accessibility. */
 function DialogTitle({ className, ...props }) {
   return (
     <DialogPrimitive.Title
@@ -111,6 +120,7 @@ function DialogTitle({ className, ...props }) {
   );
 }
 
+/** Muted supporting text below the dialog title. */
 function DialogDescription({ className, ...props }) {
   return (
     <DialogPrimitive.Description
@@ -121,6 +131,11 @@ function DialogDescription({ className, ...props }) {
   );
 }
 
+/**
+ * Composed confirmation dialog with Cancel / Confirm buttons.
+ * Pass `requireConfirmText` to force the user to type a specific string
+ * (e.g. the resource name) before the Confirm button enables.
+ */
 function ConfirmDialog({
   open,
   onOpenChange,

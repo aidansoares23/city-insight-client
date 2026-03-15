@@ -17,7 +17,7 @@ import CityMap from "@/components/city/CityMap";
 import { MapPin } from "lucide-react";
 
 import {
-  Car,
+  PersonStanding,
   BarChart3,
   Trash2,
   DollarSign,
@@ -36,11 +36,13 @@ import {
   deleteMyReview as deleteMyReviewApi,
 } from "@/lib/reviews";
 
+/** Formats a numeric value as `"X.X/10"`, or `"—"` if null/non-finite. */
 function fmtOutOf10(value) {
   const num = safeNumOrNull(value);
   return num == null ? "—" : `${num.toFixed(1)}/10`;
 }
 
+/** Summary metric tile showing an icon, title, large value, and a subtitle note. */
 function MetricCard({ title, icon: Icon, value, subtitle }) {
   return (
     <div className="rounded-2xl border border-slate-300/70 bg-white px-6 py-5 shadow-l">
@@ -62,6 +64,7 @@ function MetricCard({ title, icon: Icon, value, subtitle }) {
   );
 }
 
+/** Horizontal rating bar row with an icon, label, progress bar, and numeric score. */
 function RatingRow({ label, value, icon: Icon }) {
   const safeValue = safeNumOrNull(value);
   const pct = safeValue == null ? 0 : clamp01(safeValue / 10) * 100;
@@ -87,6 +90,7 @@ function RatingRow({ label, value, icon: Icon }) {
   );
 }
 
+/** City detail page — loads city data, the current user's review, and public reviews; supports pagination and inline delete. */
 export default function CityDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -243,7 +247,9 @@ export default function CityDetail() {
       const existingIds = new Set(
         publicReviews.map((review) => review?.id).filter(Boolean),
       );
-      const unique = newReviews.filter((review) => !review?.id || !existingIds.has(review.id));
+      const unique = newReviews.filter(
+        (review) => !review?.id || !existingIds.has(review.id),
+      );
 
       setPublicReviews((prev) => [...prev, ...unique]);
       setNextCursor(unique.length > 0 ? newCursor : null);
@@ -313,7 +319,9 @@ export default function CityDetail() {
       const deletedId = myReview?.id;
       setMyReview(null);
       if (deletedId) {
-        setPublicReviews((prev) => prev.filter((review) => review?.id !== deletedId));
+        setPublicReviews((prev) =>
+          prev.filter((review) => review?.id !== deletedId),
+        );
       }
     } catch (err) {
       console.error(err);
@@ -481,7 +489,7 @@ export default function CityDetail() {
           <RatingRow
             label="Walkability"
             value={avgRatings?.walkability}
-            icon={Car}
+            icon={PersonStanding}
           />
           <RatingRow
             label="Cleanliness"
@@ -547,13 +555,18 @@ export default function CityDetail() {
           </div>
         ) : null}
 
-        {!isPublicLoading && !reviewsError && publicReviewsExcludingMine.length === 0 ? (
+        {!isPublicLoading &&
+        !reviewsError &&
+        publicReviewsExcludingMine.length === 0 ? (
           <div className="text-sm text-slate-600">No reviews yet.</div>
         ) : !reviewsError ? (
           <div className="space-y-4">
             {publicReviewsExcludingMine.map((review, idx) => (
               <ReviewCard
-                key={review?.id || `${review?.cityId || slug}__${review?.createdAtIso || idx}`}
+                key={
+                  review?.id ||
+                  `${review?.cityId || slug}__${review?.createdAtIso || idx}`
+                }
                 review={review}
                 variant="list"
                 title="Anonymous"

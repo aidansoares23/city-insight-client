@@ -24,6 +24,7 @@ import {
 
 // ─── Sub-components ────────────────────────────────────────────────────────
 
+/** Small bordered card with an icon, title, and description — used in overview grids. */
 function MiniCard({ icon: Icon, title, children }) {
   return (
     <div className="rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4">
@@ -42,6 +43,7 @@ function MiniCard({ icon: Icon, title, children }) {
   );
 }
 
+/** Card with an icon, title, optional badge, and description — used in data-source sections. */
 function StatCard({ icon: Icon, title, badge, children }) {
   return (
     <div className="rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4">
@@ -199,6 +201,7 @@ function JumpLink({ href, children }) {
 
 // ─── Page ──────────────────────────────────────────────────────────────────
 
+/** Comprehensive methodology page explaining data sources, scoring formulas, and the livability blend. */
 export default function Methodology() {
   usePageTitle("How It Works");
 

@@ -51,6 +51,7 @@ const buttonVariants = cva(
   },
 );
 
+/** Flexible button with CVA-driven variants (`primary`, `secondary`, `danger`) and sizes; use `asChild` to render as another element via Radix Slot. */
 function Button({ className, variant, size, asChild = false, ...props }) {
   const Comp = asChild ? Slot : "button";
   return (

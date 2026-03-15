@@ -26,6 +26,7 @@ const badgeVariants = cva(
   },
 );
 
+/** Small label badge with CVA-driven colour variants; use `asChild` to render as a link or other element. */
 function Badge({ className, variant = "default", asChild = false, ...props }) {
   const Comp = asChild ? Slot.Root : "span";
 

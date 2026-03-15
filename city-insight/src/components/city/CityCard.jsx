@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { fmtMoney, fmtNum, toOutOf10 } from "@/lib/format";
 import { scoreColor } from "@/lib/ratings";
 
+/** Stacked label/value pair used inside `CityCard` metric rows. */
 function Stat({ label, value }) {
   return (
     <div className="space-y-1">
@@ -14,6 +15,7 @@ function Stat({ label, value }) {
   );
 }
 
+/** Card displaying a city's livability score, key metrics (safety, median rent, reviews), and a link to the detail page. */
 export default function CityCard({ city }) {
   const score = toOutOf10(city?.livabilityScore);
   const tone = scoreColor(score);

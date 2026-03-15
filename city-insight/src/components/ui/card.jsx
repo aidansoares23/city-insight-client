@@ -2,6 +2,7 @@
 import * as React from "react";
 import { cn } from "@/utils/utils";
 
+/** Root card container with rounded border and shadow. */
 function Card({ className, ...props }) {
   return (
     <div
@@ -15,6 +16,7 @@ function Card({ className, ...props }) {
   );
 }
 
+/** Card header with a responsive grid layout; automatically adjusts columns when a `CardAction` is present. */
 function CardHeader({ className, ...props }) {
   return (
     <div
@@ -28,6 +30,7 @@ function CardHeader({ className, ...props }) {
   );
 }
 
+/** Semibold card title element. */
 function CardTitle({ className, ...props }) {
   return (
     <div
@@ -38,6 +41,7 @@ function CardTitle({ className, ...props }) {
   );
 }
 
+/** Muted-colour card subtitle / description element. */
 function CardDescription({ className, ...props }) {
   return (
     <div
@@ -48,6 +52,7 @@ function CardDescription({ className, ...props }) {
   );
 }
 
+/** Right-aligned action slot inside `CardHeader`; spans both header rows via CSS grid. */
 function CardAction({ className, ...props }) {
   return (
     <div
@@ -61,6 +66,7 @@ function CardAction({ className, ...props }) {
   );
 }
 
+/** Card body content area with horizontal and vertical padding. */
 function CardContent({ className, ...props }) {
   return (
     <div
@@ -71,6 +77,7 @@ function CardContent({ className, ...props }) {
   );
 }
 
+/** Card footer with flex layout for action buttons or metadata. */
 function CardFooter({ className, ...props }) {
   return (
     <div

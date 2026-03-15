@@ -10,6 +10,7 @@ import { clamp01 } from "@/lib/format";
 import { Pencil, User as UserIcon, MapPin, Trash2 } from "lucide-react";
 import { clampRating10, avgFromCategories, scoreColor } from "@/lib/ratings";
 
+/** Converts a 0–10 rating to a 0–100 percentage clamped to [0, 1] for bar widths. */
 function tinyPct(value) {
   const n = Number(value);
   if (!Number.isFinite(n)) return 0;
@@ -17,6 +18,7 @@ function tinyPct(value) {
 }
 
 
+/** Displays posted and (if edited) last-edited timestamps; returns null if neither date is available. */
 function TimestampLine({ createdAtIso, updatedAtIso, isEdited = false, showTime = false }) {
   const createdLabel = createdAtIso
     ? showTime
@@ -42,6 +44,7 @@ function TimestampLine({ createdAtIso, updatedAtIso, isEdited = false, showTime 
   );
 }
 
+/** Renders review comment text with expand/collapse for long content (threshold: `clampChars`). */
 function CommentBlock({ text, clampChars = 180 }) {
   const trimmed = (text || "").trim();
   const [open, setOpen] = useState(false);
@@ -71,6 +74,7 @@ function CommentBlock({ text, clampChars = 180 }) {
   );
 }
 
+/** Displays the overall score as a colour-coded badge (e.g. `7/10 Overall`). */
 function OverallBlock({ score }) {
   const { badge: badgeClass } = scoreColor(score);
 
@@ -87,6 +91,7 @@ function OverallBlock({ score }) {
   );
 }
 
+/** Grid of mini progress bars for safety, affordability, walkability, and cleanliness ratings. */
 function MiniBars({ ratings, barClassName = "bg-blue-500/35" }) {
   const items = [
     ["Safety", clampRating10(ratings?.safety)],
@@ -123,6 +128,10 @@ function MiniBars({ ratings, barClassName = "bg-blue-500/35" }) {
   );
 }
 
+/**
+ * Full review card showing scores, category bars, comment, author/city info, and optional edit/delete actions.
+ * `variant` controls layout and auth-gated actions: `"public"` | `"account"` | `"list"`.
+ */
 export default function ReviewCard({
   review,
   variant = "public",

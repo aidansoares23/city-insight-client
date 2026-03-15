@@ -12,6 +12,7 @@ import ReviewEditor from "./pages/ReviewEditor";
 import Methodology from "./pages/Methodology";
 import NotFound from "./pages/NotFound";
 
+/** Route guard that redirects unauthenticated users to `/login`, preserving the intended path in router state. */
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
   const location = useLocation();

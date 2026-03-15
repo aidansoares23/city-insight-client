@@ -1,4 +1,5 @@
 import { cn } from "@/utils/utils";
+/** Reusable page-header section with a large title, optional description, and an optional right-aligned aside. */
 export default function PageHero({
   title,
   description,

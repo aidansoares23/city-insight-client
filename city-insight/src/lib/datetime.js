@@ -1,3 +1,10 @@
+/**
+ * Coerces a value to a native `Date`.
+ * Accepts a Firestore `Timestamp`, a Firestore-like `{ seconds }` / `{ _seconds }` object,
+ * a native `Date`, an ISO string, or a numeric epoch. Returns `null` for anything invalid.
+ * @param {unknown} value
+ * @returns {Date|null}
+ */
 export function toDate(value) {
   if (value == null) return null;
 
@@ -25,6 +32,7 @@ export function toDate(value) {
   return Number.isFinite(dt.getTime()) ? dt : null;
 }
 
+/** Formats a date-time value as a locale string; defaults to medium date + short time. Returns `—` if invalid. */
 export function fmtDateTime(value, opts) {
   const dt = toDate(value);
   if (!dt) return "—";
@@ -34,6 +42,7 @@ export function fmtDateTime(value, opts) {
   );
 }
 
+/** Formats a date value as a locale date-only string; defaults to medium date style. Returns `—` if invalid. */
 export function fmtDate(value, opts) {
   const dt = toDate(value);
   if (!dt) return "—";

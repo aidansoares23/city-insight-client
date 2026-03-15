@@ -3,6 +3,7 @@ import { Separator as SeparatorPrimitive } from "radix-ui";
 
 import { cn } from "@/utils/utils";
 
+/** Radix-based horizontal or vertical rule; decorative by default (excluded from accessibility tree). */
 function Separator({
   className,
   orientation = "horizontal",

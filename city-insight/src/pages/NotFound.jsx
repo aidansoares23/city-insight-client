@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Home as HomeIcon } from "lucide-react";
 
+/** Truncates a pathname to 48 characters with an ellipsis to prevent overflow on mobile. */
 function nicePathname(pathname) {
   const raw = typeof pathname === "string" ? pathname : "";
   const safe = raw.trim() || "/";
@@ -9,6 +10,7 @@ function nicePathname(pathname) {
   return safe.length > 48 ? safe.slice(0, 48) + "…" : safe;
 }
 
+/** 404 page displaying the attempted path with links back to Cities and Home. */
 export default function NotFound() {
   const location = useLocation();
   const path = nicePathname(location?.pathname);

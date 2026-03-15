@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { Link } from "react-router-dom";
 
+/** Leaflet map rendering all cities that have valid coordinates as markers with name/link popups. */
 export default function CitiesMap({ cities = [] }) {
   // Only keep cities that have valid coordinates
   const mapped = cities.filter(

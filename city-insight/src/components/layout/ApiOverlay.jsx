@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Loader2, Server } from "lucide-react";
 
+/** Full-screen modal overlay displayed while the backend is waking up; locks body scroll when visible. */
 export default function ApiOverlay({ show, title, message, hint }) {
   useEffect(() => {
     if (!show) return;

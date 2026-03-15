@@ -1,10 +1,12 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
+/** Opens the given coordinates in Google Maps in a new tab. */
 function openInGoogleMaps(lat, lng) {
   const url = `https://www.google.com/maps?q=${lat},${lng}`;
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
+/** Single-city Leaflet map with a title bar, coordinate display, and "Open in Maps" button. Returns null if coordinates are missing. */
 export default function CityMap({ cityName, state, lat, lng, zoom = 11 }) {
   const hasCoords = Number.isFinite(lat) && Number.isFinite(lng);
   if (!hasCoords) return null;

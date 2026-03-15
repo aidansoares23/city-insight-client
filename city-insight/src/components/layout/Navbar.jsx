@@ -4,6 +4,7 @@ import { useAuth } from "@/auth/authContext";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
+/** Desktop pill-style `NavLink` with active highlight using the primary colour token. */
 function PillNavLink({ to, children }) {
   return (
     <NavLink
@@ -24,6 +25,7 @@ function PillNavLink({ to, children }) {
   );
 }
 
+/** Full-width mobile nav item with a right-arrow indicator and active highlight. */
 function MobileNavLink({ to, onClick, children }) {
   return (
     <NavLink
@@ -44,6 +46,7 @@ function MobileNavLink({ to, onClick, children }) {
   );
 }
 
+/** Compact pill-style `NavLink` used in the top row of the mobile drawer. */
 function MobilePillNavLink({ to, children }) {
   return (
     <NavLink
@@ -63,6 +66,7 @@ function MobilePillNavLink({ to, children }) {
   );
 }
 
+/** Sticky top navbar with responsive desktop nav links, auth controls, and an animated mobile dropdown. */
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
   const [open, setOpen] = useState(false);

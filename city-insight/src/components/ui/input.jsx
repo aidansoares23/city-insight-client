@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { cn } from "@/utils/utils";
 
+/** Styled text input with focus ring, validation states, and file-upload appearance. */
 function Input({ className, type, ...props }) {
   return (
     <input

@@ -10,6 +10,7 @@ import api from "../services/api";
 
 const AuthContext = createContext(null);
 
+/** Context provider that manages the session user state and exposes auth methods to the component tree. */
 export function AuthProvider({ children }) {
   const [sessionUser, setSessionUser] = useState(null);
   const [isBootstrapping, setIsBootstrapping] = useState(true);
@@ -17,9 +18,12 @@ export function AuthProvider({ children }) {
   // Guards against setting state after unmount (or after a newer request finishes).
   const didUnmountRef = useRef(false);
 
-  // Session is stored in an httpOnly cookie JS can’t read, so /api/me is the
-  // only way to know who’s logged in. Fail closed: any error except 401 still
-  // clears the user rather than leaving stale auth state.
+  /**
+   * Fetches the current session user from `/api/me` and updates state.
+   * Session is stored in an httpOnly cookie JS can’t read, so this endpoint is the
+   * only way to know who is logged in. Fail-closed: any error except 401 still
+   * clears the user to avoid leaving stale auth state.
+   */
   async function refreshSessionUser() {
     try {
       const response = await api.get("/me");
@@ -54,12 +58,14 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  /** Exchanges a Google ID token for a server session, then refreshes the session user. */
   async function loginWithGoogleIdToken(googleIdToken) {
     const res = await api.post("/auth/login", { idToken: googleIdToken });
     await refreshSessionUser();
     return res.data;
   }
 
+  /** Clears the server-side session cookie and resets local session state to null. */
   async function logout() {
     try {
       await api.post("/auth/logout");
@@ -84,6 +90,7 @@ export function AuthProvider({ children }) {
   );
 }
 
+/** Returns the auth context value; throws if called outside of `<AuthProvider>`. */
 export function useAuth() {
   const auth = useContext(AuthContext);
   if (!auth) throw new Error("useAuth must be used inside <AuthProvider>");

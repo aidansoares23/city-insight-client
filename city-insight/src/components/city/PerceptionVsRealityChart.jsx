@@ -4,15 +4,15 @@
 // - `objective` is the metric score (reality)
 // The UI currently renders only the first valid row in `rows`.
 
+/** Clamps any numeric-ish input to the range [0, 1]; returns 0 for non-finite values. */
 function clampToUnitInterval(value) {
-  // Clamp any numeric-ish input to the range [0, 1].
   const n = Number(value);
   if (!Number.isFinite(n)) return 0;
   return Math.max(0, Math.min(1, n));
 }
 
+/** Formats a number to one decimal place (e.g. `7.3`); returns `—` for non-finite values. */
 function formatOneDecimal(value) {
-  // Display numbers like 7.3, otherwise an em dash.
   const n = Number(value);
   return Number.isFinite(n) ? (Math.round(n * 10) / 10).toFixed(1) : "—";
 }
@@ -140,6 +140,7 @@ function CompareRow({ label, user, objective, polarity = "higher_is_better" }) {
   );
 }
 
+/** Renders a perception-vs-reality comparison for the first valid row in `rows`. */
 export default function PerceptionVsRealityChart({ rows }) {
   // Keep only rows that have at least one meaningful value.
   const validRows = (Array.isArray(rows) ? rows : []).filter(

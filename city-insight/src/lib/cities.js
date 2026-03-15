@@ -1,11 +1,17 @@
+/** Capitalizes the first character of a word; returns `""` for empty input. */
 function titleCaseWord(word) {
   if (!word) return "";
   const s = String(word);
   return s[0].toUpperCase() + s.slice(1);
 }
 
-// "san-jose-ca" -> "San Jose, CA"
-// If last token looks like a 2-letter state, format as "City, ST", else just Title Case tokens.
+/**
+ * Converts a city URL slug to a display name (e.g. `"san-jose-ca"` → `"San Jose, CA"`).
+ * If the last token is a 2-letter state code it is formatted as `"City, ST"`;
+ * otherwise all tokens are title-cased and joined with spaces.
+ * @param {string} slug
+ * @returns {string}
+ */
 export function prettyCityFromSlug(slug) {
   if (typeof slug !== "string") return "City";
 

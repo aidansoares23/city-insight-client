@@ -37,6 +37,7 @@ const RATING_LABELS = {
 
 const COMMENT_MAX = 800;
 
+/** Range-slider row for a single rating category; calls `onChange` with the new string value. */
 function RatingRow({ label, value, onChange }) {
   const safeValue = Number.isFinite(Number(value)) ? Number(value) : 0;
 
@@ -62,6 +63,7 @@ function RatingRow({ label, value, onChange }) {
   );
 }
 
+/** Review create/edit form — loads an existing review if one exists, then saves or deletes via the API. */
 export default function ReviewEditor() {
   const { slug } = useParams();
   const navigate = useNavigate();
