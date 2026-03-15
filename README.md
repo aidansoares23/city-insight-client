@@ -1,4 +1,4 @@
-# City Insight — Frontend
+# City Insight — Client
 
 A React SPA for exploring and comparing California cities using objective metrics and community reviews.
 
