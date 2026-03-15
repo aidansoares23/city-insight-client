@@ -219,8 +219,10 @@ export default function CityDetail() {
         if (!alive) return;
         setMyReview(res.data?.review ?? null);
       })
-      .catch(() => {
+      .catch((err) => {
         if (!alive) return;
+        // 404 means no review yet — anything else is unexpected
+        if (err?.response?.status !== 404) console.error(err);
         setMyReview(null);
       })
       .finally(() => {
@@ -518,13 +520,13 @@ export default function CityDetail() {
         action={myReviewAction}
       >
         {myReviewState === "auth_loading" ? (
-          <div className="text-sm text-slate-600">Checking sign-in…</div>
+          <Loading label="Checking sign-in…" />
         ) : myReviewState === "signed_out" ? (
           <div className="text-sm text-slate-600">
             Sign in to leave a review for this city.
           </div>
         ) : myReviewState === "review_loading" ? (
-          <div className="text-sm text-slate-600">Loading your review…</div>
+          <Loading label="Loading your review…" />
         ) : myReviewState === "no_review" ? (
           <div className="text-sm text-slate-600">
             You haven't reviewed this city yet.
@@ -545,9 +547,7 @@ export default function CityDetail() {
         title="Reviews"
         subtitle="Public reviews for this city."
       >
-        {isPublicLoading ? (
-          <div className="text-sm text-slate-600">Loading reviews…</div>
-        ) : null}
+        {isPublicLoading ? <Loading label="Loading reviews…" /> : null}
 
         {reviewsError ? (
           <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">

@@ -74,6 +74,7 @@ export default function Account() {
         if (alive) setMyReviews(reviews);
       })
       .catch((e) => {
+        console.error(e);
         if (alive)
           setError(
             e?.response?.data?.error?.message || "Failed to load reviews",
@@ -245,9 +246,7 @@ export default function Account() {
           </div>
 
           <CardContent className="bg-white px-6 py-5">
-            {isReviewsLoading ? (
-              <div className="text-sm text-slate-600">Loading reviews…</div>
-            ) : null}
+            {isReviewsLoading ? <Loading label="Loading reviews…" /> : null}
 
             {error ? (
               <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">

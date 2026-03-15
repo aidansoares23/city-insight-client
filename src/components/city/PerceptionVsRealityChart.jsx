@@ -79,7 +79,6 @@ function CompareRow({ label, user, objective, polarity = "higher_is_better" }) {
     <div className="rounded-2xl border border-slate-200 bg-white p-4">
       <div className="flex items-center justify-between gap-3">
         <div className="text-sm font-semibold text-slate-900">{label}</div>
-        {/* <div className="text-xs text-slate-500">Scale: 0–10</div> */}
       </div>
 
       <div className="mt-3 space-y-3">

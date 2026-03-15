@@ -153,7 +153,9 @@ function ConfirmDialog({
     if (!open) setInputValue("");
   }, [open]);
 
-  const confirmed = !requireConfirmText || inputValue === requireConfirmText;
+  const confirmed =
+    !requireConfirmText ||
+    inputValue.trim().toLowerCase() === requireConfirmText.toLowerCase();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

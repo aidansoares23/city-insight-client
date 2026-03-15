@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/auth/authContext";
 
 import { Button } from "@/components/ui/button";
+import { Loading } from "@/components/ui/loading";
 import { ConfirmDialog } from "@/components/ui/dialog";
 import PageHero from "@/components/layout/PageHero";
 import { BackLink } from "@/components/ui/back-link";
@@ -123,6 +124,7 @@ export default function ReviewEditor() {
         setForm(normalizeReviewToForm(review));
       })
       .catch((e) => {
+        console.error(e);
         if (!alive) return;
         setError(
           e?.response?.data?.error?.message || "Failed to load your review.",
@@ -169,7 +171,10 @@ export default function ReviewEditor() {
           comment: form.comment?.trim() ? form.comment.trim() : null,
         };
 
-        const res = await upsertMyReview(slug, payload);
+        const timeout = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("timeout")), 30_000),
+        );
+        const res = await Promise.race([upsertMyReview(slug, payload), timeout]);
         const created = !!res?.data?.created;
 
         navigate(returnTo, {
@@ -178,7 +183,9 @@ export default function ReviewEditor() {
         });
       } catch (err) {
         setError(
-          err?.response?.data?.error?.message || "Failed to save review.",
+          err?.message === "timeout"
+            ? "Request timed out. Please check your connection and try again."
+            : err?.response?.data?.error?.message || "Failed to save review.",
         );
       } finally {
         setIsSaving(false);
@@ -212,7 +219,7 @@ export default function ReviewEditor() {
   }, [slug, navigate, returnTo]);
 
   if (authLoading || isLoading) {
-    return <div className="text-sm text-slate-600">Loading…</div>;
+    return <Loading variant="page" />;
   }
 
   const headerTitle =
