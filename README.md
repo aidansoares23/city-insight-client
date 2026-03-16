@@ -6,6 +6,20 @@ A React SPA for exploring and comparing California cities using objective metric
 
 ---
 
+## Table of Contents
+
+- [What it does](#what-it-does)
+- [Tech stack](#tech-stack)
+- [Project structure](#project-structure)
+- [How to run locally](#how-to-run-locally)
+- [Environment variables](#environment-variables)
+- [Authentication flow](#authentication-flow)
+- [Cold-start handling](#cold-start-handling)
+- [Testing](#testing)
+- [Linting](#linting)
+
+---
+
 ## What it does
 
 - **Browse cities** — view California cities with livability scores; search by name and sort by livability, safety, rent, review count, or name; toggle between grid and map views
