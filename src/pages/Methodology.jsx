@@ -56,7 +56,9 @@ function StatCard({ icon: Icon, title, badge, children }) {
         <div className="font-medium text-slate-900">{title}</div>
         {badge ? <Badge variant="secondary">{badge}</Badge> : null}
       </div>
-      <p className="mt-2.5 text-sm leading-relaxed text-slate-600">{children}</p>
+      <p className="mt-2.5 text-sm leading-relaxed text-slate-600">
+        {children}
+      </p>
     </div>
   );
 }
@@ -214,7 +216,9 @@ export default function Methodology() {
 
       {/* ── Jump nav ───────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-1 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
-        <span className="mr-1 text-xs font-medium text-slate-400">Jump to:</span>
+        <span className="mr-1 text-xs font-medium text-slate-400">
+          Jump to:
+        </span>
         <JumpLink href="#glance">At a glance</JumpLink>
         <JumpLink href="#pipeline">Data pipeline</JumpLink>
         <JumpLink href="#scores">Score formulas</JumpLink>
@@ -253,8 +257,8 @@ export default function Methodology() {
             Public datasets (Census, crime) are refreshed{" "}
             <span className="font-medium text-slate-700">once per week</span>.
             Review averages and Livability scores update{" "}
-            <span className="font-medium text-slate-700">instantly</span>{" "}
-            the moment a review is submitted, edited, or removed.
+            <span className="font-medium text-slate-700">instantly</span> the
+            moment a review is submitted, edited, or removed.
           </MiniCard>
 
           <MiniCard icon={Calculator} title="What we compute">
@@ -293,10 +297,26 @@ export default function Methodology() {
             <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-5 py-6">
               <Pipeline
                 steps={[
-                  { icon: Users,      label: "Census & Crime",  sub: "Population, rent, crime counts" },
-                  { icon: Calculator, label: "Normalize",        sub: "Rates per 100k residents" },
-                  { icon: Shield,     label: "Safety score",    sub: "0–10, weighted formula" },
-                  { icon: BarChart3,  label: "Livability",      sub: "0–100 blended score" },
+                  {
+                    icon: Users,
+                    label: "Census & Crime",
+                    sub: "Population, rent, crime counts",
+                  },
+                  {
+                    icon: Calculator,
+                    label: "Normalize",
+                    sub: "Rates per 100k residents",
+                  },
+                  {
+                    icon: Shield,
+                    label: "Safety score",
+                    sub: "0–10, weighted formula",
+                  },
+                  {
+                    icon: BarChart3,
+                    label: "Livability",
+                    sub: "0–100 blended score",
+                  },
                 ]}
               />
             </div>
@@ -310,10 +330,26 @@ export default function Methodology() {
             <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-5 py-6">
               <Pipeline
                 steps={[
-                  { icon: Star,       label: "Review submitted", sub: "Create, edit, or delete" },
-                  { icon: Database,   label: "Scores updated",   sub: "Scores saved immediately" },
-                  { icon: Calculator, label: "Averages",         sub: "Running totals → avg" },
-                  { icon: BarChart3,  label: "Livability",       sub: "Instantly recomputed" },
+                  {
+                    icon: Star,
+                    label: "Review submitted",
+                    sub: "Create, edit, or delete",
+                  },
+                  {
+                    icon: Database,
+                    label: "Scores updated",
+                    sub: "Scores saved immediately",
+                  },
+                  {
+                    icon: Calculator,
+                    label: "Averages",
+                    sub: "Running totals → avg",
+                  },
+                  {
+                    icon: BarChart3,
+                    label: "Livability",
+                    sub: "Instantly recomputed",
+                  },
                 ]}
               />
             </div>
@@ -336,8 +372,7 @@ export default function Methodology() {
             <span className="font-medium text-slate-700">
               safety, affordability, walkability,
             </span>{" "}
-            and{" "}
-            <span className="font-medium text-slate-700">cleanliness</span>.
+            and <span className="font-medium text-slate-700">cleanliness</span>.
             Each is an integer from 1–10. An{" "}
             <span className="font-medium text-slate-700">overall</span> score is
             then automatically derived as the simple average of the four,
@@ -514,11 +549,11 @@ export default function Methodology() {
           </StatCard>
 
           <StatCard icon={Calculator} title="Affordability score" badge="0–10">
-            Census median rent converted to a 0–10 scale: $0/mo → 10,
-            $3,500/mo → 0. Scores above the ceiling floor at 0. This is the
-            objective counterpart to the community's affordability rating,
-            shown side-by-side on city pages so you can compare what residents
-            feel against what the rent data says.
+            Census median rent converted to a 0–10 scale: $0/mo → 10, $3,500/mo
+            → 0. Scores above the ceiling floor at 0. This is the objective
+            counterpart to the community's affordability rating, shown
+            side-by-side on city pages so you can compare what residents feel
+            against what the rent data says.
           </StatCard>
 
           <StatCard icon={Shield} title="Safety score" badge="0–10">
@@ -533,8 +568,8 @@ export default function Methodology() {
             title="Review ratings"
             badge="1–10 integer"
           >
-            Four integer ratings per review: safety, affordability, walkability, and
-            cleanliness. An overall score is automatically derived as their
+            Four integer ratings per review: safety, affordability, walkability,
+            and cleanliness. An overall score is automatically derived as their
             average (rounded to the nearest integer). Each city's per-category
             average updates in real time on every review change. Optional
             written notes up to 800 characters.
@@ -607,8 +642,6 @@ export default function Methodology() {
             <div className="text-sm font-semibold text-slate-900">
               Sign-in &amp; privacy
             </div>
-            <Badge variant="secondary">Google OAuth</Badge>
-            <Badge variant="secondary">HTTP-only cookie</Badge>
           </div>
 
           <p className="mt-2 text-sm text-slate-600">
@@ -617,34 +650,12 @@ export default function Methodology() {
             reviews publicly. We never see your Google password or access
             anything beyond that scope.
           </p>
-
-          <details className="mt-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-4 py-3">
-            <summary className="cursor-pointer text-sm font-semibold text-slate-900">
-              Technical details
-            </summary>
-            <div className="mt-3 space-y-2 text-sm text-slate-600">
-              <p>
-                After Google sign-in, the server verifies your ID token and
-                issues a signed session stored in an HTTP-only cookie named{" "}
-                <Mono>ci_session</Mono> (7-day expiry). The cookie is sent
-                automatically with every subsequent request.
-              </p>
-              <p>
-                Because it's HTTP-only, the token is invisible to JavaScript —
-                limiting XSS token-theft risk. State-changing requests
-                (POST/PUT/PATCH/DELETE) additionally require an{" "}
-                <Mono>X-Requested-With: XMLHttpRequest</Mono> header as a
-                lightweight CSRF guard. Signing out invalidates the session
-                immediately.
-              </p>
-            </div>
-          </details>
         </div>
       </SectionCard>
 
       {/* ── Bottom CTA ─────────────────────────────────────────────────── */}
-      <div className="flex flex-col items-center gap-3 rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-6 py-8 text-center">
-        <p className="text-sm text-slate-600">
+      <div className="flex flex-col items-center gap-3 rounded-2xl px-6 py-8 text-center">
+        <p className="text-md text-slate-800">
           Now you know how it works — go see for yourself.
         </p>
         <Button asChild variant="primary" size="lg">
