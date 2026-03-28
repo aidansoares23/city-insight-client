@@ -9,12 +9,13 @@ import { usePageTitle } from "@/hooks/usePageTitle";
 import PageHero from "@/components/layout/PageHero";
 import { Loading } from "@/components/ui/loading";
 
-import { ShieldCheck, Mail, Calendar, Trash2 } from "lucide-react";
+import { ShieldCheck, Mail, Calendar, Trash2, Heart } from "lucide-react";
 
 import { fmtDateTime } from "@/lib/datetime";
 import { initialsFromUser } from "@/lib/format";
 import { prettyCityFromSlug } from "@/lib/cities";
 import { fetchMyReviews, deleteMyReview, deleteMyAccount } from "@/lib/reviews";
+import { fetchMyFavorites, removeFavorite } from "@/lib/favorites";
 
 /** Labelled info row with an icon for displaying user profile fields. */
 function InfoRow({ icon: Icon, label, value }) {
@@ -60,6 +61,11 @@ export default function Account() {
   const [pendingDeleteSlug, setPendingDeleteSlug] = useState(null);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
+  const [myFavorites, setMyFavorites] = useState([]);
+  const [isFavoritesLoading, setIsFavoritesLoading] = useState(false);
+  const [favoritesError, setFavoritesError] = useState("");
+  const [unfavoriteLoadingSlug, setUnfavoriteLoadingSlug] = useState(null);
+
   usePageTitle(authLoading ? "Account" : user ? "Account" : "Sign in");
 
   useEffect(() => {
@@ -82,6 +88,33 @@ export default function Account() {
       })
       .finally(() => {
         if (alive) setIsReviewsLoading(false);
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    let alive = true;
+    setFavoritesError("");
+    setIsFavoritesLoading(true);
+
+    fetchMyFavorites()
+      .then((favorites) => {
+        if (alive) setMyFavorites(favorites);
+      })
+      .catch((e) => {
+        console.error(e);
+        if (alive)
+          setFavoritesError(
+            e?.response?.data?.error?.message || "Failed to load favorites",
+          );
+      })
+      .finally(() => {
+        if (alive) setIsFavoritesLoading(false);
       });
 
     return () => {
@@ -126,6 +159,20 @@ export default function Account() {
       setError("Failed to delete account.");
     }
   }, [logout]);
+
+  const onUnfavorite = useCallback(async (citySlug) => {
+    if (!citySlug) return;
+    setUnfavoriteLoadingSlug(citySlug);
+    try {
+      await removeFavorite(citySlug);
+      setMyFavorites((prev) => prev.filter((f) => f.cityId !== citySlug));
+    } catch (e) {
+      console.error(e);
+      setFavoritesError("Failed to remove favorite.");
+    } finally {
+      setUnfavoriteLoadingSlug(null);
+    }
+  }, []);
 
   if (authLoading) return <Loading />;
 
@@ -296,6 +343,75 @@ export default function Account() {
                       editState={{ returnTo: "/account" }}
                       onDelete={() => onDeleteReview(citySlug)}
                     />
+                  );
+                })}
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+
+        <Card className="overflow-hidden border-slate-200 bg-white p-0 shadow-l transition-transform duration-200 hover:-translate-y-0.5">
+          <div className="relative bg-[hsl(var(--secondary))] px-6 py-6">
+            <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5" />
+            <div className="min-w-0">
+              <h2 className="truncate text-xl font-semibold tracking-tight text-slate-900">
+                Favorite Cities
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Cities you've saved for easy access.
+              </p>
+            </div>
+          </div>
+
+          <CardContent className="bg-white px-6 py-5">
+            {isFavoritesLoading ? <Loading label="Loading favorites…" /> : null}
+
+            {favoritesError ? (
+              <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                {favoritesError}
+              </div>
+            ) : null}
+
+            {!isFavoritesLoading && !favoritesError && myFavorites.length === 0 ? (
+              <Card className="border-slate-200/70 shadow-sm ring-1 ring-blue-100/30">
+                <CardContent className="px-6 py-5">
+                  <div className="text-base font-semibold text-slate-900">
+                    No favorites yet.
+                  </div>
+                  <div className="mt-1 text-sm text-slate-600">
+                    Favorite a city on its detail page and it'll appear here.
+                  </div>
+                </CardContent>
+              </Card>
+            ) : null}
+
+            {!isFavoritesLoading && !favoritesError && myFavorites.length > 0 ? (
+              <div className="space-y-2">
+                {myFavorites.map((fav) => {
+                  const slug = fav.cityId;
+                  const label = prettyCityFromSlug(slug);
+                  const isRemoving = unfavoriteLoadingSlug === slug;
+                  return (
+                    <div
+                      key={slug}
+                      className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3"
+                    >
+                      <a
+                        href={`/cities/${slug}`}
+                        className="min-w-0 truncate text-sm font-semibold text-slate-900 underline-offset-2 hover:underline"
+                      >
+                        {label}
+                      </a>
+                      <button
+                        onClick={() => onUnfavorite(slug)}
+                        disabled={isRemoving}
+                        aria-label={`Remove ${label} from favorites`}
+                        className="shrink-0 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:pointer-events-none disabled:opacity-50"
+                      >
+                        <Heart className="h-3.5 w-3.5 fill-rose-400 text-rose-400" />
+                        {isRemoving ? "Removing…" : "Unfavorite"}
+                      </button>
+                    </div>
                   );
                 })}
               </div>

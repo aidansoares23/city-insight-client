@@ -1,4 +1,4 @@
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams, useLocation, Link } from "react-router-dom";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import api from "@/services/api";
 import { useAuth } from "@/auth/authContext";
@@ -14,7 +14,8 @@ import PerceptionVsRealityChart from "@/components/city/PerceptionVsRealityChart
 import { Loading } from "@/components/ui/loading";
 
 import CityMap from "@/components/city/CityMap";
-import { MapPin } from "lucide-react";
+import CityRadarChart from "@/components/city/CityRadarChart";
+import { MapPin, Activity } from "lucide-react";
 
 import {
   PersonStanding,
@@ -35,6 +36,10 @@ import {
   buildReviewsQuery,
   deleteMyReview as deleteMyReviewApi,
 } from "@/lib/reviews";
+import { upsertReaction, deleteReaction } from "@/lib/reactions";
+import { fetchMyFavorites, addFavorite, removeFavorite } from "@/lib/favorites";
+import FavoriteButton from "@/components/city/FavoriteButton";
+import { GitCompareArrows } from "lucide-react";
 
 /** Formats a numeric value as `"X.X/10"`, or `"—"` if null/non-finite. */
 function fmtOutOf10(value) {
@@ -114,6 +119,14 @@ export default function CityDetail() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+
+  // Map of reviewId -> { reactions: {helpful,agree,disagree}, myReaction: type|null }
+  const [reactionState, setReactionState] = useState({});
+  // Set of reviewIds with in-flight reaction API calls
+  const [reactingIds, setReactingIds] = useState(new Set());
+
   const city = cityData?.city ?? null;
   const stats = cityData?.stats ?? null;
   const metrics = cityData?.metrics ?? null;
@@ -183,8 +196,22 @@ export default function CityDetail() {
       .get(`/cities/${slug}/reviews?pageSize=10`)
       .then((res) => {
         if (!alive) return;
-        setPublicReviews(res.data?.reviews || []);
+        const reviews = res.data?.reviews || [];
+        setPublicReviews(reviews);
         setNextCursor(res.data?.nextCursor || null);
+        // Seed reaction state from API response
+        setReactionState((prev) => {
+          const next = { ...prev };
+          reviews.forEach((r) => {
+            if (r?.id) {
+              next[r.id] = {
+                reactions: r.reactions ?? { helpful: 0, agree: 0, disagree: 0 },
+                myReaction: r.myReaction ?? null,
+              };
+            }
+          });
+          return next;
+        });
       })
       .catch((err) => {
         console.error(err);
@@ -255,6 +282,18 @@ export default function CityDetail() {
 
       setPublicReviews((prev) => [...prev, ...unique]);
       setNextCursor(unique.length > 0 ? newCursor : null);
+      setReactionState((prev) => {
+        const next = { ...prev };
+        unique.forEach((r) => {
+          if (r?.id) {
+            next[r.id] = {
+              reactions: r.reactions ?? { helpful: 0, agree: 0, disagree: 0 },
+              myReaction: r.myReaction ?? null,
+            };
+          }
+        });
+        return next;
+      });
     } catch (e) {
       console.error(e);
       setReviewsError("Couldn't load more reviews.");
@@ -262,6 +301,49 @@ export default function CityDetail() {
       setIsLoadingMore(false);
     }
   }, [slug, nextCursor, isLoadingMore, publicReviews]);
+
+  // Load favorite status when user + slug are known
+  useEffect(() => {
+    if (!user || !slug) {
+      setIsFavorited(false);
+      return;
+    }
+
+    let alive = true;
+    fetchMyFavorites()
+      .then((favorites) => {
+        if (!alive) return;
+        setIsFavorited(favorites.some((f) => f.cityId === slug));
+      })
+      .catch(() => {
+        // Non-critical — silently ignore
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, [user, slug]);
+
+  const toggleFavorite = useCallback(async () => {
+    if (!user) {
+      goLoginAndReturn();
+      return;
+    }
+    setFavoriteLoading(true);
+    try {
+      if (isFavorited) {
+        await removeFavorite(slug);
+        setIsFavorited(false);
+      } else {
+        await addFavorite(slug);
+        setIsFavorited(true);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setFavoriteLoading(false);
+    }
+  }, [user, slug, isFavorited, goLoginAndReturn]);
 
   const hasMyReview = !!myReview?.id;
 
@@ -330,6 +412,45 @@ export default function CityDetail() {
       setReviewsError("Failed to delete review.");
     }
   }, [slug, myReview?.id]);
+
+  const handleReactionChange = useCallback((reviewId, newType) => {
+    if (!reviewId) return;
+
+    // Capture previous state for rollback
+    const prev = reactionState[reviewId] ?? {
+      reactions: { helpful: 0, agree: 0, disagree: 0 },
+      myReaction: null,
+    };
+
+    // Optimistic update
+    setReactionState((s) => {
+      const cur = s[reviewId] ?? { reactions: { helpful: 0, agree: 0, disagree: 0 }, myReaction: null };
+      const counts = { ...cur.reactions };
+      if (cur.myReaction) counts[cur.myReaction] = Math.max(0, counts[cur.myReaction] - 1);
+      if (newType) counts[newType] = (counts[newType] ?? 0) + 1;
+      return { ...s, [reviewId]: { reactions: counts, myReaction: newType } };
+    });
+
+    // Mark in-flight
+    setReactingIds((s) => new Set([...s, reviewId]));
+
+    const apiCall = newType
+      ? upsertReaction(slug, reviewId, newType)
+      : deleteReaction(slug, reviewId);
+
+    apiCall
+      .catch(() => {
+        // Rollback on error
+        setReactionState((s) => ({ ...s, [reviewId]: prev }));
+      })
+      .finally(() => {
+        setReactingIds((s) => {
+          const next = new Set(s);
+          next.delete(reviewId);
+          return next;
+        });
+      });
+  }, [slug, reactionState]);
 
   if (isCityLoading) return <Loading />;
 
@@ -403,6 +524,19 @@ export default function CityDetail() {
         asideFooter={`Based on ${stats?.count ?? "—"} reviews & city metrics`}
       />
 
+      <div className="flex items-center gap-2">
+        <FavoriteButton
+          isFavorited={isFavorited}
+          loading={favoriteLoading}
+          onToggle={toggleFavorite}
+        />
+        <Button variant="secondary" size="sm" asChild>
+          <Link to={`/compare?a=${slug}`}>
+            <GitCompareArrows className="h-4 w-4 shrink-0" />
+            Compare
+          </Link>
+        </Button>
+      </div>
       <SectionCard
         icon={BarChart3}
         title="Metrics"
@@ -503,6 +637,14 @@ export default function CityDetail() {
       </SectionCard>
 
       <SectionCard
+        icon={Activity}
+        title="Livability Radar"
+        subtitle="Visual overview across all 5 dimensions."
+      >
+        <CityRadarChart averages={avgRatings} label={city?.name} />
+      </SectionCard>
+
+      <SectionCard
         icon={BarChart3}
         title="Insights"
         subtitle="How it feels vs what the data says."
@@ -561,17 +703,29 @@ export default function CityDetail() {
           <div className="text-sm text-slate-600">No reviews yet.</div>
         ) : !reviewsError ? (
           <div className="space-y-4">
-            {publicReviewsExcludingMine.map((review, idx) => (
-              <ReviewCard
-                key={
-                  review?.id ||
-                  `${review?.cityId || slug}__${review?.createdAtIso || idx}`
-                }
-                review={review}
-                variant="list"
-                title="Anonymous"
-              />
-            ))}
+            {publicReviewsExcludingMine.map((review, idx) => {
+              const rxState = reactionState[review?.id] ?? {
+                reactions: review?.reactions ?? { helpful: 0, agree: 0, disagree: 0 },
+                myReaction: review?.myReaction ?? null,
+              };
+              return (
+                <ReviewCard
+                  key={
+                    review?.id ||
+                    `${review?.cityId || slug}__${review?.createdAtIso || idx}`
+                  }
+                  review={review}
+                  variant="list"
+                  title="Anonymous"
+                  reactions={rxState.reactions}
+                  myReaction={rxState.myReaction}
+                  currentUserId={user?.sub ?? null}
+                  isOwnReview={false}
+                  onReactionChange={handleReactionChange}
+                  reactionsDisabled={reactingIds.has(review?.id)}
+                />
+              );
+            })}
           </div>
         ) : null}
 

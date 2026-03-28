@@ -8,6 +8,7 @@ import { fmtDateTime, fmtDate } from "@/lib/datetime";
 import { clamp01 } from "@/lib/format";
 
 import { Pencil, User as UserIcon, MapPin, Trash2 } from "lucide-react";
+import ReactionBar from "@/components/reviews/ReactionBar";
 import { clampRating10, avgFromCategories, scoreColor } from "@/lib/ratings";
 
 /** Converts a 0–10 rating to a 0–100 percentage clamped to [0, 1] for bar widths. */
@@ -141,6 +142,13 @@ export default function ReviewCard({
   editTo = null,
   editState = undefined,
   onDelete = null,
+  // Reactions
+  reactions = null,
+  myReaction = null,
+  currentUserId = null,
+  isOwnReview = false,
+  onReactionChange = null,
+  reactionsDisabled = false,
 }) {
   const isList = variant === "list";
 
@@ -237,6 +245,19 @@ export default function ReviewCard({
           <div className="order-3 min-w-0 md:order-none md:col-start-2 md:row-start-2 md:border-l md:border-slate-200 md:pl-6 md:h-full">
             <div className="min-w-0 flex flex-col gap-3 md:h-full">
               <CommentBlock text={review?.comment} clampChars={160} />
+
+              {variant !== "account" && reactions !== null && (
+                <ReactionBar
+                  reviewId={review?.id}
+                  citySlug={review?.cityId}
+                  reactions={reactions}
+                  myReaction={myReaction}
+                  currentUserId={currentUserId}
+                  isOwnReview={isOwnReview}
+                  onReactionChange={onReactionChange}
+                  disabled={reactionsDisabled}
+                />
+              )}
 
               <div className="mt-2 md:mt-auto grid w-full grid-cols-2 gap-2 sm:w-auto sm:flex sm:justify-end sm:gap-2">
                 {editTo && (

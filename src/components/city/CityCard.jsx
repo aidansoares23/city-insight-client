@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { GitCompareArrows } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { fmtMoney, fmtNum, toOutOf10 } from "@/lib/format";
 import { scoreColor } from "@/lib/ratings";
@@ -30,6 +31,7 @@ export default function CityCard({ city }) {
         to={`/cities/${city?.slug || ""}`}
         className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
       >
+
         {/* HERO SECTION — tinted background */}
         <div className="bg-[hsl(var(--secondary))] px-3 py-3 border-b border-sky-100">
           <div className="flex items-start justify-between gap-3">
@@ -74,6 +76,17 @@ export default function CityCard({ city }) {
           </div>
         </CardContent>
       </Link>
+
+      {/* Compare link — outside the <Link> to avoid invalid nested anchors */}
+      <div className="border-t border-slate-100 px-5 py-2">
+        <Link
+          to={`/compare?a=${city?.slug || ""}`}
+          className="inline-flex items-center gap-1 text-xs text-slate-400 underline-offset-2 hover:text-slate-600 hover:underline"
+        >
+          <GitCompareArrows className="h-3 w-3" />
+          Compare
+        </Link>
+      </div>
     </Card>
   );
 }

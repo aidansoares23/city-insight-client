@@ -10,6 +10,7 @@ import ApiOverlay from "./components/layout/ApiOverlay";
 import { useAuth } from "./auth/authContext";
 import ReviewEditor from "./pages/ReviewEditor";
 import Methodology from "./pages/Methodology";
+import Compare from "./pages/Compare";
 import NotFound from "./pages/NotFound";
 
 /** Route guard that redirects unauthenticated users to `/login`, preserving the intended path in router state. */
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="/cities" element={<Cities />} />
           <Route path="/cities/:slug" element={<CityDetail />} />
           <Route path="/methodology" element={<Methodology />} />
+          <Route path="/compare" element={<Compare />} />
 
           <Route path="/login" element={<Login />} />
 
