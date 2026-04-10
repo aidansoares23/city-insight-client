@@ -3,13 +3,13 @@ import { Link, useSearchParams } from "react-router-dom";
 import api from "@/services/api";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
-import PageHero from "@/components/layout/PageHero";
-import { BackLink } from "@/components/ui/back-link";
-import SectionCard from "@/components/layout/SectionCard";
 import CityRadarChart from "@/components/city/CityRadarChart";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Loading } from "@/components/ui/loading";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Loading } from "@/components/ui/Loading";
+import ErrorMessage from "@/components/ui/ErrorMessage";
+import { fetchAllCities } from "@/lib/cities";
+import PageHero from "@/components/layout/PageHero";
 
 import {
   BarChart3,
@@ -17,32 +17,61 @@ import {
   Search,
   X,
   Check,
+  Plus,
+  DollarSign,
 } from "lucide-react";
+import CostCalculator from "@/components/city/CostCalculator";
 
 import { fmtMoney, safeNumOrNull, toOutOf10 } from "@/lib/format";
 import { scoreColor } from "@/lib/ratings";
 import { cn } from "@/utils/utils";
 
-/** Formats a 0–10 value as "X.X/10" or "—". */
-function fmt10(value) {
-  const n = safeNumOrNull(value);
-  return n == null ? "—" : `${n.toFixed(1)}/10`;
-}
+const PARAM_KEYS = ["a", "b", "c", "d"];
+const MAX_CITIES = 4;
+const MIN_CITIES = 2;
 
-/** Colored score badge cell used in the comparison table. */
+// Dot classes and strokes match --chart-1/2/3/4 tokens in theme.css
+const CITY_COLORS = [
+  { dot: "bg-[hsl(var(--chart-1))]", stroke: "hsl(199 97% 55%)" },
+  { dot: "bg-[hsl(var(--chart-2))]", stroke: "hsl(0 84% 60%)" },
+  { dot: "bg-[hsl(var(--chart-3))]", stroke: "hsl(142 72% 45%)" },
+  { dot: "bg-[hsl(var(--chart-4))]", stroke: "hsl(38 92% 50%)" },
+];
+
 function ScoreBadge({ value }) {
   const n = safeNumOrNull(value);
   const tone = scoreColor(n);
-  if (n == null) return <span className="text-slate-400">—</span>;
+  if (n == null) return <span className="text-slate-400">N/A</span>;
   return (
-    <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", tone.pill)}>
+    <span
+      className={cn(
+        "rounded-full px-2.5 py-0.5 text-xs font-semibold",
+        tone.pill,
+      )}
+    >
       {n.toFixed(1)}/10
     </span>
   );
 }
 
-/** Inline search/typeahead for selecting a city. */
-function CitySelector({ allCities, selectedSlug, onSelect, label, placeholder }) {
+function LivabilityBadge({ value }) {
+  const n = safeNumOrNull(value);
+  const tone = scoreColor(toOutOf10(n));
+  if (n == null) return <span className="text-slate-400">N/A</span>;
+  return (
+    <span
+      className={cn(
+        "rounded-full px-2.5 py-0.5 text-xs font-semibold",
+        tone.pill,
+      )}
+    >
+      {Math.round(n)}/100
+    </span>
+  );
+}
+
+/** Inline city search typeahead. */
+function CitySelector({ allCities, selectedSlug, onSelect, placeholder }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const inputRef = useRef(null);
@@ -53,8 +82,11 @@ function CitySelector({ allCities, selectedSlug, onSelect, label, placeholder })
     [allCities, selectedSlug],
   );
 
-  // Display value: show city name when selected and not actively searching
-  const displayValue = open ? query : selectedCity ? `${selectedCity.name}, ${selectedCity.state}` : "";
+  const displayValue = open
+    ? query
+    : selectedCity
+      ? `${selectedCity.name}, ${selectedCity.state}`
+      : "";
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim();
@@ -95,7 +127,6 @@ function CitySelector({ allCities, selectedSlug, onSelect, label, placeholder })
 
   return (
     <div className="relative">
-      <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
       <div className="relative flex items-center">
         <Search className="pointer-events-none absolute left-3 h-4 w-4 text-slate-400" />
         <Input
@@ -119,22 +150,26 @@ function CitySelector({ allCities, selectedSlug, onSelect, label, placeholder })
       </div>
 
       {open && (
-        <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-md">
+        <div className="absolute z-30 mt-1 w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-md">
           {filtered.length === 0 ? (
-            <div className="px-4 py-3 text-sm text-slate-500">No cities found.</div>
+            <div className="px-4 py-3 text-sm text-slate-500">
+              No cities found.
+            </div>
           ) : (
             filtered.map((city) => (
               <button
                 key={city.slug}
                 onMouseDown={() => handleSelect(city)}
                 className={cn(
-                  "flex w-full items-center justify-between px-4 py-2.5 text-left text-sm hover:bg-[hsl(var(--accent))]",
+                  "flex w-full items-center px-4 py-2.5 text-left text-sm hover:bg-[hsl(var(--accent))]",
                   city.slug === selectedSlug && "bg-[hsl(var(--secondary))]",
                 )}
               >
                 <span className="font-medium text-slate-900">
                   {city.name}
-                  <span className="ml-1 font-normal text-slate-500">{city.state}</span>
+                  <span className="ml-1 font-normal text-slate-500">
+                    {city.state}
+                  </span>
                 </span>
               </button>
             ))
@@ -145,307 +180,428 @@ function CitySelector({ allCities, selectedSlug, onSelect, label, placeholder })
   );
 }
 
-/** Comparison table row. */
-function CompareRow({ metric, valueA, valueB, winner, renderValue }) {
-  return (
-    <tr className="border-b border-slate-100 last:border-0">
-      <td className="py-3 pr-4 text-sm text-slate-600">{metric}</td>
-      <td className="py-3 pr-4 text-center">
-        <div className="flex items-center justify-center gap-1.5">
-          {renderValue ? renderValue(valueA) : <span className="text-sm font-semibold text-slate-900">{valueA}</span>}
-          {winner === "a" && <Check className="h-3.5 w-3.5 shrink-0 text-emerald-500" />}
-        </div>
-      </td>
-      <td className="py-3 text-center">
-        <div className="flex items-center justify-center gap-1.5">
-          {renderValue ? renderValue(valueB) : <span className="text-sm font-semibold text-slate-900">{valueB}</span>}
-          {winner === "b" && <Check className="h-3.5 w-3.5 shrink-0 text-emerald-500" />}
-        </div>
-      </td>
-    </tr>
-  );
+/** Returns the index of the best value, or null on tie / insufficient data. */
+function findWinner(values, dir = "higher") {
+  const nums = values.map((v) => safeNumOrNull(v));
+  const valid = nums.filter((n) => n != null);
+  if (valid.length < 2) return null;
+  const best = dir === "higher" ? Math.max(...valid) : Math.min(...valid);
+  if (nums.filter((n) => n === best).length > 1) return null; // tie
+  return nums.findIndex((n) => n === best);
 }
 
-/** Determine winner between two numeric values; dir: "higher" or "lower" wins. */
-function winner(a, b, dir = "higher") {
-  const na = safeNumOrNull(a);
-  const nb = safeNumOrNull(b);
-  if (na == null || nb == null) return null;
-  if (na === nb) return null;
-  if (dir === "higher") return na > nb ? "a" : "b";
-  return na < nb ? "a" : "b";
+function CompareRow({ metric, values, winnerIdx, renderValue }) {
+  return (
+    <tr className="border-b border-slate-100 last:border-0">
+      <td className="py-3 pr-4 text-sm text-slate-600 whitespace-nowrap">
+        {metric}
+      </td>
+      {values.map((value, i) => (
+        <td key={i} className="py-3 pr-2 text-center" style={{ minWidth: 100 }}>
+          <div className="flex items-center justify-center gap-1.5">
+            {renderValue ? (
+              renderValue(value)
+            ) : (
+              <span className="text-sm font-semibold text-slate-900">
+                {value}
+              </span>
+            )}
+            {winnerIdx === i && (
+              <Check className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+            )}
+          </div>
+        </td>
+      ))}
+    </tr>
+  );
 }
 
 export default function Compare() {
   usePageTitle("Compare Cities");
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const slugA = searchParams.get("a") || "";
-  const slugB = searchParams.get("b") || "";
+
+  // Slot count (2–4), initialised from URL
+  const [slotCount, setSlotCount] = useState(() => {
+    let count = MIN_CITIES;
+    for (let i = MIN_CITIES; i < PARAM_KEYS.length; i++) {
+      if (searchParams.get(PARAM_KEYS[i])) count = i + 1;
+    }
+    return count;
+  });
+
+  const slugs = PARAM_KEYS.slice(0, slotCount).map(
+    (k) => searchParams.get(k) || "",
+  );
+  const slugKey = slugs.join(",");
 
   const [allCities, setAllCities] = useState([]);
   const [citiesLoading, setCitiesLoading] = useState(true);
+  const [allCitiesError, setAllCitiesError] = useState(false);
 
-  const [cityA, setCityA] = useState(null);
-  const [cityB, setCityB] = useState(null);
-  const [loadingA, setLoadingA] = useState(false);
-  const [loadingB, setLoadingB] = useState(false);
-  const [errorA, setErrorA] = useState("");
-  const [errorB, setErrorB] = useState("");
+  // Per-slot state (indexed 0–3)
+  const [cityData, setCityData] = useState(Array(MAX_CITIES).fill(null));
+  const [loadingStates, setLoadingStates] = useState(
+    Array(MAX_CITIES).fill(false),
+  );
+  const [errorStates, setErrorStates] = useState(Array(MAX_CITIES).fill(""));
 
-  const sameCityWarning = slugA && slugB && slugA === slugB;
-
-  // Load all cities for typeahead once on mount
+  // Load all cities once for the typeahead
   useEffect(() => {
-    api
-      .get("/cities?limit=200")
-      .then((res) => setAllCities(res.data?.cities || res.data || []))
-      .catch(() => {})
+    fetchAllCities()
+      .then((list) => setAllCities(list))
+      .catch(() => setAllCitiesError(true))
       .finally(() => setCitiesLoading(false));
   }, []);
 
-  // Fetch city A details
+  // Fetch details for each active slot
   useEffect(() => {
-    if (!slugA) { setCityA(null); setErrorA(""); return; }
-    let alive = true;
-    setLoadingA(true);
-    setErrorA("");
-    api
-      .get(`/cities/${slugA}/details`)
-      .then((res) => { if (alive) setCityA(res.data); })
-      .catch((err) => {
-        if (!alive) return;
-        setErrorA(err?.response?.status === 404 ? "City not found." : "Failed to load city.");
-        setCityA(null);
-      })
-      .finally(() => { if (alive) setLoadingA(false); });
-    return () => { alive = false; };
-  }, [slugA]);
+    const aliveFlags = Array.from({ length: slotCount }, () => ({
+      alive: true,
+    }));
 
-  // Fetch city B details
-  useEffect(() => {
-    if (!slugB) { setCityB(null); setErrorB(""); return; }
-    let alive = true;
-    setLoadingB(true);
-    setErrorB("");
-    api
-      .get(`/cities/${slugB}/details`)
-      .then((res) => { if (alive) setCityB(res.data); })
-      .catch((err) => {
-        if (!alive) return;
-        setErrorB(err?.response?.status === 404 ? "City not found." : "Failed to load city.");
-        setCityB(null);
-      })
-      .finally(() => { if (alive) setLoadingB(false); });
-    return () => { alive = false; };
-  }, [slugB]);
+    slugs.forEach((slug, i) => {
+      if (!slug) {
+        setCityData((prev) => {
+          const n = [...prev];
+          n[i] = null;
+          return n;
+        });
+        setErrorStates((prev) => {
+          const n = [...prev];
+          n[i] = "";
+          return n;
+        });
+        return;
+      }
 
-  const handleSelectA = useCallback((slug) => {
+      setLoadingStates((prev) => {
+        const n = [...prev];
+        n[i] = true;
+        return n;
+      });
+      setErrorStates((prev) => {
+        const n = [...prev];
+        n[i] = "";
+        return n;
+      });
+
+      api
+        .get(`/cities/${slug}/details`)
+        .then((res) => {
+          if (!aliveFlags[i].alive) return;
+          setCityData((prev) => {
+            const n = [...prev];
+            n[i] = res.data;
+            return n;
+          });
+        })
+        .catch((err) => {
+          if (!aliveFlags[i].alive) return;
+          setErrorStates((prev) => {
+            const n = [...prev];
+            n[i] =
+              err?.response?.status === 404
+                ? "City not found."
+                : "Failed to load city.";
+            return n;
+          });
+          setCityData((prev) => {
+            const n = [...prev];
+            n[i] = null;
+            return n;
+          });
+        })
+        .finally(() => {
+          if (!aliveFlags[i].alive) return;
+          setLoadingStates((prev) => {
+            const n = [...prev];
+            n[i] = false;
+            return n;
+          });
+        });
+    });
+
+    return () => {
+      aliveFlags.forEach((f) => {
+        f.alive = false;
+      });
+    };
+  }, [slugKey, slotCount]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSelect = useCallback(
+    (index, slug) => {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        if (slug) next.set(PARAM_KEYS[index], slug);
+        else next.delete(PARAM_KEYS[index]);
+        return next;
+      });
+    },
+    [setSearchParams],
+  );
+
+  const addSlot = () => setSlotCount((c) => Math.min(c + 1, MAX_CITIES));
+
+  const removeSlot = (index) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      if (slug) next.set("a", slug); else next.delete("a");
+      // Shift remaining slugs down to fill the gap
+      for (let i = index; i < slotCount - 1; i++) {
+        const val = next.get(PARAM_KEYS[i + 1]);
+        if (val) next.set(PARAM_KEYS[i], val);
+        else next.delete(PARAM_KEYS[i]);
+      }
+      next.delete(PARAM_KEYS[slotCount - 1]);
       return next;
     });
-  }, [setSearchParams]);
-
-  const handleSelectB = useCallback((slug) => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (slug) next.set("b", slug); else next.delete("b");
-      return next;
+    setCityData((prev) => {
+      const n = [...prev];
+      n.splice(index, 1);
+      n.push(null);
+      return n;
     });
-  }, [setSearchParams]);
+    setSlotCount((c) => Math.max(c - 1, MIN_CITIES));
+  };
 
-  const bothLoaded = cityA && cityB && !sameCityWarning;
+  const activeSlugs = slugs.filter(Boolean);
+  const hasDuplicates = activeSlugs.length !== new Set(activeSlugs).size;
 
-  // Derive comparison data
-  const aAvg = cityA?.stats?.averages ?? {};
-  const bAvg = cityB?.stats?.averages ?? {};
-  const aMetrics = cityA?.metrics ?? {};
-  const bMetrics = cityB?.metrics ?? {};
-  const aLivability = toOutOf10(cityA?.livability?.score ?? cityA?.stats?.livabilityScore);
-  const bLivability = toOutOf10(cityB?.livability?.score ?? cityB?.stats?.livabilityScore);
+  // Only cities that have fully loaded
+  const loadedCities = slugs
+    .map((slug, i) => ({ slug, data: cityData[i], color: CITY_COLORS[i] }))
+    .filter((c) => c.slug && c.data);
 
-  const tableRows = bothLoaded ? [
-    {
-      metric: "Livability",
-      valueA: aLivability,
-      valueB: bLivability,
-      win: winner(aLivability, bLivability, "higher"),
-      render: (v) => <ScoreBadge value={v} />,
-    },
-    {
-      metric: "Safety (user avg)",
-      valueA: aAvg.safety,
-      valueB: bAvg.safety,
-      win: winner(aAvg.safety, bAvg.safety, "higher"),
-      render: (v) => <ScoreBadge value={v} />,
-    },
-    {
-      metric: "Affordability (user avg)",
-      valueA: aAvg.affordability,
-      valueB: bAvg.affordability,
-      win: winner(aAvg.affordability, bAvg.affordability, "higher"),
-      render: (v) => <ScoreBadge value={v} />,
-    },
-    {
-      metric: "Walkability (user avg)",
-      valueA: aAvg.walkability,
-      valueB: bAvg.walkability,
-      win: winner(aAvg.walkability, bAvg.walkability, "higher"),
-      render: (v) => <ScoreBadge value={v} />,
-    },
-    {
-      metric: "Cleanliness (user avg)",
-      valueA: aAvg.cleanliness,
-      valueB: bAvg.cleanliness,
-      win: winner(aAvg.cleanliness, bAvg.cleanliness, "higher"),
-      render: (v) => <ScoreBadge value={v} />,
-    },
-    {
-      metric: "Overall (user avg)",
-      valueA: aAvg.overall,
-      valueB: bAvg.overall,
-      win: winner(aAvg.overall, bAvg.overall, "higher"),
-      render: (v) => <ScoreBadge value={v} />,
-    },
-    {
-      metric: "Median Rent",
-      valueA: aMetrics.medianRent,
-      valueB: bMetrics.medianRent,
-      win: winner(aMetrics.medianRent, bMetrics.medianRent, "lower"),
-      render: (v) => <span className="text-sm font-semibold text-slate-900">{fmtMoney(v)}</span>,
-    },
-    {
-      metric: "Reviews",
-      valueA: cityA?.stats?.count ?? 0,
-      valueB: cityB?.stats?.count ?? 0,
-      win: null,
-      render: (v) => <span className="text-sm text-slate-700">{v ?? 0}</span>,
-    },
-  ] : [];
+  const canShowResults = loadedCities.length >= 2 && !hasDuplicates;
 
-  const nameA = cityA ? `${cityA.city?.name}, ${cityA.city?.state}` : "City A";
-  const nameB = cityB ? `${cityB.city?.name}, ${cityB.city?.state}` : "City B";
+  const radarCities = loadedCities.map((c) => ({
+    averages: c.data?.stats?.averages ?? {},
+    label: c.data?.city?.name || "",
+    color: c.color.stroke,
+  }));
+
+  const tableRows = canShowResults
+    ? [
+        {
+          metric: "Livability Score",
+          values: loadedCities.map(
+            (c) => c.data?.livability?.score ?? c.data?.stats?.livabilityScore ?? null,
+          ),
+          dir: "higher",
+          render: (v) => <LivabilityBadge value={v} />,
+        },
+        {
+          metric: "Safety",
+          values: loadedCities.map((c) => c.data?.stats?.averages?.safety),
+          dir: "higher",
+          render: (v) => <ScoreBadge value={v} />,
+        },
+        {
+          metric: "Affordability",
+          values: loadedCities.map(
+            (c) => c.data?.stats?.averages?.affordability,
+          ),
+          dir: "higher",
+          render: (v) => <ScoreBadge value={v} />,
+        },
+        {
+          metric: "Walkability",
+          values: loadedCities.map((c) => c.data?.stats?.averages?.walkability),
+          dir: "higher",
+          render: (v) => <ScoreBadge value={v} />,
+        },
+        {
+          metric: "Cleanliness",
+          values: loadedCities.map((c) => c.data?.stats?.averages?.cleanliness),
+          dir: "higher",
+          render: (v) => <ScoreBadge value={v} />,
+        },
+        {
+          metric: "Overall Rating",
+          values: loadedCities.map((c) => c.data?.stats?.averages?.overall),
+          dir: "higher",
+          render: (v) => <ScoreBadge value={v} />,
+        },
+        {
+          metric: "Median Rent",
+          values: loadedCities.map((c) => c.data?.metrics?.medianRent),
+          dir: "lower",
+          render: (v) => (
+            <span className="text-sm font-semibold text-slate-900">
+              {fmtMoney(v)}
+            </span>
+          ),
+        },
+        {
+          metric: "Air Quality (AQI)",
+          values: loadedCities.map((c) => c.data?.metrics?.aqiValue ?? null),
+          dir: "lower",
+          render: (v) => (
+            <span className="text-sm font-semibold text-slate-900">
+              {v != null ? `${v} AQI` : "N/A"}
+            </span>
+          ),
+        },
+        {
+          metric: "Reviews",
+          values: loadedCities.map((c) => c.data?.stats?.count ?? 0),
+          dir: null,
+          render: (v) => (
+            <span className="text-sm text-slate-900">{v ?? 0}</span>
+          ),
+        },
+      ]
+    : [];
+
+  const selectorCols =
+    slotCount === 4
+      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+      : slotCount === 3
+        ? "grid-cols-1 sm:grid-cols-3"
+        : "grid-cols-1 sm:grid-cols-2";
 
   return (
-    <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
-      <BackLink to="/cities">Back to all cities</BackLink>
-
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-300">
       <PageHero
         title="Compare Cities"
-        description="Select two cities to compare their livability, safety, affordability, and more side by side."
+        description="Pick two to four cities and see how they stack up — ratings, rent, and more, all side by side."
       />
 
       {/* City selectors */}
-      <SectionCard icon={GitCompareArrows} title="Select Cities" subtitle="Search and pick two cities to compare.">
-        {citiesLoading ? (
-          <Loading label="Loading cities…" />
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2">
-            <div>
-              <CitySelector
-                allCities={allCities}
-                selectedSlug={slugA}
-                onSelect={handleSelectA}
-                label="City A"
-                placeholder="Search city…"
-              />
-              {errorA && (
-                <p className="mt-2 text-xs text-rose-600">{errorA}</p>
-              )}
-              {loadingA && <div className="mt-2"><Loading label="Loading…" /></div>}
-              {cityA && !loadingA && (
-                <Link
-                  to={`/cities/${slugA}`}
-                  className="mt-2 block text-xs text-slate-500 underline-offset-2 hover:underline"
-                >
-                  View {cityA.city?.name} →
-                </Link>
-              )}
-            </div>
+      <div>
+        <div className="flex items-center gap-2">
+          <GitCompareArrows className="h-5 w-5 text-slate-500" />
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Choose Your Cities</h2>
+        </div>
+        <p className="mt-1 text-sm text-slate-600">Add up to {MAX_CITIES} cities to compare.</p>
+        <div className="mt-4">
+          {citiesLoading ? (
+            <Loading label="Loading cities…" />
+          ) : allCitiesError ? (
+            <ErrorMessage message="Could not load city list. Please refresh to try again." />
+          ) : (
+            <div className={`grid gap-5 ${selectorCols}`}>
+              {slugs.map((slug, i) => (
+                <div key={i}>
+                  {/* Slot header */}
+                  <div className="mb-1.5 flex items-center gap-1.5">
+                    <span
+                      className={`inline-block h-2 w-2 rounded-full ${CITY_COLORS[i].dot}`}
+                    />
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      City {i + 1}
+                    </span>
+                    {i >= MIN_CITIES && (
+                      <button
+                        onClick={() => removeSlot(i)}
+                        className="ml-auto flex h-5 w-5 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                        aria-label={`Remove city ${i + 1}`}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
 
-            <div>
-              <CitySelector
-                allCities={allCities}
-                selectedSlug={slugB}
-                onSelect={handleSelectB}
-                label="City B"
-                placeholder="Search city…"
-              />
-              {errorB && (
-                <p className="mt-2 text-xs text-rose-600">{errorB}</p>
-              )}
-              {loadingB && <div className="mt-2"><Loading label="Loading…" /></div>}
-              {cityB && !loadingB && (
-                <Link
-                  to={`/cities/${slugB}`}
-                  className="mt-2 block text-xs text-slate-500 underline-offset-2 hover:underline"
-                >
-                  View {cityB.city?.name} →
-                </Link>
-              )}
-            </div>
-          </div>
-        )}
+                  <CitySelector
+                    allCities={allCities}
+                    selectedSlug={slug}
+                    onSelect={(s) => handleSelect(i, s)}
+                    placeholder="Search for a city…"
+                  />
 
-        {sameCityWarning && (
-          <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Select two different cities to compare.
-          </div>
-        )}
-      </SectionCard>
+                  {errorStates[i] && (
+                    <p className="mt-2 text-xs text-rose-600">{errorStates[i]}</p>
+                  )}
+                  {loadingStates[i] && (
+                    <div className="mt-2">
+                      <Loading label="Loading…" />
+                    </div>
+                  )}
+                  {cityData[i] && !loadingStates[i] && (
+                    <Link
+                      to={`/cities/${slug}`}
+                      className="mt-2 block text-xs text-slate-500 underline-offset-2 hover:underline"
+                    >
+                      View {cityData[i].city?.name} →
+                    </Link>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {slotCount < MAX_CITIES && (
+            <button
+              onClick={addSlot}
+              className="mt-5 flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900"
+            >
+              <Plus className="h-4 w-4" />
+              Add another city
+            </button>
+          )}
+
+          {hasDuplicates && (
+            <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              You've picked the same city more than once — each slot should be a
+              different city.
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Empty state */}
-      {!slugA && !slugB && (
+      {activeSlugs.length === 0 && (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-sm text-slate-500">
-          Select two cities above to compare them.
+          Search for cities above to start comparing.
         </div>
       )}
 
-      {/* Radar chart — shown when both cities are loaded */}
-      {bothLoaded && (
-        <SectionCard
-          icon={BarChart3}
-          title="Radar Comparison"
-          subtitle="All 5 livability dimensions overlaid."
-        >
-          <CityRadarChart
-            averages={aAvg}
-            label={cityA.city?.name}
-            compareAverages={bAvg}
-            compareLabel={cityB.city?.name}
-            height={320}
-          />
-        </SectionCard>
+      {/* Radar chart */}
+      {canShowResults && (
+        <div className="border-t border-slate-200 pt-12">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-slate-500" />
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900">Score Overview</h2>
+          </div>
+          <p className="mt-1 text-sm text-slate-600">How each city rates across all categories.</p>
+          <div className="mt-4">
+            <CityRadarChart cities={radarCities} height={320} />
+          </div>
+        </div>
       )}
 
-      {/* Comparison table — shown when both cities are loaded */}
-      {bothLoaded && (
-        <SectionCard
-          icon={GitCompareArrows}
-          title="Side-by-Side"
-          subtitle="Key metrics compared. ✓ marks the better value where applicable."
-        >
+      {/* Comparison table */}
+      {canShowResults && (
+        <div className="border-t border-slate-200 pt-12">
+          <div className="flex items-center gap-2">
+            <GitCompareArrows className="h-5 w-5 text-slate-500" />
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900">Side-by-Side Breakdown</h2>
+          </div>
+          <p className="mt-1 text-sm text-slate-600">✓ marks the best city for each category.</p>
+          <div className="mt-4">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-200">
-                  <th className="pb-3 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Metric
+                  <th className="pb-3 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 whitespace-nowrap">
+                    Category
                   </th>
-                  <th className="pb-3 pr-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    <div className="flex items-center justify-center gap-1.5">
-                      <span className="inline-block h-2.5 w-2.5 rounded-full bg-[hsl(199_97%_55%)]" />
-                      <span className="max-w-[120px] truncate">{cityA.city?.name}</span>
-                    </div>
-                  </th>
-                  <th className="pb-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    <div className="flex items-center justify-center gap-1.5">
-                      <span className="inline-block h-2.5 w-2.5 rounded-full bg-[hsl(0_84%_60%)]" />
-                      <span className="max-w-[120px] truncate">{cityB.city?.name}</span>
-                    </div>
-                  </th>
+                  {loadedCities.map((c, i) => (
+                    <th
+                      key={i}
+                      className="pb-3 pr-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-500"
+                      style={{ minWidth: 100 }}
+                    >
+                      <div className="flex items-center justify-center gap-1.5">
+                        <span
+                          className={`inline-block h-2.5 w-2.5 rounded-full ${c.color.dot}`}
+                        />
+                        <span className="max-w-[100px] truncate">
+                          {c.data?.city?.name}
+                        </span>
+                      </div>
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -453,9 +609,8 @@ export default function Compare() {
                   <CompareRow
                     key={row.metric}
                     metric={row.metric}
-                    valueA={row.valueA}
-                    valueB={row.valueB}
-                    winner={row.win}
+                    values={row.values}
+                    winnerIdx={row.dir ? findWinner(row.values, row.dir) : null}
                     renderValue={row.render}
                   />
                 ))}
@@ -463,15 +618,31 @@ export default function Compare() {
             </table>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-4 border-t border-slate-100 pt-4">
-            <Button variant="secondary" size="sm" asChild>
-              <Link to={`/cities/${slugA}`}>View {cityA.city?.name}</Link>
-            </Button>
-            <Button variant="secondary" size="sm" asChild>
-              <Link to={`/cities/${slugB}`}>View {cityB.city?.name}</Link>
-            </Button>
+          <div className="mt-4 flex flex-wrap gap-3 border-t border-slate-100 pt-4">
+            {loadedCities.map((c, i) => (
+              <Button key={i} variant="secondary" size="sm" asChild>
+                <Link to={`/cities/${c.slug}`} state={{ from: "compare" }}>
+                  View {c.data?.city?.name}
+                </Link>
+              </Button>
+            ))}
           </div>
-        </SectionCard>
+          </div>
+        </div>
+      )}
+
+      {/* Moving Cost Calculator */}
+      {canShowResults && (
+        <div className="border-t border-slate-200 pt-12">
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5 text-slate-500" />
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900">Moving Cost Estimate</h2>
+          </div>
+          <p className="mt-1 text-sm text-slate-600">Monthly budget comparison based on median rent ratios.</p>
+          <div className="mt-4">
+            <CostCalculator cities={loadedCities} />
+          </div>
+        </div>
       )}
     </div>
   );

@@ -16,7 +16,6 @@ const REACTIONS = [
  */
 export default function ReactionBar({
   reviewId,
-  citySlug,
   reactions = { helpful: 0, agree: 0, disagree: 0 },
   myReaction = null,
   currentUserId = null,
@@ -59,7 +58,7 @@ export default function ReactionBar({
             onClick={() => handleClick(type)}
             disabled={disabled && !isOwnReview}
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
+              "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium transition-colors sm:gap-1.5 sm:px-2.5 sm:py-1",
               isActive
                 ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))] text-slate-900"
                 : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300",
@@ -71,7 +70,7 @@ export default function ReactionBar({
             <Icon className="h-3 w-3 shrink-0" />
             <span>{label}</span>
             {count > 0 && (
-              <span className={cn("tabular-nums", isActive ? "text-slate-800" : "text-slate-400")}>
+              <span className={cn("tabular-nums", isActive ? "text-slate-900" : "text-slate-400")}>
                 {count}
               </span>
             )}

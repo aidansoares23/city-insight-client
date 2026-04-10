@@ -6,12 +6,12 @@ describe("fmtMoney", () => {
     expect(fmtMoney(1500)).toBe("$1,500");
     expect(fmtMoney(0)).toBe("$0");
   });
-  it("returns — for null or undefined", () => {
-    expect(fmtMoney(null)).toBe("—");
-    expect(fmtMoney(undefined)).toBe("—");
+  it("returns N/A for null or undefined", () => {
+    expect(fmtMoney(null)).toBe("N/A");
+    expect(fmtMoney(undefined)).toBe("N/A");
   });
-  it("returns — for non-numeric strings", () => {
-    expect(fmtMoney("abc")).toBe("—");
+  it("returns N/A for non-numeric strings", () => {
+    expect(fmtMoney("abc")).toBe("N/A");
   });
 });
 
@@ -22,9 +22,9 @@ describe("fmtNum", () => {
   it("formats with specified decimal digits", () => {
     expect(fmtNum(3.14159, { digits: 2 })).toBe("3.14");
   });
-  it("returns — for null or non-numeric", () => {
-    expect(fmtNum(null)).toBe("—");
-    expect(fmtNum("abc")).toBe("—");
+  it("returns N/A for null or non-numeric", () => {
+    expect(fmtNum(null)).toBe("N/A");
+    expect(fmtNum("abc")).toBe("N/A");
   });
 });
 

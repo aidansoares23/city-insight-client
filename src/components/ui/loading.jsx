@@ -18,7 +18,7 @@ export function Loading({
   const body = (
     <div
       className={cn(
-        "inline-flex items-center gap-2 text-slate-700",
+        "inline-flex items-center gap-2 text-slate-600",
         sizes.text,
         className,
       )}

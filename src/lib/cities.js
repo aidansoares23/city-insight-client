@@ -1,3 +1,15 @@
+import api from "@/services/api";
+
+/** Shared limit used across all pages that need the full city list. */
+export const ALL_CITIES_LIMIT = 200;
+
+/** Fetches all cities up to `ALL_CITIES_LIMIT`. Returns an array of city objects. */
+export function fetchAllCities() {
+  return api
+    .get("/cities", { params: { limit: ALL_CITIES_LIMIT } })
+    .then((res) => res.data?.cities || res.data || []);
+}
+
 /** Capitalizes the first character of a word; returns `""` for empty input. */
 function titleCaseWord(word) {
   if (!word) return "";

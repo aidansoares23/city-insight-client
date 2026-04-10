@@ -23,7 +23,9 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^[A-Z_]' }],
+      // shadcn/ui files intentionally co-export variant helpers alongside components
+      'react-refresh/only-export-components': ['warn', { allowExportNames: ['useAuth', 'badgeVariants', 'buttonVariants'] }],
     },
   },
 ])

@@ -1,15 +1,15 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 
 import { fmtDateTime, fmtDate } from "@/lib/datetime";
 import { clamp01 } from "@/lib/format";
 
 import { Pencil, User as UserIcon, MapPin, Trash2 } from "lucide-react";
 import ReactionBar from "@/components/reviews/ReactionBar";
-import { clampRating10, avgFromCategories, scoreColor } from "@/lib/ratings";
+import { RATING_KEYS, clampRating10, avgFromCategories, scoreColor } from "@/lib/ratings";
 
 /** Converts a 0–10 rating to a 0–100 percentage clamped to [0, 1] for bar widths. */
 function tinyPct(value) {
@@ -36,7 +36,7 @@ function TimestampLine({ createdAtIso, updatedAtIso, isEdited = false, showTime 
   if (!createdLabel && !updatedLabel) return null;
 
   return (
-    <div className="text-[11px] text-slate-500">
+    <div className="text-xs text-slate-500">
       {createdLabel ? <span>Posted {createdLabel}</span> : null}
       {updatedLabel ? (
         <span className="ml-2">• Edited {updatedLabel}</span>
@@ -58,7 +58,7 @@ function CommentBlock({ text, clampChars = 180 }) {
 
   return (
     <div className="space-y-2">
-      <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-900">
+      <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-900">
         {shown}
       </p>
 
@@ -66,7 +66,7 @@ function CommentBlock({ text, clampChars = 180 }) {
         <button
           type="button"
           onClick={() => setOpen((isOpen) => !isOpen)}
-          className="text-xs font-semibold text-slate-700 underline decoration-slate-300 underline-offset-4 hover:text-slate-900"
+          className="text-xs font-semibold text-slate-900 underline decoration-slate-300 underline-offset-4 hover:text-slate-900"
         >
           {open ? "Show less" : "Read more"}
         </button>
@@ -82,7 +82,7 @@ function OverallBlock({ score }) {
   return (
     <div className={`inline-flex items-baseline gap-1 rounded-lg border px-3 py-1.5 ${badgeClass}`}>
       <span className="text-2xl font-bold tabular-nums leading-none">
-        {score == null ? "—" : score}
+        {score == null ? "N/A" : score}
       </span>
       <span className="text-xs font-medium opacity-50">/10</span>
       <span className="ml-1 text-[10px] font-semibold uppercase tracking-wide opacity-60">
@@ -94,12 +94,10 @@ function OverallBlock({ score }) {
 
 /** Grid of mini progress bars for safety, affordability, walkability, and cleanliness ratings. */
 function MiniBars({ ratings, barClassName = "bg-blue-500/35" }) {
-  const items = [
-    ["Safety", clampRating10(ratings?.safety)],
-    ["Affordability", clampRating10(ratings?.affordability)],
-    ["Walkability", clampRating10(ratings?.walkability)],
-    ["Cleanliness", clampRating10(ratings?.cleanliness)],
-  ];
+  const items = RATING_KEYS.map((key) => [
+    key.charAt(0).toUpperCase() + key.slice(1),
+    clampRating10(ratings?.[key]),
+  ]);
 
   return (
     <div className="grid gap-2">
@@ -121,7 +119,7 @@ function MiniBars({ ratings, barClassName = "bg-blue-500/35" }) {
           </div>
 
           <div className="text-right text-xs font-semibold text-slate-900 tabular-nums">
-            {rating == null ? "—" : `${rating}/10`}
+            {rating == null ? "N/A" : `${rating}/10`}
           </div>
         </div>
       ))}
@@ -175,7 +173,7 @@ export default function ReviewCard({
   const canDelete = variant !== "public" && typeof onDelete === "function";
 
   return (
-    <Card className="overflow-hidden border-slate-200/70 bg-white-100/70 shadow-l transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl">
+    <Card className="overflow-hidden border-slate-200/70 bg-white shadow-l transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl">
       <CardContent className={isList ? "px-6 py-5" : "px-6 py-4"}>
         <div className="grid gap-4 md:grid-cols-[240px_1fr] md:grid-rows-[auto_1fr] md:items-start md:gap-y-3">
           <div className="order-1 flex flex-col gap-2 md:order-none md:col-start-2 md:row-start-1 md:border-l md:border-slate-200 md:pl-6">

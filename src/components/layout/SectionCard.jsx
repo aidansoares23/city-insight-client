@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/Card";
 import { cn } from "@/utils/utils";
 
 /**
@@ -32,15 +32,15 @@ export default function SectionCard({
       {showHeader ? (
         <div
           className={cn(
-            "relative",
+            "relative rounded-t-xs",
             "bg-[hsl(var(--secondary))]",
             "px-6 py-6",
             headerClassName,
           )}
+          x
         >
-          <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5" />
+          <div className="pointer-events-none absolute inset-0 rounded-t-3xl ring-1 ring-inset ring-slate-900/5" />
 
-          {/* <div className="flex items-start justify-between gap-4"> */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
@@ -55,7 +55,6 @@ export default function SectionCard({
               ) : null}
             </div>
 
-            {/* {action ? <div className="shrink-0">{action}</div> : null} */}
             {action ? (
               <div className="sm:shrink-0">
                 <div className="flex flex-wrap gap-2 sm:justify-end">

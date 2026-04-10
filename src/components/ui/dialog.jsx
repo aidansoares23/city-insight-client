@@ -3,7 +3,7 @@ import { XIcon } from "lucide-react";
 import { Dialog as DialogPrimitive } from "radix-ui";
 
 import { cn } from "@/utils/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 
 /** Radix Dialog root — manages open/close state. */
 function Dialog({ ...props }) {
@@ -175,7 +175,7 @@ function ConfirmDialog({
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-200"
+              className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[hsl(var(--ring))] focus:ring-2 focus:ring-[hsl(var(--ring))]/30"
               autoComplete="off"
             />
           </div>

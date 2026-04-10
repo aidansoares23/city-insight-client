@@ -23,16 +23,20 @@ const buttonVariants = cva(
         ].join(" "),
 
         secondary: [
-          "border border-slate-400 bg-white text-slate-700",
+          "border border-slate-300 bg-white text-slate-900",
           "shadow-sm",
-          "hover:bg-slate-50 hover:border-slate-600 hover:text-slate-900",
+          "hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900",
         ].join(" "),
 
         danger: [
           "border border-rose-200 bg-white text-rose-700",
           "shadow-sm",
           "hover:bg-rose-50 hover:text-rose-800",
-          // "focus-visible:ring-rose-200",
+        ].join(" "),
+
+        ghost: [
+          "text-slate-600 bg-transparent",
+          "hover:bg-slate-100 hover:text-slate-900 hover:-translate-y-0.5",
         ].join(" "),
       },
 

@@ -6,6 +6,7 @@ import {
   avgFromCategories,
   derivedOverall,
   scoreColor,
+  scoreLabel,
   makeEmptyReviewForm,
   normalizeReviewToForm,
   DEFAULT_RATING,
@@ -113,27 +114,51 @@ describe("derivedOverall", () => {
 });
 
 describe("scoreColor", () => {
-  it("returns slate classes for null", () => {
+  it("returns neutral classes for null", () => {
     const result = scoreColor(null);
-    expect(result.pill).toContain("slate");
-    expect(result.badge).toContain("slate");
+    expect(result.pill).toContain("score-neutral");
+    expect(result.badge).toContain("score-neutral");
   });
-  it("returns emerald classes for score >= 7", () => {
-    expect(scoreColor(7).pill).toContain("emerald");
-    expect(scoreColor(10).pill).toContain("emerald");
+  it("returns good classes for score >= 7", () => {
+    expect(scoreColor(7).pill).toContain("score-good");
+    expect(scoreColor(10).pill).toContain("score-good");
   });
-  it("returns amber classes for score >= 4 and < 7", () => {
-    expect(scoreColor(4).pill).toContain("amber");
-    expect(scoreColor(6).pill).toContain("amber");
+  it("returns ok classes for score >= 4 and < 7", () => {
+    expect(scoreColor(4).pill).toContain("score-ok");
+    expect(scoreColor(6).pill).toContain("score-ok");
   });
-  it("returns rose classes for score < 4", () => {
-    expect(scoreColor(3).pill).toContain("rose");
-    expect(scoreColor(0).pill).toContain("rose");
+  it("returns bad classes for score < 4", () => {
+    expect(scoreColor(3).pill).toContain("score-bad");
+    expect(scoreColor(0).pill).toContain("score-bad");
   });
   it("returns both pill and badge keys", () => {
     const result = scoreColor(8);
     expect(result).toHaveProperty("pill");
     expect(result).toHaveProperty("badge");
+  });
+  it("returns a bar key in every tier", () => {
+    expect(scoreColor(8)).toHaveProperty("bar");
+    expect(scoreColor(5)).toHaveProperty("bar");
+    expect(scoreColor(2)).toHaveProperty("bar");
+    expect(scoreColor(null)).toHaveProperty("bar");
+  });
+});
+
+describe("scoreLabel", () => {
+  it("returns Great for score >= 7", () => {
+    expect(scoreLabel(7)).toBe("Great");
+    expect(scoreLabel(10)).toBe("Great");
+  });
+  it("returns Good for score >= 4 and < 7", () => {
+    expect(scoreLabel(4)).toBe("Good");
+    expect(scoreLabel(6.9)).toBe("Good");
+  });
+  it("returns Fair for score < 4", () => {
+    expect(scoreLabel(3)).toBe("Fair");
+    expect(scoreLabel(0)).toBe("Fair");
+  });
+  it("returns null for null input", () => {
+    expect(scoreLabel(null)).toBeNull();
   });
 });
 

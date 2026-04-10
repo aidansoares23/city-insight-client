@@ -46,37 +46,50 @@ export function derivedOverall(ratings, keys = RATING_KEYS) {
 
 /**
  * Shared 3-tier color tokens for any score out of 10.
- * Good  ≥ 7  → emerald
- * Ok    ≥ 4  → amber
- * Poor  < 4  → rose
+ * Good  ≥ 7  → --score-good (emerald)
+ * Ok    ≥ 4  → --score-ok (amber)
+ * Poor  < 4  → --score-bad (rose)
  *
  * Returns an object with Tailwind class strings for common contexts:
  *   pill   – filled pill (CityCard livability badge)
  *   badge  – light badge with border (ReviewCard overall block)
+ *   bar    – solid fill for progress bars
  */
 export function scoreColor(outOf10) {
   if (outOf10 == null) {
     return {
-      pill:  "bg-slate-100 text-slate-700",
-      badge: "bg-slate-100 text-slate-500 border-slate-200",
+      pill:  "bg-[hsl(var(--score-neutral-subtle))] text-[hsl(var(--score-neutral))]",
+      badge: "bg-[hsl(var(--score-neutral-subtle))] text-[hsl(var(--score-neutral))] border-[hsl(var(--score-neutral-subtle))]",
+      bar:   "bg-[hsl(var(--score-neutral))]",
     };
   }
   if (outOf10 >= 7) {
     return {
-      pill:  "bg-emerald-100 text-emerald-800",
-      badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      pill:  "bg-[hsl(var(--score-good-subtle))] text-[hsl(var(--score-good))]",
+      badge: "bg-[hsl(var(--score-good-subtle))] text-[hsl(var(--score-good))] border-[hsl(var(--score-good-subtle))]",
+      bar:   "bg-[hsl(var(--score-good))]",
     };
   }
   if (outOf10 >= 4) {
     return {
-      pill:  "bg-amber-100 text-amber-800",
-      badge: "bg-amber-50 text-amber-700 border-amber-200",
+      pill:  "bg-[hsl(var(--score-ok-subtle))] text-[hsl(var(--score-ok))]",
+      badge: "bg-[hsl(var(--score-ok-subtle))] text-[hsl(var(--score-ok))] border-[hsl(var(--score-ok-subtle))]",
+      bar:   "bg-[hsl(var(--score-ok))]",
     };
   }
   return {
-    pill:  "bg-rose-100 text-rose-800",
-    badge: "bg-rose-50 text-rose-700 border-rose-200",
+    pill:  "bg-[hsl(var(--score-bad-subtle))] text-[hsl(var(--score-bad))]",
+    badge: "bg-[hsl(var(--score-bad-subtle))] text-[hsl(var(--score-bad))] border-[hsl(var(--score-bad-subtle))]",
+    bar:   "bg-[hsl(var(--score-bad))]",
   };
+}
+
+/** Returns a qualitative label for a score out of 10: "Great", "Good", or "Fair". */
+export function scoreLabel(outOf10) {
+  if (outOf10 == null) return null;
+  if (outOf10 >= 7) return "Great";
+  if (outOf10 >= 4) return "Good";
+  return "Fair";
 }
 
 /** ReviewEditor form shape */

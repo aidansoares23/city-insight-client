@@ -1,21 +1,25 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/auth/authContext";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ConfirmDialog } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
+import { ConfirmDialog } from "@/components/ui/Dialog";
 import ReviewCard from "@/components/reviews/ReviewCard";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import PageHero from "@/components/layout/PageHero";
-import { Loading } from "@/components/ui/loading";
+import { Loading } from "@/components/ui/Loading";
+import ErrorMessage from "@/components/ui/ErrorMessage";
 
-import { ShieldCheck, Mail, Calendar, Trash2, Heart } from "lucide-react";
+import { Pencil, ShieldCheck, Mail, Calendar, Trash2, Heart, Check, X } from "lucide-react";
 
 import { fmtDateTime } from "@/lib/datetime";
 import { initialsFromUser } from "@/lib/format";
 import { prettyCityFromSlug } from "@/lib/cities";
 import { fetchMyReviews, deleteMyReview, deleteMyAccount } from "@/lib/reviews";
 import { fetchMyFavorites, removeFavorite } from "@/lib/favorites";
+import { updateMyProfile } from "@/lib/me";
+import { RATING_KEYS, scoreColor, derivedOverall } from "@/lib/ratings";
 
 /** Labelled info row with an icon for displaying user profile fields. */
 function InfoRow({ icon: Icon, label, value }) {
@@ -44,7 +48,7 @@ function Avatar({ user }) {
   }
 
   return (
-    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-700">
+    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-900">
       {initialsFromUser(user)}
     </div>
   );
@@ -52,7 +56,7 @@ function Avatar({ user }) {
 
 /** User account page showing profile info, review list with edit/delete, and an account-deletion option. */
 export default function Account() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading, logout, refreshSessionUser } = useAuth();
 
   const [myReviews, setMyReviews] = useState([]);
   const [isReviewsLoading, setIsReviewsLoading] = useState(false);
@@ -65,6 +69,16 @@ export default function Account() {
   const [isFavoritesLoading, setIsFavoritesLoading] = useState(false);
   const [favoritesError, setFavoritesError] = useState("");
   const [unfavoriteLoadingSlug, setUnfavoriteLoadingSlug] = useState(null);
+
+  // Inline display name editing
+  const [editingName, setEditingName] = useState(false);
+  const [nameValue, setNameValue] = useState("");
+  const [nameSaving, setNameSaving] = useState(false);
+  const [nameError, setNameError] = useState("");
+  const nameInputRef = useRef(null);
+
+  // Review sort
+  const [reviewSort, setReviewSort] = useState("newest");
 
   usePageTitle(authLoading ? "Account" : user ? "Account" : "Sign in");
 
@@ -122,12 +136,57 @@ export default function Account() {
     };
   }, [user]);
 
+  // Focus input when entering name edit mode
+  useEffect(() => {
+    if (editingName && nameInputRef.current) {
+      nameInputRef.current.focus();
+      nameInputRef.current.select();
+    }
+  }, [editingName]);
+
   const citiesReviewed = useMemo(() => {
     const uniqueCities = new Set(
       myReviews.map((review) => review?.cityId).filter(Boolean),
     );
     return uniqueCities.size;
   }, [myReviews]);
+
+  // Stats derived from reviews
+  const reviewStats = useMemo(() => {
+    if (myReviews.length === 0) return null;
+    const avgs = {};
+    for (const key of RATING_KEYS) {
+      const vals = myReviews.map((r) => r?.ratings?.[key]).filter((v) => v != null);
+      avgs[key] = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+    }
+    const mostRecent = myReviews[0]?.updatedAt ?? myReviews[0]?.createdAt ?? null;
+    return { avgs, mostRecent, total: myReviews.length };
+  }, [myReviews]);
+
+  // Sorted reviews
+  const sortedReviews = useMemo(() => {
+    const copy = [...myReviews];
+    switch (reviewSort) {
+      case "oldest":
+        return copy.sort((a, b) =>
+          (a.createdAt ?? "") < (b.createdAt ?? "") ? -1 : 1,
+        );
+      case "city":
+        return copy.sort((a, b) =>
+          (a.cityId ?? "").localeCompare(b.cityId ?? ""),
+        );
+      case "highest":
+        return copy.sort(
+          (a, b) => derivedOverall(b.ratings) - derivedOverall(a.ratings),
+        );
+      case "lowest":
+        return copy.sort(
+          (a, b) => derivedOverall(a.ratings) - derivedOverall(b.ratings),
+        );
+      default:
+        return copy; // newest — API already returns newest first
+    }
+  }, [myReviews, reviewSort]);
 
   const onDeleteReview = useCallback((citySlug) => {
     if (!citySlug) return;
@@ -174,6 +233,46 @@ export default function Account() {
     }
   }, []);
 
+  function startEditName() {
+    setNameValue(user?.displayName || "");
+    setNameError("");
+    setEditingName(true);
+  }
+
+  async function commitNameEdit() {
+    const trimmed = nameValue.trim();
+    if (!trimmed || trimmed === user?.displayName) {
+      setEditingName(false);
+      return;
+    }
+    setNameSaving(true);
+    setNameError("");
+    try {
+      await updateMyProfile({ displayName: trimmed });
+      await refreshSessionUser();
+      setEditingName(false);
+    } catch (e) {
+      console.error(e);
+      setNameError(e?.response?.data?.error?.message || "Failed to update name.");
+    } finally {
+      setNameSaving(false);
+    }
+  }
+
+  function cancelNameEdit() {
+    setEditingName(false);
+    setNameError("");
+  }
+
+  function handleNameKeyDown(e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      commitNameEdit();
+    } else if (e.key === "Escape") {
+      cancelNameEdit();
+    }
+  }
+
   if (authLoading) return <Loading />;
 
   if (!user) {
@@ -205,33 +304,22 @@ export default function Account() {
         onConfirm={onConfirmDeleteAccount}
         requireConfirmText="delete my account"
       />
+
       <PageHero
         title="Account"
         description="Manage your profile and reviews."
-        aside={
-          <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
-            Signed in
-          </div>
-        }
+        nav={[
+          { href: "#profile", label: "Profile" },
+          { href: "#reviews", label: "Reviews" },
+          { href: "#favorites", label: "Favorites" },
+        ]}
       />
 
-      <div className="space-y-6 animate-in py-6 fade-in slide-in-from-bottom-2 duration-300">
-        <Card className="overflow-hidden border-slate-200 bg-white p-0">
-          <div className="relative bg-[hsl(var(--secondary))] px-6 py-6">
-            <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5" />
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <h2 className="truncate text-xl font-semibold tracking-tight text-slate-900">
-                  Profile
-                </h2>
-                <p className="mt-1 text-sm text-slate-600">
-                  Your account details and activity snapshot.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <CardContent className="bg-white px-6 py-5">
+      <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div id="profile" className="scroll-mt-32">
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Profile</h2>
+          <p className="mt-1 text-sm text-slate-600">Your account details and activity snapshot.</p>
+          <div className="mt-4">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex min-w-0 items-start gap-4">
                 <div className="shrink-0">
@@ -239,15 +327,69 @@ export default function Account() {
                 </div>
 
                 <div className="min-w-0">
-                  <div className="truncate text-base font-semibold text-slate-900">
-                    {user.displayName || "Unnamed user"}
-                  </div>
+                  {/* Inline display name editor */}
+                  {editingName ? (
+                    <div className="space-y-1.5">
+                      <div className="flex flex-col gap-2">
+                        <input
+                          ref={nameInputRef}
+                          type="text"
+                          value={nameValue}
+                          onChange={(e) => { setNameValue(e.target.value); setNameError(""); }}
+                          onKeyDown={handleNameKeyDown}
+                          maxLength={50}
+                          disabled={nameSaving}
+                          className="w-full rounded-md border border-slate-300 px-2 py-1 text-base font-semibold text-slate-900 outline-none focus:border-[hsl(var(--ring))] focus:ring-2 focus:ring-[hsl(var(--ring))]/30 disabled:opacity-50"
+                        />
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={commitNameEdit}
+                            disabled={nameSaving}
+                            aria-label="Save name"
+                            className="inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-100 disabled:opacity-50"
+                          >
+                            <Check className="h-3.5 w-3.5" />
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelNameEdit}
+                            disabled={nameSaving}
+                            aria-label="Cancel"
+                            className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                      {nameError && (
+                        <p className="text-xs text-rose-600">{nameError}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <div className="truncate text-base font-semibold text-slate-900">
+                        {user.displayName || "Unnamed user"}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={startEditName}
+                        aria-label="Edit display name"
+                        className="shrink-0 inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs font-medium text-slate-500 shadow-sm hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                      >
+                        <Pencil className="h-3 w-3" />
+                        Edit
+                      </button>
+                    </div>
+                  )}
                   <div className="truncate text-sm text-slate-600">
-                    {user.email || "—"}
+                    {user.email || "N/A"}
                   </div>
 
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                    <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-900">
                       {citiesReviewed}{" "}
                       {citiesReviewed === 1 ? "city" : "cities"} reviewed
                     </span>
@@ -256,7 +398,7 @@ export default function Account() {
               </div>
 
               <div className="grid w-full gap-3 sm:max-w-sm">
-                <InfoRow icon={Mail} label="Email" value={user.email || "—"} />
+                <InfoRow icon={Mail} label="Email" value={user.email || "N/A"} />
                 <InfoRow
                   icon={ShieldCheck}
                   label="Email verified"
@@ -274,35 +416,69 @@ export default function Account() {
                 />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="overflow-hidden border-slate-200 bg-white p-0 shadow-l transition-transform duration-200 hover:-translate-y-0.5">
-          <div className="relative bg-[hsl(var(--secondary))] px-6 py-6">
-            <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5" />
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <h2 className="truncate text-xl font-semibold tracking-tight text-slate-900">
-                  Your Reviews
-                </h2>
-                <p className="mt-1 text-sm text-slate-600">
-                  View, edit, and delete all of your reviews.
-                </p>
+        {/* Stats — shown only once reviews are loaded and at least one exists */}
+        {!isReviewsLoading && reviewStats ? (
+          <div className="border-t border-slate-200 pt-12">
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900">Your Stats</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Average ratings you've given across all {reviewStats.total}{" "}
+              {reviewStats.total === 1 ? "review" : "reviews"}.
+            </p>
+            <div className="mt-4">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {RATING_KEYS.map((key) => {
+                  const avg = reviewStats.avgs[key];
+                  const rounded = avg != null ? Math.round(avg * 10) / 10 : null;
+                  const { bar: barClass } = scoreColor(rounded);
+                  return (
+                    <div
+                      key={key}
+                      className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3"
+                    >
+                      <div className="text-xs font-semibold capitalize text-slate-500">
+                        {key}
+                      </div>
+                      <div className="text-2xl font-bold tabular-nums text-slate-900">
+                        {rounded ?? "N/A"}
+                        <span className="text-sm font-normal text-slate-400">
+                          /10
+                        </span>
+                      </div>
+                      <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
+                        <div
+                          className={`h-full rounded-full ${barClass}`}
+                          style={{ width: `${((rounded ?? 0) / 10) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+              {reviewStats.mostRecent ? (
+                <p className="mt-4 text-xs text-slate-500">
+                  Most recent review:{" "}
+                  <span className="font-medium text-slate-900">
+                    {fmtDateTime(reviewStats.mostRecent)}
+                  </span>
+                </p>
+              ) : null}
             </div>
           </div>
+        ) : null}
 
-          <CardContent className="bg-white px-6 py-5">
+        <div id="reviews" className="scroll-mt-32 border-t border-slate-200 pt-12">
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Your Reviews</h2>
+          <p className="mt-1 text-sm text-slate-600">View, edit, and delete all of your reviews.</p>
+          <div className="mt-4">
             {isReviewsLoading ? <Loading label="Loading reviews…" /> : null}
 
-            {error ? (
-              <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-                {error}
-              </div>
-            ) : null}
+            {error ? <ErrorMessage message={error} /> : null}
 
             {!isReviewsLoading && !error && myReviews.length === 0 ? (
-              <Card className="border-slate-200/70 shadow-sm ring-1 ring-blue-100/30">
+              <Card className="border-slate-200/70 shadow-sm ring-1 ring-[hsl(var(--border))]">
                 <CardContent className="px-6 py-5">
                   <div className="flex items-start gap-3">
                     <div>
@@ -320,7 +496,30 @@ export default function Account() {
 
             {!isReviewsLoading && !error && myReviews.length > 0 ? (
               <div className="space-y-3">
-                {myReviews.map((review, index) => {
+                {myReviews.length > 1 ? (
+                  <div className="flex items-center justify-end gap-2">
+                    <label
+                      htmlFor="review-sort"
+                      className="text-xs font-medium text-slate-500"
+                    >
+                      Sort by
+                    </label>
+                    <select
+                      id="review-sort"
+                      value={reviewSort}
+                      onChange={(e) => setReviewSort(e.target.value)}
+                      className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-600 outline-none focus:border-[hsl(var(--ring))] focus:ring-2 focus:ring-[hsl(var(--ring))]/30"
+                    >
+                      <option value="newest">Newest first</option>
+                      <option value="oldest">Oldest first</option>
+                      <option value="city">City A–Z</option>
+                      <option value="highest">Highest rated</option>
+                      <option value="lowest">Lowest rated</option>
+                    </select>
+                  </div>
+                ) : null}
+
+                {sortedReviews.map((review, index) => {
                   const citySlug = review?.cityId || "unknown-city";
                   const key =
                     review?.id ||
@@ -347,33 +546,21 @@ export default function Account() {
                 })}
               </div>
             ) : null}
-          </CardContent>
-        </Card>
-
-        <Card className="overflow-hidden border-slate-200 bg-white p-0 shadow-l transition-transform duration-200 hover:-translate-y-0.5">
-          <div className="relative bg-[hsl(var(--secondary))] px-6 py-6">
-            <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-slate-900/5" />
-            <div className="min-w-0">
-              <h2 className="truncate text-xl font-semibold tracking-tight text-slate-900">
-                Favorite Cities
-              </h2>
-              <p className="mt-1 text-sm text-slate-600">
-                Cities you've saved for easy access.
-              </p>
-            </div>
           </div>
+        </div>
 
-          <CardContent className="bg-white px-6 py-5">
+        <div id="favorites" className="scroll-mt-32 border-t border-slate-200 pt-12">
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Favorite Cities</h2>
+          <p className="mt-1 text-sm text-slate-600">Cities you've saved for easy access.</p>
+          <div className="mt-4">
             {isFavoritesLoading ? <Loading label="Loading favorites…" /> : null}
 
-            {favoritesError ? (
-              <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-                {favoritesError}
-              </div>
-            ) : null}
+            {favoritesError ? <ErrorMessage message={favoritesError} /> : null}
 
-            {!isFavoritesLoading && !favoritesError && myFavorites.length === 0 ? (
-              <Card className="border-slate-200/70 shadow-sm ring-1 ring-blue-100/30">
+            {!isFavoritesLoading &&
+            !favoritesError &&
+            myFavorites.length === 0 ? (
+              <Card className="border-slate-200/70 shadow-sm ring-1 ring-[hsl(var(--border))]">
                 <CardContent className="px-6 py-5">
                   <div className="text-base font-semibold text-slate-900">
                     No favorites yet.
@@ -385,7 +572,9 @@ export default function Account() {
               </Card>
             ) : null}
 
-            {!isFavoritesLoading && !favoritesError && myFavorites.length > 0 ? (
+            {!isFavoritesLoading &&
+            !favoritesError &&
+            myFavorites.length > 0 ? (
               <div className="space-y-2">
                 {myFavorites.map((fav) => {
                   const slug = fav.cityId;
@@ -396,12 +585,12 @@ export default function Account() {
                       key={slug}
                       className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3"
                     >
-                      <a
-                        href={`/cities/${slug}`}
+                      <Link
+                        to={`/cities/${slug}`}
                         className="min-w-0 truncate text-sm font-semibold text-slate-900 underline-offset-2 hover:underline"
                       >
                         {label}
-                      </a>
+                      </Link>
                       <button
                         onClick={() => onUnfavorite(slug)}
                         disabled={isRemoving}
@@ -416,10 +605,10 @@ export default function Account() {
                 })}
               </div>
             ) : null}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="border-slate-200/70 bg-white shadow-black-xl ring-1 ring-rose-100/40">
+        <Card className="border-slate-200/70 bg-white shadow-md ring-1 ring-[hsl(var(--destructive))]/20">
           <CardContent className="px-6 py-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>

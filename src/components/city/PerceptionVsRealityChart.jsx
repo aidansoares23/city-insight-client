@@ -11,10 +11,10 @@ function clampToUnitInterval(value) {
   return Math.max(0, Math.min(1, n));
 }
 
-/** Formats a number to one decimal place (e.g. `7.3`); returns `—` for non-finite values. */
+/** Formats a number to one decimal place (e.g. `7.3`); returns `"N/A"` for non-finite values. */
 function formatOneDecimal(value) {
   const n = Number(value);
-  return Number.isFinite(n) ? (Math.round(n * 10) / 10).toFixed(1) : "—";
+  return Number.isFinite(n) ? (Math.round(n * 10) / 10).toFixed(1) : "N/A";
 }
 
 /**
@@ -86,10 +86,10 @@ function CompareRow({ label, user, objective, polarity = "higher_is_better" }) {
         <div>
           <div className="flex items-center justify-between text-xs">
             <span className="text-slate-600">Data</span>
-            <span className="font-medium text-slate-700">
+            <span className="font-medium text-slate-900">
               {hasObjectiveScore
                 ? `${formatOneDecimal(objectiveScore)}/10`
-                : "—"}
+                : "N/A"}
             </span>
           </div>
           <div className="mt-1 h-2 w-full rounded-full bg-slate-100">
@@ -108,7 +108,7 @@ function CompareRow({ label, user, objective, polarity = "higher_is_better" }) {
           <div className="flex items-center justify-between text-xs">
             <span className="text-slate-600">People say</span>
             <span className="font-medium text-slate-900">
-              {hasUserScore ? `${formatOneDecimal(userScore)}/10` : "—"}
+              {hasUserScore ? `${formatOneDecimal(userScore)}/10` : "N/A"}
             </span>
           </div>
           <div className="mt-1 h-2 w-full rounded-full bg-slate-100">
