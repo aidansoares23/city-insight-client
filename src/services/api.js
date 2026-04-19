@@ -37,8 +37,7 @@ async function wakeServer({ maxWaitMs = 60000 } = {}) {
   wakeInFlight = (async () => {
     setApiStatus({
       status: "waking",
-      message:
-        "Server is waking up (free tier). First load may take ~10–30 seconds…",
+      message: "Reconnecting to server…",
     });
 
     let delay = 1000;
@@ -51,13 +50,13 @@ async function wakeServer({ maxWaitMs = 60000 } = {}) {
       } catch {
         await sleep(delay);
         delay = Math.min(Math.round(delay * 1.7), 8000);
-        setApiStatus({ status: "waking", message: "Still waking up…" });
+        setApiStatus({ status: "waking", message: "Still reconnecting…" });
       }
     }
 
     setApiStatus({
       status: "down",
-      message: "Backend is currently unavailable. Please try again later.",
+      message: "Couldn't reach the server. Please refresh and try again.",
     });
 
     return false;
@@ -108,7 +107,7 @@ api.interceptors.response.use(
     if (!original || original._retry) {
       setApiStatus({
         status: "down",
-        message: "Backend is currently unavailable. Please try again later.",
+        message: "Couldn't reach the server. Please refresh and try again.",
       });
       return Promise.reject(error);
     }

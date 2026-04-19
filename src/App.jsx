@@ -44,9 +44,9 @@ export default function App() {
     <div>
       <ApiOverlay
         show={status === "waking"}
-        title="Waking up City Insight backend…"
-        message="The free tier sleeps when idle. First request can take ~30 seconds."
-        hint="If it stalls, refresh and try again."
+        title="Getting things ready…"
+        message="We're having trouble reaching the server. Hang tight while we reconnect — this usually takes just a moment."
+        hint="Still stuck? Try refreshing the page."
       />
 
       {status === "rate-limited" && (

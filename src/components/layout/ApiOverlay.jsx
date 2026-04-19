@@ -42,7 +42,7 @@ export default function ApiOverlay({ show, title, message, hint }) {
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sky-400/15 text-sky-700 ring-1 ring-sky-200/70">
                   <Server className="h-3.5 w-3.5" />
                 </span>
-                Waking up backend
+                Reconnecting
               </div>
 
               <div className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
@@ -52,15 +52,14 @@ export default function ApiOverlay({ show, title, message, hint }) {
               <div className="text-sm leading-relaxed text-slate-600 sm:text-base">
                 {message ?? (
                   <>
-                    This demo uses a free hosting tier, so the backend goes to
-                    sleep when idle. We’re waking it up now — first load may
-                    take up to ~30 seconds.
+                    We’re having trouble reaching the server. Hang tight while
+                    we reconnect — this usually takes just a moment.
                   </>
                 )}
               </div>
 
               <div className="text-xs text-slate-500">
-                {hint ?? "If it doesn’t come back, try again in a moment."}
+                {hint ?? "Still stuck? Try refreshing the page."}
               </div>
             </div>
           </div>
