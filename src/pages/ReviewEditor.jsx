@@ -4,7 +4,7 @@ import { useAuth } from "@/auth/authContext";
 
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/loading";
-import { ConfirmDialog } from "@/components/ui/Dialog";
+import { ConfirmDialog } from "@/components/ui/dialog";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import { RatingSlider } from "@/components/ui/RatingSlider";
 import SectionCard from "@/components/layout/SectionCard";

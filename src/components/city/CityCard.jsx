@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { GitCompareArrows } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/Card";
+import { Card, CardContent } from "@/components/ui/card";
 import { fmtMoney, fmtNum, fmtPop, toOutOf10, clamp01 } from "@/lib/format";
 import { scoreColor, scoreLabel } from "@/lib/ratings";
 

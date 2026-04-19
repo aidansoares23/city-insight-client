@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/auth/authContext";
 
 import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/ui/Dialog";
+import { ConfirmDialog } from "@/components/ui/dialog";
 import ReviewCard from "@/components/reviews/ReviewCard";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import PageHero from "@/components/layout/PageHero";

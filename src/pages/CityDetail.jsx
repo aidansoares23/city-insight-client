@@ -7,7 +7,7 @@ import { useAuth } from "@/auth/authContext";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/Badge";
-import { ConfirmDialog } from "@/components/ui/Dialog";
+import { ConfirmDialog } from "@/components/ui/dialog";
 import ReviewCard from "@/components/reviews/ReviewCard";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import PageNav from "@/components/layout/PageNav";
