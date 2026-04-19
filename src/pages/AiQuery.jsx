@@ -7,7 +7,7 @@ import { sanitizeAiQuery } from "@/lib/sanitize";
 import { fetchAllCities } from "@/lib/cities";
 import { useAuth } from "@/auth/authContext";
 import { usePageTitle } from "@/hooks/usePageTitle";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import {
   Sparkles,
@@ -81,7 +81,11 @@ function extractCitiesFromTrace(trace) {
     } else if (step.tool === "aggregateReviews" && r.found && r.city?.slug) {
       if (!seen.has(r.city.slug)) {
         seen.add(r.city.slug);
-        cities.push({ slug: r.city.slug, name: r.city.name, state: r.city.state });
+        cities.push({
+          slug: r.city.slug,
+          name: r.city.name,
+          state: r.city.state,
+        });
       }
     } else if (step.tool === "compareCities") {
       for (const c of [r.city1, r.city2]) {
@@ -155,7 +159,11 @@ function TracePanel({ trace }) {
         className="flex w-full items-center justify-between px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
       >
         <span>Tool calls ({trace.length})</span>
-        {open ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+        {open ? (
+          <ChevronUp className="h-3.5 w-3.5" />
+        ) : (
+          <ChevronDown className="h-3.5 w-3.5" />
+        )}
       </button>
 
       {open && (
@@ -164,7 +172,9 @@ function TracePanel({ trace }) {
             <div key={idx} className="px-4 py-3 text-xs">
               <p className="font-semibold text-slate-900">
                 {idx + 1}.{" "}
-                <span className="font-mono text-[hsl(var(--primary-foreground))]">{step.tool}</span>
+                <span className="font-mono text-[hsl(var(--primary-foreground))]">
+                  {step.tool}
+                </span>
               </p>
               <p className="mt-1 text-slate-500">Input:</p>
               <pre className="mt-0.5 overflow-x-auto rounded border border-slate-400 bg-white p-2 text-slate-700">
@@ -238,20 +248,32 @@ function AssistantBubble({ message }) {
           remarkPlugins={[remarkGfm]}
           components={{
             p: ({ children }) => (
-              <p className="mb-3 text-sm leading-relaxed text-slate-900 last:mb-0">{children}</p>
+              <p className="mb-3 text-sm leading-relaxed text-slate-900 last:mb-0">
+                {children}
+              </p>
             ),
             strong: ({ children }) => (
-              <strong className="font-semibold text-slate-900">{children}</strong>
+              <strong className="font-semibold text-slate-900">
+                {children}
+              </strong>
             ),
             ul: ({ children }) => (
-              <ul className="mb-3 ml-4 list-disc space-y-1 text-sm text-slate-900">{children}</ul>
+              <ul className="mb-3 ml-4 list-disc space-y-1 text-sm text-slate-900">
+                {children}
+              </ul>
             ),
             ol: ({ children }) => (
-              <ol className="mb-3 ml-4 list-decimal space-y-1 text-sm text-slate-900">{children}</ol>
+              <ol className="mb-3 ml-4 list-decimal space-y-1 text-sm text-slate-900">
+                {children}
+              </ol>
             ),
-            li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+            li: ({ children }) => (
+              <li className="leading-relaxed">{children}</li>
+            ),
             h3: ({ children }) => (
-              <h3 className="mb-2 mt-4 text-base font-semibold text-slate-900">{children}</h3>
+              <h3 className="mb-2 mt-4 text-base font-semibold text-slate-900">
+                {children}
+              </h3>
             ),
             h4: ({ children }) => (
               <h4 className="mb-1 mt-3 text-sm font-semibold text-slate-900 uppercase tracking-wide">
@@ -280,9 +302,13 @@ function AssistantBubble({ message }) {
             ),
             tbody: ({ children }) => <tbody>{children}</tbody>,
             tr: ({ children }) => (
-              <tr className="border-b border-slate-100 last:border-0">{children}</tr>
+              <tr className="border-b border-slate-100 last:border-0">
+                {children}
+              </tr>
             ),
-            td: ({ children }) => <td className="px-4 py-2.5 text-slate-900">{children}</td>,
+            td: ({ children }) => (
+              <td className="px-4 py-2.5 text-slate-900">{children}</td>
+            ),
           }}
         >
           {message.content}
@@ -314,7 +340,9 @@ export default function AiQuery() {
 
   const { user, loading: authLoading } = useAuth();
   const [messages, setMessages] = useState([]);
-  const [sessionId, setSessionId] = useState(() => sessionStorage.getItem(SESSION_STORAGE_KEY) || null);
+  const [sessionId, setSessionId] = useState(
+    () => sessionStorage.getItem(SESSION_STORAGE_KEY) || null,
+  );
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -350,8 +378,15 @@ export default function AiQuery() {
         for (const msg of stored) {
           if (msg.role === "user" && typeof msg.content === "string") {
             displayMessages.push({ role: "user", content: msg.content });
-          } else if (msg.role === "assistant" && typeof msg.content === "string") {
-            displayMessages.push({ role: "assistant", content: msg.content, toolCallTrace: [] });
+          } else if (
+            msg.role === "assistant" &&
+            typeof msg.content === "string"
+          ) {
+            displayMessages.push({
+              role: "assistant",
+              content: msg.content,
+              toolCallTrace: [],
+            });
           }
         }
         if (displayMessages.length > 0) setMessages(displayMessages);
@@ -394,7 +429,11 @@ export default function AiQuery() {
     setLoading(true);
 
     try {
-      const res = await api.post("/ai/query", { query: q, sessionId }, { timeout: 90000 });
+      const res = await api.post(
+        "/ai/query",
+        { query: q, sessionId },
+        { timeout: 90000 },
+      );
       const { response, toolCallTrace, sessionId: newSessionId } = res.data;
 
       if (newSessionId && newSessionId !== sessionId) {
@@ -404,10 +443,15 @@ export default function AiQuery() {
 
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: response, toolCallTrace: toolCallTrace ?? [] },
+        {
+          role: "assistant",
+          content: response,
+          toolCallTrace: toolCallTrace ?? [],
+        },
       ]);
     } catch (err) {
-      const isTimeout = err.code === "ECONNABORTED" || err.message?.includes("timeout");
+      const isTimeout =
+        err.code === "ECONNABORTED" || err.message?.includes("timeout");
       const msg = isTimeout
         ? "The query timed out — try rephrasing or asking something more specific."
         : (err?.response?.status ?? 0) >= 500
@@ -439,7 +483,8 @@ export default function AiQuery() {
         <div className="text-center space-y-2">
           <h1 className="text-xl font-semibold text-slate-900">Ask AI</h1>
           <p className="text-sm text-slate-500 max-w-xs mx-auto">
-            AI features are available to signed-in users. Create a free account or sign in to get started.
+            AI features are available to signed-in users. Create a free account
+            or sign in to get started.
           </p>
         </div>
         <Button asChild>
@@ -461,9 +506,12 @@ export default function AiQuery() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-lg bg-[hsl(var(--secondary))]">
             <Sparkles className="h-7 w-7 text-[hsl(var(--primary-foreground))]" />
           </div>
-          <h1 className="text-2xl font-semibold text-slate-900">Ask anything</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">
+            Ask anything
+          </h1>
           <p className="text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">
-            Safety, affordability, livability — ask about any California city in our database.
+            Safety, affordability, livability — ask about any California city in
+            our database.
           </p>
         </div>
 

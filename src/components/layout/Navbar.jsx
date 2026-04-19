@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/auth/authContext";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { initialsFromUser } from "@/lib/format";
 import {
   Menu,
@@ -232,7 +232,9 @@ export default function Navbar() {
               "rounded-xl border border-slate-200 bg-[hsl(var(--muted))]/90 backdrop-blur-xl p-2",
               "shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.06)]",
               "transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
-              open ? "scale-100 opacity-100 translate-y-0" : "scale-[0.96] opacity-0 -translate-y-3",
+              open
+                ? "scale-100 opacity-100 translate-y-0"
+                : "scale-[0.96] opacity-0 -translate-y-3",
             ].join(" ")}
           >
             {NAV_ITEMS.filter((item) => !item.aiOnly || AI_ENABLED).map(
@@ -240,7 +242,15 @@ export default function Navbar() {
                 <div
                   key={to}
                   className="transition-[opacity,transform] duration-300 ease-out"
-                  style={open ? { transitionDelay: `${60 + i * 40}ms`, opacity: 1, transform: "translateY(0)" } : { opacity: 0, transform: "translateY(-6px)" }}
+                  style={
+                    open
+                      ? {
+                          transitionDelay: `${60 + i * 40}ms`,
+                          opacity: 1,
+                          transform: "translateY(0)",
+                        }
+                      : { opacity: 0, transform: "translateY(-6px)" }
+                  }
                 >
                   <MobileNavLink to={to} onClick={() => setOpen(false)}>
                     <Icon className="h-3.5 w-3.5 mr-1.5 inline-block" />
@@ -258,7 +268,15 @@ export default function Navbar() {
               <>
                 <div
                   className="transition-[opacity,transform] duration-300 ease-out"
-                  style={open ? { transitionDelay: `${60 + NAV_ITEMS.length * 40}ms`, opacity: 1, transform: "translateY(0)" } : { opacity: 0, transform: "translateY(-6px)" }}
+                  style={
+                    open
+                      ? {
+                          transitionDelay: `${60 + NAV_ITEMS.length * 40}ms`,
+                          opacity: 1,
+                          transform: "translateY(0)",
+                        }
+                      : { opacity: 0, transform: "translateY(-6px)" }
+                  }
                 >
                   <MobileNavLink to="/account" onClick={() => setOpen(false)}>
                     <UserCircle className="h-3.5 w-3.5 mr-1.5 inline-block" />
@@ -268,7 +286,15 @@ export default function Navbar() {
 
                 <div
                   className="transition-[opacity,transform] duration-300 ease-out"
-                  style={open ? { transitionDelay: `${60 + (NAV_ITEMS.length + 1) * 40}ms`, opacity: 1, transform: "translateY(0)" } : { opacity: 0, transform: "translateY(-6px)" }}
+                  style={
+                    open
+                      ? {
+                          transitionDelay: `${60 + (NAV_ITEMS.length + 1) * 40}ms`,
+                          opacity: 1,
+                          transform: "translateY(0)",
+                        }
+                      : { opacity: 0, transform: "translateY(-6px)" }
+                  }
                 >
                   <Button
                     variant="outline"
@@ -287,7 +313,15 @@ export default function Navbar() {
             ) : (
               <div
                 className="transition-[opacity,transform] duration-300 ease-out"
-                style={open ? { transitionDelay: `${60 + NAV_ITEMS.length * 40}ms`, opacity: 1, transform: "translateY(0)" } : { opacity: 0, transform: "translateY(-6px)" }}
+                style={
+                  open
+                    ? {
+                        transitionDelay: `${60 + NAV_ITEMS.length * 40}ms`,
+                        opacity: 1,
+                        transform: "translateY(0)",
+                      }
+                    : { opacity: 0, transform: "translateY(-6px)" }
+                }
               >
                 <Button asChild className="mt-2 w-full rounded-xl">
                   <NavLink to="/login" onClick={() => setOpen(false)}>

@@ -5,7 +5,7 @@ import remarkGfm from "remark-gfm";
 import api from "@/services/api";
 import { useAuth } from "@/auth/authContext";
 
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/Badge";
 import { ConfirmDialog } from "@/components/ui/Dialog";
 import ReviewCard from "@/components/reviews/ReviewCard";

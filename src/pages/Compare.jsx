@@ -4,7 +4,7 @@ import api from "@/services/api";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 import CityRadarChart from "@/components/city/CityRadarChart";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Loading } from "@/components/ui/Loading";
 import ErrorMessage from "@/components/ui/ErrorMessage";
@@ -385,7 +385,10 @@ export default function Compare() {
         {
           metric: "Livability Score",
           values: loadedCities.map(
-            (c) => c.data?.livability?.score ?? c.data?.stats?.livabilityScore ?? null,
+            (c) =>
+              c.data?.livability?.score ??
+              c.data?.stats?.livabilityScore ??
+              null,
           ),
           dir: "higher",
           render: (v) => <LivabilityBadge value={v} />,
@@ -471,9 +474,13 @@ export default function Compare() {
       <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
         <div className="flex items-center gap-2">
           <GitCompareArrows className="h-5 w-5 text-slate-500" />
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Choose Your Cities</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            Choose Your Cities
+          </h2>
         </div>
-        <p className="mt-1 text-sm text-slate-500">Add up to {MAX_CITIES} cities to compare.</p>
+        <p className="mt-1 text-sm text-slate-500">
+          Add up to {MAX_CITIES} cities to compare.
+        </p>
         <div className="mt-3">
           {citiesLoading ? (
             <Loading label="Loading cities…" />
@@ -509,7 +516,9 @@ export default function Compare() {
                   />
 
                   {errorStates[i] && (
-                    <p className="mt-2 text-xs text-rose-600">{errorStates[i]}</p>
+                    <p className="mt-2 text-xs text-rose-600">
+                      {errorStates[i]}
+                    </p>
                   )}
                   {loadingStates[i] && (
                     <div className="mt-2">
@@ -562,9 +571,13 @@ export default function Compare() {
         <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-slate-500" />
-            <h2 className="text-xl font-semibold tracking-tight text-slate-900">Score Overview</h2>
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+              Score Overview
+            </h2>
           </div>
-          <p className="mt-1 text-sm text-slate-500">How each city rates across all categories.</p>
+          <p className="mt-1 text-sm text-slate-500">
+            How each city rates across all categories.
+          </p>
           <div className="mt-3">
             <CityRadarChart cities={radarCities} height={320} />
           </div>
@@ -576,9 +589,13 @@ export default function Compare() {
         <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
           <div className="flex items-center gap-2">
             <GitCompareArrows className="h-5 w-5 text-slate-500" />
-            <h2 className="text-xl font-semibold tracking-tight text-slate-900">Side-by-Side Breakdown</h2>
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+              Side-by-Side Breakdown
+            </h2>
           </div>
-          <p className="mt-1 text-sm text-slate-500">✓ marks the best city for each category.</p>
+          <p className="mt-1 text-sm text-slate-500">
+            ✓ marks the best city for each category.
+          </p>
           <div className="mt-3">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -611,7 +628,9 @@ export default function Compare() {
                       key={row.metric}
                       metric={row.metric}
                       values={row.values}
-                      winnerIdx={row.dir ? findWinner(row.values, row.dir) : null}
+                      winnerIdx={
+                        row.dir ? findWinner(row.values, row.dir) : null
+                      }
                       renderValue={row.render}
                     />
                   ))}
@@ -637,9 +656,13 @@ export default function Compare() {
         <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
           <div className="flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-slate-500" />
-            <h2 className="text-xl font-semibold tracking-tight text-slate-900">Moving Cost Estimate</h2>
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+              Moving Cost Estimate
+            </h2>
           </div>
-          <p className="mt-1 text-sm text-slate-500">Monthly budget comparison based on median rent ratios.</p>
+          <p className="mt-1 text-sm text-slate-500">
+            Monthly budget comparison based on median rent ratios.
+          </p>
           <div className="mt-3">
             <CostCalculator cities={loadedCities} />
           </div>

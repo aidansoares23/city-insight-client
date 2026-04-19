@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import PageHero from "@/components/layout/PageHero";
 import LivabilityBreakdown from "@/components/city/LivabilityBreakdown";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 import {
