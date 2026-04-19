@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import Home from "./pages/Home";
 import Cities from "./pages/Cities";
 import CityDetail from "./pages/CityDetail";
@@ -91,6 +92,7 @@ export default function App() {
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Analytics />
     </div>
   );
 }
