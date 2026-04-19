@@ -52,23 +52,23 @@ describe("toDate", () => {
 });
 
 describe("fmtDateTime", () => {
-  it("returns — for null", () => {
-    expect(fmtDateTime(null)).toBe("—");
+  it("returns N/A for null", () => {
+    expect(fmtDateTime(null)).toBe("N/A");
   });
   it("returns a non-empty string for a valid ISO date", () => {
     const result = fmtDateTime("2024-01-15T12:00:00.000Z");
     expect(typeof result).toBe("string");
-    expect(result).not.toBe("—");
+    expect(result).not.toBe("N/A");
   });
 });
 
 describe("fmtDate", () => {
-  it("returns — for null", () => {
-    expect(fmtDate(null)).toBe("—");
+  it("returns N/A for null", () => {
+    expect(fmtDate(null)).toBe("N/A");
   });
   it("returns a non-empty string for a valid ISO date", () => {
     const result = fmtDate("2024-01-15");
     expect(typeof result).toBe("string");
-    expect(result).not.toBe("—");
+    expect(result).not.toBe("N/A");
   });
 });

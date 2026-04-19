@@ -2,67 +2,39 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/auth/authContext";
 
-import { Button } from "@/components/ui/button";
-import { Loading } from "@/components/ui/loading";
-import { ConfirmDialog } from "@/components/ui/dialog";
-import PageHero from "@/components/layout/PageHero";
-import { BackLink } from "@/components/ui/back-link";
+import { Button } from "@/components/ui/Button";
+import { Loading } from "@/components/ui/Loading";
+import { ConfirmDialog } from "@/components/ui/Dialog";
+import ErrorMessage from "@/components/ui/ErrorMessage";
+import { RatingSlider } from "@/components/ui/RatingSlider";
 import SectionCard from "@/components/layout/SectionCard";
+import PageHero from "@/components/layout/PageHero";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { cn } from "@/utils/utils";
 
-import {
-  MessageSquareText,
-  Save,
-  Trash2,
-  X,
-  SlidersHorizontal,
-} from "lucide-react";
+import { Save, Star, Trash2, X } from "lucide-react";
 
 import { safeReturnTo } from "@/lib/routing";
 import { prettyCityFromSlug } from "@/lib/cities";
 import {
   RATING_KEYS,
+  RATING_LABELS,
   clampRating10,
   derivedOverall,
   makeEmptyReviewForm,
   normalizeReviewToForm,
+  scoreColor,
 } from "@/lib/ratings";
 import { fetchMyReview, upsertMyReview, deleteMyReview } from "@/lib/reviews";
 
-const RATING_LABELS = {
-  safety: "Safety",
-  affordability: "Affordability",
-  walkability: "Walkability",
-  cleanliness: "Cleanliness",
+const RATING_DESCRIPTIONS = {
+  safety: "How safe did you feel day-to-day?",
+  affordability: "Cost of living, dining & activities",
+  walkability: "Transit, bikeability & foot traffic",
+  cleanliness: "Maintenance, air quality & upkeep",
 };
 
 const COMMENT_MAX = 800;
-
-/** Range-slider row for a single rating category; calls `onChange` with the new string value. */
-function RatingRow({ label, value, onChange }) {
-  const safeValue = Number.isFinite(Number(value)) ? Number(value) : 0;
-
-  return (
-    <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[160px_1fr_72px] sm:gap-4">
-      <label className="text-sm font-medium text-slate-700">{label}</label>
-
-      <input
-        className="w-full accent-[hsl(var(--primary))]"
-        type="range"
-        min="1"
-        max="10"
-        step="1"
-        value={safeValue}
-        onChange={(e) => onChange(e.target.value)}
-        aria-label={`${label} rating`}
-      />
-
-      <div className="text-right text-sm font-semibold text-slate-900 tabular-nums">
-        {safeValue}/10
-      </div>
-    </div>
-  );
-}
 
 /** Review create/edit form — loads an existing review if one exists, then saves or deletes via the API. */
 export default function ReviewEditor() {
@@ -171,10 +143,7 @@ export default function ReviewEditor() {
           comment: form.comment?.trim() ? form.comment.trim() : null,
         };
 
-        const timeout = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("timeout")), 30_000),
-        );
-        const res = await Promise.race([upsertMyReview(slug, payload), timeout]);
+        const res = await upsertMyReview(slug, payload);
         const created = !!res?.data?.created;
 
         navigate(returnTo, {
@@ -182,11 +151,7 @@ export default function ReviewEditor() {
           state: { reviewSaved: true, created, citySlug: slug },
         });
       } catch (err) {
-        setError(
-          err?.message === "timeout"
-            ? "Request timed out. Please check your connection and try again."
-            : err?.response?.data?.error?.message || "Failed to save review.",
-        );
+        setError(err?.response?.data?.error?.message || "Failed to save review.");
       } finally {
         setIsSaving(false);
       }
@@ -222,15 +187,12 @@ export default function ReviewEditor() {
     return <Loading variant="page" />;
   }
 
-  const headerTitle =
-    mode === "edit"
-      ? `Edit Review — ${cityLabel}`
-      : `Write Review — ${cityLabel}`;
-
+  const overallScore = derivedOverall(form.ratings);
+  const overallColors = scoreColor(overallScore);
   const isBusy = isSaving || isDeleting;
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+    <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
       <ConfirmDialog
         open={confirmDeleteOpen}
         onOpenChange={setConfirmDeleteOpen}
@@ -240,92 +202,95 @@ export default function ReviewEditor() {
         onConfirm={executeDelete}
       />
 
-      <div className="flex items-center justify-between">
-        <BackLink onClick={() => navigate(returnTo)}>Back</BackLink>
-      </div>
-
       <PageHero
-        title={headerTitle}
-        description="Update your ratings and comment."
-        aside={
-          <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
-            <SlidersHorizontal className="h-4 w-4 text-slate-400" />
-            Ratings (1–10)
-          </div>
+        className="pt-1 pb-1"
+        title={mode === "edit" ? "Edit Review" : "Write a Review"}
+        description={
+          mode === "edit"
+            ? `Update your review of ${cityLabel}.`
+            : `Share your honest experience living in or visiting ${cityLabel}.`
         }
       />
 
-      {error ? (
-        <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-          {error}
-        </div>
-      ) : null}
+      {error ? <ErrorMessage message={error} /> : null}
 
-      <form onSubmit={onSubmit} className="space-y-5">
+      <form onSubmit={onSubmit} className="flex flex-col gap-2 mt-0">
         <SectionCard
-          icon={MessageSquareText}
-          title="Your Ratings"
-          subtitle="Rate each category from 1–10."
+          icon={Star}
+          title="Rate Your Experience"
+          subtitle="Rate each category and share your thoughts."
           action={
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              {mode === "edit" ? "Editing" : "New review"}
-            </span>
+            <div className={cn(
+              "inline-flex items-baseline gap-1 rounded-lg border px-3 py-1.5",
+              overallColors.badge,
+            )}>
+              <span className="text-2xl font-bold tabular-nums leading-none">
+                {overallScore}
+              </span>
+              <span className="text-xs font-medium opacity-50">/10</span>
+              <span className="ml-1 text-[10px] font-semibold uppercase tracking-wide opacity-60">
+                Overall
+              </span>
+            </div>
           }
         >
-          <div className="space-y-6">
-            <div className="space-y-4">
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
               {RATING_KEYS.map((key) => (
-                <RatingRow
+                <RatingSlider
                   key={key}
                   label={RATING_LABELS[key] ?? key}
-                  value={form.ratings[key]}
+                  description={RATING_DESCRIPTIONS[key]}
+                  value={Number(form.ratings[key]) || 6}
                   onChange={(newValue) => setRating(key, newValue)}
+                  min={1}
+                  max={10}
+                  minLabel="Poor"
+                  maxLabel="Excellent"
                 />
               ))}
             </div>
 
             <div className="h-px bg-slate-100" />
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-900">
-                Additional Comments (Optional)
-              </label>
-
+            <div className="space-y-1.5">
+              <div className="flex items-baseline justify-between">
+                <label className="text-sm font-semibold text-slate-900">
+                  Additional Comments <span className="font-normal text-slate-400">(Optional)</span>
+                </label>
+                <span className="text-xs tabular-nums text-slate-400">
+                  {form.comment.length}&thinsp;/&thinsp;{COMMENT_MAX}
+                </span>
+              </div>
               <textarea
-                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+                className="w-full resize-y rounded-lg border border-slate-400 bg-slate-50 px-4 py-3 text-sm text-slate-900 shadow-inner outline-none transition placeholder:text-slate-400 focus:border-[hsl(var(--ring))] focus:bg-white focus:ring-2 focus:ring-[hsl(var(--ring))]/30"
                 value={form.comment}
                 onChange={(e) => setComment(e.target.value)}
-                rows={6}
-                placeholder="Share more details about your experience…"
+                rows={2}
+                placeholder="What stood out most? Any tips for someone considering a visit or move?"
                 maxLength={COMMENT_MAX}
               />
-
-              <div className="text-xs text-slate-500 tabular-nums">
-                {form.comment.length}/{COMMENT_MAX}
-              </div>
             </div>
 
             <div className="h-px bg-slate-100" />
 
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <Button type="submit" variant="primary" disabled={isBusy}>
-                <Save className="mr-2 h-4 w-4" />
-                {isSaving
-                  ? "Saving…"
-                  : mode === "edit"
-                    ? "Save changes"
-                    : "Submit review"}
-              </Button>
+            <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
+              <div className="flex gap-2">
+                <Button type="submit" variant="primary" disabled={isBusy}>
+                  <Save />
+                  {isSaving ? "Saving…" : mode === "edit" ? "Save changes" : "Submit review"}
+                </Button>
 
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => navigate(returnTo)}
-                disabled={isBusy}
-              >
-                <X className="mr-2 h-4 w-4" />
-                Cancel
-              </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => navigate(returnTo)}
+                  disabled={isBusy}
+                >
+                  <X />
+                  Cancel
+                </Button>
+              </div>
 
               {mode === "edit" ? (
                 <Button
@@ -333,10 +298,10 @@ export default function ReviewEditor() {
                   variant="danger"
                   onClick={onDelete}
                   disabled={isBusy}
-                  className="sm:ml-auto"
+                  className="w-full sm:ml-auto sm:w-auto"
                 >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  {isDeleting ? "Deleting…" : "Delete"}
+                  <Trash2 />
+                  {isDeleting ? "Deleting…" : "Delete review"}
                 </Button>
               ) : null}
             </div>

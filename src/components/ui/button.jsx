@@ -23,23 +23,27 @@ const buttonVariants = cva(
         ].join(" "),
 
         secondary: [
-          "border border-slate-400 bg-white text-slate-700",
+          "border border-slate-400 bg-white text-slate-900",
           "shadow-sm",
-          "hover:bg-slate-50 hover:border-slate-600 hover:text-slate-900",
+          "hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900",
         ].join(" "),
 
         danger: [
           "border border-rose-200 bg-white text-rose-700",
           "shadow-sm",
           "hover:bg-rose-50 hover:text-rose-800",
-          // "focus-visible:ring-rose-200",
+        ].join(" "),
+
+        ghost: [
+          "text-slate-600 bg-transparent",
+          "hover:bg-slate-100 hover:text-slate-900 hover:-translate-y-0.5",
         ].join(" "),
       },
 
       size: {
         default: "h-9 rounded-lg px-4 py-2 has-[>svg]:px-3",
         sm: "h-8 rounded-lg px-3 has-[>svg]:px-2.5",
-        lg: "h-11 rounded-2xl px-8 has-[>svg]:px-7",
+        lg: "h-11 rounded-lg px-8 has-[>svg]:px-7",
         icon: "h-9 w-9 rounded-lg px-0",
         "icon-sm": "h-8 w-8 rounded-lg px-0",
       },

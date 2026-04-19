@@ -11,7 +11,14 @@ import ApiOverlay from "./components/layout/ApiOverlay";
 import { useAuth } from "./auth/authContext";
 import ReviewEditor from "./pages/ReviewEditor";
 import Methodology from "./pages/Methodology";
+import Compare from "./pages/Compare";
+import AiQuery from "./pages/AiQuery";
+import Quiz from "./pages/Quiz";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
+
+const AI_ENABLED = import.meta.env.VITE_AI_ENABLED !== "false";
 
 /** Route guard that redirects unauthenticated users to `/login`, preserving the intended path in router state. */
 function RequireAuth({ children }) {
@@ -57,6 +64,12 @@ export default function App() {
           <Route path="/cities" element={<Cities />} />
           <Route path="/cities/:slug" element={<CityDetail />} />
           <Route path="/methodology" element={<Methodology />} />
+          <Route path="/compare" element={<Compare />} />
+          {AI_ENABLED && <Route path="/ask" element={<AiQuery />} />}
+          <Route path="/quiz" element={<Quiz />} />
+
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
 
           <Route path="/login" element={<Login />} />
 

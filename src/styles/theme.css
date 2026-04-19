@@ -1,9 +1,18 @@
-@import url("https://fonts.googleapis.com/css2?family=Bungee&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", sans-serif;
+}
+@plugin "@tailwindcss/typography";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+
+html, body {
+  font-family: "Inter", sans-serif;
+}
 
 /* =========================
    City Insight Theme Tokens
@@ -11,13 +20,13 @@
 :root {
   /* Base */
   --background: 0 0% 100%;
-  --foreground: 200 92% 10%; /* #022333 */
+  --foreground: 222 47% 11%; /* slate-900 */
 
   --card: 0 0% 100%;
-  --card-foreground: 200 92% 10%;
+  --card-foreground: 222 47% 11%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 200 92% 10%;
+  --popover-foreground: 222 47% 11%;
 
   /* Brand */
   /* #8FD9FB */
@@ -25,13 +34,13 @@
   /* --primary: #7dd3fc; */
   /* --primary: #ea252f; */
   --primary: 199 97% 74%;
-  --primary-foreground: 200 92% 10%; /* #022333 */
+  --primary-foreground: 222 47% 11%; /* slate-900 */
 
   /* Support */
   /* soft tint derived from #99B8C7 */
   /* --secondary: 200 29% 92%; */
   --secondary: 199 92% 84%;
-  --secondary-foreground: 200 92% 10%;
+  --secondary-foreground: 222 47% 11%;
 
   --muted: 200 29% 95%;
   --muted-foreground: 198 23% 31%; /* #3D5661 */
@@ -45,6 +54,22 @@
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
+
+  /* Score / rating tier colors */
+  --score-good: 142 72% 45%;        /* emerald — ≥7/10 */
+  --score-good-subtle: 142 76% 92%; /* emerald-100 tint */
+  --score-ok: 38 92% 50%;           /* amber — ≥4/10 */
+  --score-ok-subtle: 45 93% 87%;    /* amber-100 tint */
+  --score-bad: 0 84% 60%;           /* rose — <4/10 (same as --destructive) */
+  --score-bad-subtle: 356 100% 94%; /* rose-100 tint */
+  --score-neutral: 215 16% 47%;     /* slate-500 — no data */
+  --score-neutral-subtle: 210 17% 93%; /* slate-100 tint */
+
+  /* Chart / multi-city colors (used in CityRadarChart, Compare) */
+  --chart-1: 199 97% 55%; /* primary blue */
+  --chart-2: 0 84% 60%;   /* rose/red */
+  --chart-3: 142 72% 45%; /* green */
+  --chart-4: 38 92% 50%;  /* amber */
 }
 
 /* Optional dark theme (we can tune later) */
@@ -73,10 +98,26 @@
   --border: 198 23% 22%;
   --input: 198 23% 22%;
   --ring: 199 93% 77%;
+
+  /* Score colors — dark mode (same hue, adjusted lightness) */
+  --score-good: 142 72% 52%;
+  --score-good-subtle: 142 40% 20%;
+  --score-ok: 38 92% 55%;
+  --score-ok-subtle: 38 50% 20%;
+  --score-bad: 0 84% 65%;
+  --score-bad-subtle: 0 40% 20%;
+  --score-neutral: 215 16% 60%;
+  --score-neutral-subtle: 215 16% 20%;
+
+  /* Chart colors — dark mode */
+  --chart-1: 199 93% 77%;
+  --chart-2: 0 84% 65%;
+  --chart-3: 142 72% 52%;
+  --chart-4: 38 92% 55%;
 }
 
 .brand-font {
-  font-family: "Bungee", sans-serif;
+  font-family: "Inter", sans-serif;
   /* font-weight: 900; */
   /* font-size: xx-large; */
 }
@@ -92,3 +133,33 @@
 .group:hover .underline-hover {
   background-size: 100% 2px;
 }
+
+/* Home page floating-pin and entrance animations */
+@keyframes homePinA {
+  0%, 100% { transform: translate(0px,   0px)  rotate(-1deg); opacity: 0;    }
+  15%      { transform: translate(3px,  -8px)  rotate(0deg);  opacity: 0.50; }
+  55%      { transform: translate(8px, -26px)  rotate(2deg);  opacity: 0.36; }
+  88%      { transform: translate(5px, -38px)  rotate(1deg);  opacity: 0.14; }
+}
+@keyframes homePinB {
+  0%, 100% { transform: translate(0px,   0px)  rotate(1deg);  opacity: 0;    }
+  20%      { transform: translate(-5px, -9px)  rotate(-1deg); opacity: 0.46; }
+  60%      { transform: translate(-11px,-28px) rotate(-3deg); opacity: 0.30; }
+  88%      { transform: translate(-6px, -40px) rotate(-1deg); opacity: 0.12; }
+}
+@keyframes homePinC {
+  0%, 100% { transform: translate(0px,   0px)  rotate(-2deg); opacity: 0;    }
+  25%      { transform: translate(6px,  -8px)  rotate(0deg);  opacity: 0.52; }
+  65%      { transform: translate(12px,-27px)  rotate(3deg);  opacity: 0.32; }
+  90%      { transform: translate(7px, -39px)  rotate(1deg);  opacity: 0.10; }
+}
+@keyframes homeEnter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0px);  }
+}
+.home-enter-1 { animation: homeEnter 0.5s ease-out 0.05s both; }
+.home-enter-2 { animation: homeEnter 0.5s ease-out 0.13s both; }
+.home-enter-3 { animation: homeEnter 0.5s ease-out 0.21s both; }
+.home-enter-4 { animation: homeEnter 0.5s ease-out 0.29s both; }
+.home-enter-5 { animation: homeEnter 0.5s ease-out 0.33s both; }
+.home-enter-6 { animation: homeEnter 0.5s ease-out 0.37s both; }

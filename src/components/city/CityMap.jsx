@@ -12,14 +12,14 @@ export default function CityMap({ cityName, state, lat, lng, zoom = 11 }) {
   if (!hasCoords) return null;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-xl">
-      <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-5 py-3">
+    <div className="overflow-hidden rounded-lg border border-border bg-white shadow-xl">
+      <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
         <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-slate-900">
+          <div className="truncate text-sm font-semibold text-foreground">
             {cityName}
             {state ? `, ${state}` : ""}
           </div>
-          <div className="text-xs text-slate-500 tabular-nums">
+          <div className="text-xs text-muted-foreground tabular-nums">
             {lat.toFixed(4)}, {lng.toFixed(4)}
           </div>
         </div>
@@ -27,7 +27,7 @@ export default function CityMap({ cityName, state, lat, lng, zoom = 11 }) {
         <button
           type="button"
           onClick={() => openInGoogleMaps(lat, lng)}
-          className="shrink-0 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:border-slate-300 hover:text-slate-900"
+          className="shrink-0 rounded-xl border border-border bg-white px-3 py-1.5 text-xs font-medium text-foreground/70 hover:border-foreground/30 hover:text-foreground"
         >
           Open in Maps
         </button>
@@ -50,7 +50,7 @@ export default function CityMap({ cityName, state, lat, lng, zoom = 11 }) {
             <Popup>
               <div className="text-sm">
                 <div className="font-semibold">{cityName}</div>
-                {state ? <div className="text-slate-600">{state}</div> : null}
+                {state ? <div className="text-muted-foreground">{state}</div> : null}
               </div>
             </Popup>
           </Marker>

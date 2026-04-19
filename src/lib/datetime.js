@@ -32,19 +32,19 @@ export function toDate(value) {
   return Number.isFinite(dt.getTime()) ? dt : null;
 }
 
-/** Formats a date-time value as a locale string; defaults to medium date + short time. Returns `—` if invalid. */
+/** Formats a date-time value as a locale string; defaults to medium date + short time. Returns `"N/A"` if invalid. */
 export function fmtDateTime(value, opts) {
   const dt = toDate(value);
-  if (!dt) return "—";
+  if (!dt) return "N/A";
   return dt.toLocaleString(
     undefined,
     opts ?? { dateStyle: "medium", timeStyle: "short" },
   );
 }
 
-/** Formats a date value as a locale date-only string; defaults to medium date style. Returns `—` if invalid. */
+/** Formats a date value as a locale date-only string; defaults to medium date style. Returns `"N/A"` if invalid. */
 export function fmtDate(value, opts) {
   const dt = toDate(value);
-  if (!dt) return "—";
+  if (!dt) return "N/A";
   return dt.toLocaleString(undefined, opts ?? { dateStyle: "medium" });
 }
