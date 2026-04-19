@@ -14,6 +14,19 @@ export default defineConfig({
     },
     extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-react":    ["react", "react-dom", "react-router-dom"],
+          "vendor-charts":   ["recharts"],
+          "vendor-map":      ["leaflet", "react-leaflet"],
+          "vendor-markdown": ["react-markdown", "remark-gfm"],
+          "vendor-auth":     ["@react-oauth/google"],
+        },
+      },
+    },
+  },
   server: {
     proxy: {
       // send /api/* to backend

@@ -13,11 +13,11 @@
  */
 const CITY_PHOTOS = {
   "santa-barbara-ca": [
-    "/city-photos/santa-barbara-ca/gerson-repreza-88_Wt6-3PA8-unsplash.jpg",
-    "/city-photos/santa-barbara-ca/sean-mullowney-3BgUBmDKwiI-unsplash.jpg",
-    "/city-photos/santa-barbara-ca/clay-banks-b6Bs19onFtY-unsplash.jpg",
-    "/city-photos/santa-barbara-ca/harrison-lin-2OajIB8ustA-unsplash.jpg",
-    "/city-photos/santa-barbara-ca/land-o-lakes-inc-iVINr8-ZFmY-unsplash.jpg",
+    "/city-photos/santa-barbara-ca/gerson-repreza-88_Wt6-3PA8-unsplash.webp",
+    "/city-photos/santa-barbara-ca/sean-mullowney-3BgUBmDKwiI-unsplash.webp",
+    "/city-photos/santa-barbara-ca/clay-banks-b6Bs19onFtY-unsplash.webp",
+    "/city-photos/santa-barbara-ca/harrison-lin-2OajIB8ustA-unsplash.webp",
+    "/city-photos/santa-barbara-ca/land-o-lakes-inc-iVINr8-ZFmY-unsplash.webp",
   ],
 };
 

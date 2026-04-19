@@ -5,8 +5,6 @@ import App from "./App";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./auth/authContext";
 import ErrorBoundary from "./components/layout/ErrorBoundary";
-import "leaflet/dist/leaflet.css";
-import "./lib/leafletIcon";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <ErrorBoundary>

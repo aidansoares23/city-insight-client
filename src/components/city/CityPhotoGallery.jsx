@@ -67,12 +67,16 @@ export default function CityPhotoGallery({ slug }) {
               src={src}
               alt=""
               className="absolute inset-0 h-full w-full object-cover scale-110 blur-2xl"
+              loading={i === 0 ? "eager" : "lazy"}
+              decoding="async"
             />
             <div className="absolute inset-0 bg-black/30" />
             <img
               src={src}
               alt=""
               className="absolute inset-0 h-full w-full object-contain"
+              loading={i === 0 ? "eager" : "lazy"}
+              decoding="async"
             />
           </div>
         ))}
