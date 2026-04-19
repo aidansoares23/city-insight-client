@@ -125,7 +125,7 @@ function mergeReactionsIntoState(prevState, reviews) {
 /** Summary metric tile showing an icon, title, large value, and a subtitle note. */
 function MetricCard({ title, icon: Icon, value, subtitle }) {
   return (
-    <div className="rounded-lg border border-slate-400 bg-white px-4 py-4 shadow-sm">
+    <div className="rounded-lg border border-slate-400 bg-white px-4 py-4 shadow-sm min-w-0">
       <div className="flex items-center gap-3">
         {Icon ? (
           <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
@@ -135,7 +135,7 @@ function MetricCard({ title, icon: Icon, value, subtitle }) {
         <div className="text-sm font-medium text-slate-600">{title}</div>
       </div>
 
-      <div className="mt-3 text-3xl font-semibold text-slate-900 tabular-nums">
+      <div className="mt-3 text-xl font-semibold text-slate-900 tabular-nums sm:text-3xl truncate">
         {value}
       </div>
 

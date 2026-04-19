@@ -16,7 +16,7 @@ export default function Layout() {
   return (
     <div className="h-screen overflow-hidden flex flex-col bg-white text-slate-900">
       <Navbar />
-      <div ref={scrollRef} className="flex-1 overflow-y-auto flex flex-col">
+      <div ref={scrollRef} className="flex-1 overflow-x-hidden overflow-y-auto flex flex-col">
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-4 sm:px-6 lg:px-10 flex flex-col">
           <ErrorBoundary>
             <Outlet />

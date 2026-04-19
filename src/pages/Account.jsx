@@ -336,10 +336,10 @@ export default function Account() {
         ]}
       />
 
-      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="min-w-0 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
         <div
           id="profile"
-          className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+          className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-3 py-4 sm:px-5"
         >
           <h2 className="text-xl font-semibold tracking-tight text-slate-900">
             Profile
@@ -456,7 +456,7 @@ export default function Account() {
 
         {/* Stats — shown only once reviews are loaded and at least one exists */}
         {!isReviewsLoading && reviewStats ? (
-          <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
+          <div className="rounded-lg border border-slate-400 bg-white px-3 py-4 sm:px-5">
             <h2 className="text-xl font-semibold tracking-tight text-slate-900">
               Your Stats
             </h2>
@@ -509,7 +509,7 @@ export default function Account() {
 
         <div
           id="reviews"
-          className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+          className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-3 py-4 sm:px-5"
         >
           <h2 className="text-xl font-semibold tracking-tight text-slate-900">
             Your Reviews
@@ -553,7 +553,7 @@ export default function Account() {
                   </div>
                 ) : null}
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {sortedReviews.map((review, index) => {
                     const citySlug = review?.cityId || "unknown-city";
                     const key =
@@ -587,7 +587,7 @@ export default function Account() {
 
         <div
           id="favorites"
-          className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+          className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-3 py-4 sm:px-5"
         >
           <h2 className="text-xl font-semibold tracking-tight text-slate-900">
             Favorite Cities
@@ -645,7 +645,7 @@ export default function Account() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
+        <div className="rounded-lg border border-slate-400 bg-white px-3 py-4 sm:px-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="text-base font-semibold text-slate-900">

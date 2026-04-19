@@ -92,17 +92,17 @@ function CategoryChips({ ratings }) {
   });
 
   return (
-    <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-1.5 md:grid-cols-4">
       {items.map(({ key, label, rating, halo }) => (
         <div
           key={key}
           className={cn(
-            "flex items-center justify-between rounded-lg border bg-white px-2.5 py-1.5",
+            "flex items-center gap-1 overflow-hidden rounded-lg border bg-white px-2.5 py-1.5",
             halo,
           )}
         >
-          <span className="text-xs font-medium text-slate-500">{label}</span>
-          <span className="text-sm font-bold tabular-nums text-slate-900">
+          <span className="min-w-0 flex-1 truncate text-xs font-medium text-slate-500">{label}</span>
+          <span className="shrink-0 text-sm font-bold tabular-nums text-slate-900">
             {rating ?? "—"}
           </span>
         </div>
@@ -227,7 +227,7 @@ export default function ReviewCard({
             {label && (
               <span
                 className={cn(
-                  "ml-1 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                  "ml-1 hidden rounded-full px-2 py-0.5 text-[10px] font-semibold sm:inline",
                   tone.pill,
                 )}
               >
