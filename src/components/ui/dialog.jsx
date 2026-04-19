@@ -3,7 +3,7 @@ import { XIcon } from "lucide-react";
 import { Dialog as DialogPrimitive } from "radix-ui";
 
 import { cn } from "@/utils/utils";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 /** Radix Dialog root — manages open/close state. */
 function Dialog({ ...props }) {
@@ -169,7 +169,11 @@ function ConfirmDialog({
         {requireConfirmText && (
           <div className="flex flex-col gap-1.5">
             <label className="text-sm text-slate-600">
-              Type <span className="font-semibold text-slate-900">{requireConfirmText}</span> to confirm
+              Type{" "}
+              <span className="font-semibold text-slate-900">
+                {requireConfirmText}
+              </span>{" "}
+              to confirm
             </label>
             <input
               type="text"

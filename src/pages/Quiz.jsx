@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import api from "@/services/api";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import PageHero from "@/components/layout/PageHero";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import CityCard from "@/components/city/CityCard";
 import SectionCard from "@/components/layout/SectionCard";
@@ -52,18 +52,18 @@ const CRITERIA = [
 ];
 
 const LIKERT_OPTIONS = [
-  { value: 0,   label: "Strongly\nDisagree" },
+  { value: 0, label: "Strongly\nDisagree" },
   { value: 2.5, label: "Disagree" },
-  { value: 5,   label: "Neutral" },
+  { value: 5, label: "Neutral" },
   { value: 7.5, label: "Agree" },
-  { value: 10,  label: "Strongly\nAgree" },
+  { value: 10, label: "Strongly\nAgree" },
 ];
 
 const SIZE_OPTIONS = [
-  { key: "any",    label: "Any size",      sub: "No preference" },
-  { key: "small",  label: "Small city",    sub: "Under 200K people" },
+  { key: "any", label: "Any size", sub: "No preference" },
+  { key: "small", label: "Small city", sub: "Under 200K people" },
   { key: "medium", label: "Mid-size city", sub: "200K – 750K people" },
-  { key: "large",  label: "Major metro",   sub: "750K+ people" },
+  { key: "large", label: "Major metro", sub: "750K+ people" },
 ];
 
 const TOTAL_STEPS = CRITERIA.length + 1; // 5 sliders + city size step
@@ -99,7 +99,9 @@ export default function Quiz() {
     setStep("loading");
     setError("");
     try {
-      const res = await api.post("/cities/recommend", { weights: { ...weights, sizePreference } });
+      const res = await api.post("/cities/recommend", {
+        weights: { ...weights, sizePreference },
+      });
       setResults(res.data?.cities ?? []);
       setStep("results");
     } catch {
@@ -159,158 +161,173 @@ export default function Quiz() {
       {/* Quiz: one question at a time */}
       {step === "quiz" && (
         <div className="max-w-2xl mx-auto w-full">
-        <SectionCard icon={Sliders} title="What matters most to you?">
-          <div>
-            {/* Progress bar */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-1.5 text-xs text-slate-500">
-                <span>
-                  Question {questionIndex + 1} of {TOTAL_STEPS}
-                </span>
-                <span>{Math.round(progressPct)}%</span>
+          <SectionCard icon={Sliders} title="What matters most to you?">
+            <div>
+              {/* Progress bar */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-1.5 text-xs text-slate-500">
+                  <span>
+                    Question {questionIndex + 1} of {TOTAL_STEPS}
+                  </span>
+                  <span>{Math.round(progressPct)}%</span>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-[hsl(var(--primary))] transition-all duration-300"
+                    style={{ width: `${progressPct}%` }}
+                  />
+                </div>
               </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full rounded-full bg-[hsl(var(--primary))] transition-all duration-300"
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
-            </div>
-            <ErrorMessage message={error} className="mb-4" />
+              <ErrorMessage message={error} className="mb-4" />
 
-            {/* Current question */}
-            <div className="py-2">
-              <p className="text-xl font-semibold text-slate-900 mb-1">
-                {currentCriterion.label}
-              </p>
-              <p className="text-sm text-slate-500 mb-6">
-                {currentCriterion.statement}
-              </p>
-              <div className="flex gap-2">
-                {LIKERT_OPTIONS.map((opt) => {
-                  const selected = weights[currentCriterion.key] === opt.value;
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setWeight(currentCriterion.key, opt.value)}
-                      aria-pressed={selected}
-                      className={cn(
-                        "flex-1 rounded-xl border-2 px-1 py-3 text-center text-xs font-semibold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[hsl(var(--primary))]",
-                        selected
-                          ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))] text-white shadow-sm"
-                          : "border-slate-200 bg-white text-slate-500 hover:border-slate-400 hover:text-slate-900",
-                      )}
-                    >
-                      {opt.label.split("\n").map((line, i) => (
-                        <span key={i} className="block">{line}</span>
-                      ))}
-                    </button>
-                  );
-                })}
+              {/* Current question */}
+              <div className="py-2">
+                <p className="text-xl font-semibold text-slate-900 mb-1">
+                  {currentCriterion.label}
+                </p>
+                <p className="text-sm text-slate-500 mb-6">
+                  {currentCriterion.statement}
+                </p>
+                <div className="flex gap-2">
+                  {LIKERT_OPTIONS.map((opt) => {
+                    const selected =
+                      weights[currentCriterion.key] === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() =>
+                          setWeight(currentCriterion.key, opt.value)
+                        }
+                        aria-pressed={selected}
+                        className={cn(
+                          "flex-1 rounded-xl border-2 px-1 py-3 text-center text-xs font-semibold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[hsl(var(--primary))]",
+                          selected
+                            ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))] text-white shadow-sm"
+                            : "border-slate-200 bg-white text-slate-500 hover:border-slate-400 hover:text-slate-900",
+                        )}
+                      >
+                        {opt.label.split("\n").map((line, i) => (
+                          <span key={i} className="block">
+                            {line}
+                          </span>
+                        ))}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
 
-            {/* Navigation */}
-            <div className="mt-4 flex items-center justify-between">
-              <div>
-                {questionIndex > 0 && (
-                  <Button variant="outline" onClick={handleBack}>
-                    <ArrowLeft className="mr-1.5 h-4 w-4" />
-                    Back
-                  </Button>
-                )}
+              {/* Navigation */}
+              <div className="mt-4 flex items-center justify-between">
+                <div>
+                  {questionIndex > 0 && (
+                    <Button variant="outline" onClick={handleBack}>
+                      <ArrowLeft className="mr-1.5 h-4 w-4" />
+                      Back
+                    </Button>
+                  )}
+                </div>
+                <Button onClick={handleNext}>
+                  {isLastQuestion ? (
+                    <>
+                      Find my city <ArrowRight className="ml-1.5 h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      Next <ArrowRight className="ml-1.5 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
               </div>
-              <Button onClick={handleNext}>
-                {isLastQuestion ? (
-                  <>
-                    Find my city <ArrowRight className="ml-1.5 h-4 w-4" />
-                  </>
-                ) : (
-                  <>
-                    Next <ArrowRight className="ml-1.5 h-4 w-4" />
-                  </>
-                )}
-              </Button>
             </div>
-          </div>
-        </SectionCard>
+          </SectionCard>
         </div>
       )}
 
       {/* City size step */}
       {step === "size" && (
         <div className="max-w-2xl mx-auto w-full">
-        <SectionCard icon={Sliders} title="What size city do you prefer?">
-          <div>
-            {/* Progress bar */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-1.5 text-xs text-slate-500">
-                <span>Question {TOTAL_STEPS} of {TOTAL_STEPS}</span>
-                <span>{Math.round(sizeProgressPct)}%</span>
+          <SectionCard icon={Sliders} title="What size city do you prefer?">
+            <div>
+              {/* Progress bar */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-1.5 text-xs text-slate-500">
+                  <span>
+                    Question {TOTAL_STEPS} of {TOTAL_STEPS}
+                  </span>
+                  <span>{Math.round(sizeProgressPct)}%</span>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-[hsl(var(--primary))] transition-all duration-300"
+                    style={{ width: `${sizeProgressPct}%` }}
+                  />
+                </div>
               </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full rounded-full bg-[hsl(var(--primary))] transition-all duration-300"
-                  style={{ width: `${sizeProgressPct}%` }}
-                />
+
+              <p className="text-sm text-slate-500 mb-4">
+                We'll prioritize cities that match your preference for urban
+                scale.
+              </p>
+
+              <div className="grid grid-cols-2 gap-3">
+                {SIZE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.key}
+                    onClick={() => setSizePreference(opt.key)}
+                    className={cn(
+                      "rounded-xl border-2 px-4 py-3 text-left transition-colors",
+                      sizePreference === opt.key
+                        ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary)/.08)]"
+                        : "border-slate-400 bg-white hover:border-slate-400",
+                    )}
+                  >
+                    <p
+                      className={cn(
+                        "text-sm font-semibold",
+                        sizePreference === opt.key
+                          ? "text-[hsl(var(--primary))]"
+                          : "text-slate-900",
+                      )}
+                    >
+                      {opt.label}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5">{opt.sub}</p>
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-4 flex items-center justify-between">
+                <Button variant="outline" onClick={handleBackFromSize}>
+                  <ArrowLeft className="mr-1.5 h-4 w-4" />
+                  Back
+                </Button>
+                <Button onClick={handleSubmit}>
+                  Find my city <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Button>
               </div>
             </div>
-
-            <p className="text-sm text-slate-500 mb-4">
-              We'll prioritize cities that match your preference for urban scale.
-            </p>
-
-            <div className="grid grid-cols-2 gap-3">
-              {SIZE_OPTIONS.map((opt) => (
-                <button
-                  key={opt.key}
-                  onClick={() => setSizePreference(opt.key)}
-                  className={cn(
-                    "rounded-xl border-2 px-4 py-3 text-left transition-colors",
-                    sizePreference === opt.key
-                      ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary)/.08)]"
-                      : "border-slate-400 bg-white hover:border-slate-400",
-                  )}
-                >
-                  <p className={cn("text-sm font-semibold", sizePreference === opt.key ? "text-[hsl(var(--primary))]" : "text-slate-900")}>
-                    {opt.label}
-                  </p>
-                  <p className="text-xs text-slate-500 mt-0.5">{opt.sub}</p>
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-4 flex items-center justify-between">
-              <Button variant="outline" onClick={handleBackFromSize}>
-                <ArrowLeft className="mr-1.5 h-4 w-4" />
-                Back
-              </Button>
-              <Button onClick={handleSubmit}>
-                Find my city <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </SectionCard>
+          </SectionCard>
         </div>
       )}
 
       {/* Loading */}
       {step === "loading" && (
         <div className="max-w-2xl mx-auto w-full">
-        <SectionCard icon={Sliders} title="Finding your best matches…">
-          <div className="space-y-3 py-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full animate-pulse bg-slate-100" />
-                <div className="flex-1 space-y-1.5">
-                  <div className="h-3 w-1/3 animate-pulse rounded-full bg-slate-100" />
-                  <div className="h-2 w-full animate-pulse rounded-full bg-slate-100" />
+          <SectionCard icon={Sliders} title="Finding your best matches…">
+            <div className="space-y-3 py-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-full animate-pulse bg-slate-100" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3 w-1/3 animate-pulse rounded-full bg-slate-100" />
+                    <div className="h-2 w-full animate-pulse rounded-full bg-slate-100" />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
+              ))}
+            </div>
+          </SectionCard>
         </div>
       )}
 

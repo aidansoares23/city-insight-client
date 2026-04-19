@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/auth/authContext";
 
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/Dialog";
 import ReviewCard from "@/components/reviews/ReviewCard";
 import { usePageTitle } from "@/hooks/usePageTitle";
@@ -10,7 +10,16 @@ import PageHero from "@/components/layout/PageHero";
 import { Loading } from "@/components/ui/Loading";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 
-import { Pencil, ShieldCheck, Mail, Calendar, Trash2, Heart, Check, X } from "lucide-react";
+import {
+  Pencil,
+  ShieldCheck,
+  Mail,
+  Calendar,
+  Trash2,
+  Heart,
+  Check,
+  X,
+} from "lucide-react";
 
 import { fmtDateTime } from "@/lib/datetime";
 import { initialsFromUser } from "@/lib/format";
@@ -156,10 +165,15 @@ export default function Account() {
     if (myReviews.length === 0) return null;
     const avgs = {};
     for (const key of RATING_KEYS) {
-      const vals = myReviews.map((r) => r?.ratings?.[key]).filter((v) => v != null);
-      avgs[key] = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+      const vals = myReviews
+        .map((r) => r?.ratings?.[key])
+        .filter((v) => v != null);
+      avgs[key] = vals.length
+        ? vals.reduce((a, b) => a + b, 0) / vals.length
+        : null;
     }
-    const mostRecent = myReviews[0]?.updatedAt ?? myReviews[0]?.createdAt ?? null;
+    const mostRecent =
+      myReviews[0]?.updatedAt ?? myReviews[0]?.createdAt ?? null;
     return { avgs, mostRecent, total: myReviews.length };
   }, [myReviews]);
 
@@ -258,7 +272,9 @@ export default function Account() {
       setEditingName(false);
     } catch (e) {
       console.error(e);
-      setNameError(e?.response?.data?.error?.message || "Failed to update name.");
+      setNameError(
+        e?.response?.data?.error?.message || "Failed to update name.",
+      );
     } finally {
       setNameSaving(false);
     }
@@ -321,9 +337,16 @@ export default function Account() {
       />
 
       <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-        <div id="profile" className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4">
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Profile</h2>
-          <p className="mt-1 text-sm text-slate-500">Your account details and activity snapshot.</p>
+        <div
+          id="profile"
+          className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+        >
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            Profile
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Your account details and activity snapshot.
+          </p>
           <div className="mt-3">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex min-w-0 items-start gap-4">
@@ -340,7 +363,10 @@ export default function Account() {
                           ref={nameInputRef}
                           type="text"
                           value={nameValue}
-                          onChange={(e) => { setNameValue(e.target.value); setNameError(""); }}
+                          onChange={(e) => {
+                            setNameValue(e.target.value);
+                            setNameError("");
+                          }}
                           onKeyDown={handleNameKeyDown}
                           maxLength={50}
                           disabled={nameSaving}
@@ -403,7 +429,11 @@ export default function Account() {
               </div>
 
               <div className="grid w-full gap-3 sm:max-w-sm">
-                <InfoRow icon={Mail} label="Email" value={user.email || "N/A"} />
+                <InfoRow
+                  icon={Mail}
+                  label="Email"
+                  value={user.email || "N/A"}
+                />
                 <InfoRow
                   icon={ShieldCheck}
                   label="Email verified"
@@ -427,7 +457,9 @@ export default function Account() {
         {/* Stats — shown only once reviews are loaded and at least one exists */}
         {!isReviewsLoading && reviewStats ? (
           <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
-            <h2 className="text-xl font-semibold tracking-tight text-slate-900">Your Stats</h2>
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+              Your Stats
+            </h2>
             <p className="mt-1 text-sm text-slate-500">
               Average ratings you've given across all {reviewStats.total}{" "}
               {reviewStats.total === 1 ? "review" : "reviews"}.
@@ -436,7 +468,8 @@ export default function Account() {
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {RATING_KEYS.map((key) => {
                   const avg = reviewStats.avgs[key];
-                  const rounded = avg != null ? Math.round(avg * 10) / 10 : null;
+                  const rounded =
+                    avg != null ? Math.round(avg * 10) / 10 : null;
                   const { bar: barClass } = scoreColor(rounded);
                   return (
                     <div
@@ -474,9 +507,16 @@ export default function Account() {
           </div>
         ) : null}
 
-        <div id="reviews" className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4">
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Your Reviews</h2>
-          <p className="mt-1 text-sm text-slate-500">View, edit, and delete all of your reviews.</p>
+        <div
+          id="reviews"
+          className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+        >
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            Your Reviews
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            View, edit, and delete all of your reviews.
+          </p>
           <div className="mt-3">
             {isReviewsLoading ? <Loading label="Loading reviews…" /> : null}
 
@@ -545,9 +585,16 @@ export default function Account() {
           </div>
         </div>
 
-        <div id="favorites" className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4">
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Favorite Cities</h2>
-          <p className="mt-1 text-sm text-slate-500">Cities you've saved for easy access.</p>
+        <div
+          id="favorites"
+          className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+        >
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            Favorite Cities
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Cities you've saved for easy access.
+          </p>
           <div className="mt-3">
             {isFavoritesLoading ? <Loading label="Loading favorites…" /> : null}
 
@@ -557,7 +604,8 @@ export default function Account() {
             !favoritesError &&
             myFavorites.length === 0 ? (
               <div className="text-sm text-slate-500">
-                No favorites yet. Favorite a city on its detail page and it'll appear here.
+                No favorites yet. Favorite a city on its detail page and it'll
+                appear here.
               </div>
             ) : null}
 
@@ -607,10 +655,7 @@ export default function Account() {
                 Permanently delete your account and associated data.
               </div>
             </div>
-            <Button
-              variant="danger"
-              onClick={() => setDeleteAccountOpen(true)}
-            >
+            <Button variant="danger" onClick={() => setDeleteAccountOpen(true)}>
               <Trash2 className="mr-2 h-4 w-4" />
               Delete account
             </Button>

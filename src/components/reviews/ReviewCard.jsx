@@ -1,36 +1,56 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 import { fmtDateTime, fmtDate } from "@/lib/datetime";
 
 import { Pencil, MapPin, Trash2 } from "lucide-react";
 import ReactionBar from "@/components/reviews/ReactionBar";
-import { RATING_KEYS, RATING_LABELS, clampRating10, avgFromCategories, scoreColor, scoreLabel } from "@/lib/ratings";
+import {
+  RATING_KEYS,
+  RATING_LABELS,
+  clampRating10,
+  avgFromCategories,
+  scoreColor,
+  scoreLabel,
+} from "@/lib/ratings";
 import { cn } from "@/utils/utils";
 
 function initialsFromName(name) {
   if (!name || typeof name !== "string") return "?";
   const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  if (parts.length >= 2)
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   return parts[0][0].toUpperCase();
 }
 
-function TimestampLine({ createdAtIso, updatedAtIso, isEdited = false, showTime = false }) {
+function TimestampLine({
+  createdAtIso,
+  updatedAtIso,
+  isEdited = false,
+  showTime = false,
+}) {
   const createdLabel = createdAtIso
-    ? showTime ? fmtDateTime(createdAtIso) : fmtDate(createdAtIso)
+    ? showTime
+      ? fmtDateTime(createdAtIso)
+      : fmtDate(createdAtIso)
     : null;
-  const updatedLabel = isEdited && updatedAtIso
-    ? showTime ? fmtDateTime(updatedAtIso) : fmtDate(updatedAtIso)
-    : null;
+  const updatedLabel =
+    isEdited && updatedAtIso
+      ? showTime
+        ? fmtDateTime(updatedAtIso)
+        : fmtDate(updatedAtIso)
+      : null;
 
   if (!createdLabel && !updatedLabel) return null;
 
   return (
     <span className="text-xs text-slate-400">
       {createdLabel ? <span>{createdLabel}</span> : null}
-      {updatedLabel ? <span className="ml-1.5">· edited {updatedLabel}</span> : null}
+      {updatedLabel ? (
+        <span className="ml-1.5">· edited {updatedLabel}</span>
+      ) : null}
     </span>
   );
 }
@@ -39,10 +59,12 @@ function CommentBlock({ text, clampChars = 200 }) {
   const trimmed = (text || "").trim();
   const [open, setOpen] = useState(false);
 
-  if (!trimmed) return <p className="text-sm italic text-slate-400">No written comment.</p>;
+  if (!trimmed)
+    return <p className="text-sm italic text-slate-400">No written comment.</p>;
 
   const isLong = trimmed.length > clampChars;
-  const shown = !isLong || open ? trimmed : `${trimmed.slice(0, clampChars).trim()}…`;
+  const shown =
+    !isLong || open ? trimmed : `${trimmed.slice(0, clampChars).trim()}…`;
 
   return (
     <div className="space-y-1.5">
@@ -62,7 +84,6 @@ function CommentBlock({ text, clampChars = 200 }) {
   );
 }
 
-
 function CategoryChips({ ratings }) {
   const items = RATING_KEYS.map((key) => {
     const rating = clampRating10(ratings?.[key]);
@@ -75,10 +96,15 @@ function CategoryChips({ ratings }) {
       {items.map(({ key, label, rating, halo }) => (
         <div
           key={key}
-          className={cn("flex items-center justify-between rounded-lg border bg-white px-2.5 py-1.5", halo)}
+          className={cn(
+            "flex items-center justify-between rounded-lg border bg-white px-2.5 py-1.5",
+            halo,
+          )}
         >
           <span className="text-xs font-medium text-slate-500">{label}</span>
-          <span className="text-sm font-bold tabular-nums text-slate-900">{rating ?? "—"}</span>
+          <span className="text-sm font-bold tabular-nums text-slate-900">
+            {rating ?? "—"}
+          </span>
         </div>
       ))}
     </div>
@@ -112,9 +138,14 @@ export default function ReviewCard({
   const updatedAtIso = review?.updatedAt ?? null;
   const isEdited = review?.isEdited ?? false;
 
-  const derivedAvg = useMemo(() => avgFromCategories(review?.ratings), [review?.ratings]);
+  const derivedAvg = useMemo(
+    () => avgFromCategories(review?.ratings),
+    [review?.ratings],
+  );
   const explicitOverall = clampRating10(review?.ratings?.overall);
-  const headlineScore = explicitOverall ?? (derivedAvg == null ? null : Math.round(derivedAvg * 10) / 10);
+  const headlineScore =
+    explicitOverall ??
+    (derivedAvg == null ? null : Math.round(derivedAvg * 10) / 10);
   const roundedScore = headlineScore == null ? null : Math.round(headlineScore);
 
   const tone = scoreColor(roundedScore);
@@ -122,13 +153,13 @@ export default function ReviewCard({
   const canDelete = variant !== "public" && typeof onDelete === "function";
 
   // Avatar: initials for named users, icon for anonymous/account-city variant
-  const initials = variant === "account" ? null : initialsFromName(displayTitle);
+  const initials =
+    variant === "account" ? null : initialsFromName(displayTitle);
   const isAnon = displayTitle === "Anonymous";
 
   return (
     <div className="rounded-lg border border-slate-300 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
       <div className="px-5 py-4 space-y-3">
-
         {/* ── Header: avatar + author/city + timestamp + overall score ── */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
@@ -158,7 +189,9 @@ export default function ReviewCard({
                 </Link>
               ) : variant !== "account" && showCity && cityText && citySlug ? (
                 <>
-                  <span className="block truncate text-sm font-semibold text-slate-900">{displayTitle}</span>
+                  <span className="block truncate text-sm font-semibold text-slate-900">
+                    {displayTitle}
+                  </span>
                   <Link
                     to={`/cities/${citySlug}`}
                     className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-900 hover:underline"
@@ -168,7 +201,9 @@ export default function ReviewCard({
                   </Link>
                 </>
               ) : (
-                <span className="block truncate text-sm font-semibold text-slate-900">{displayTitle}</span>
+                <span className="block truncate text-sm font-semibold text-slate-900">
+                  {displayTitle}
+                </span>
               )}
               <TimestampLine
                 createdAtIso={createdAtIso}
@@ -179,16 +214,23 @@ export default function ReviewCard({
           </div>
 
           {/* Overall score badge */}
-          <div className={cn(
-            "shrink-0 inline-flex items-baseline gap-0.5 rounded-lg border bg-white px-2.5 py-1",
-            tone.halo,
-          )}>
+          <div
+            className={cn(
+              "shrink-0 inline-flex items-baseline gap-0.5 rounded-lg border bg-white px-2.5 py-1",
+              tone.halo,
+            )}
+          >
             <span className="text-lg font-bold tabular-nums leading-none text-slate-900">
               {roundedScore ?? "—"}
             </span>
             <span className="text-[10px] font-medium text-slate-400">/10</span>
             {label && (
-              <span className={cn("ml-1 rounded-full px-2 py-0.5 text-[10px] font-semibold", tone.pill)}>
+              <span
+                className={cn(
+                  "ml-1 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                  tone.pill,
+                )}
+              >
                 {label}
               </span>
             )}
@@ -223,14 +265,23 @@ export default function ReviewCard({
               <div className="flex shrink-0 items-center gap-2">
                 {editTo && (
                   <Button asChild variant="secondary" size="sm">
-                    <Link to={editTo} state={editState} className="inline-flex items-center gap-1.5">
+                    <Link
+                      to={editTo}
+                      state={editState}
+                      className="inline-flex items-center gap-1.5"
+                    >
                       <Pencil className="h-3.5 w-3.5" />
                       Edit
                     </Link>
                   </Button>
                 )}
                 {canDelete && (
-                  <Button type="button" variant="danger" size="sm" onClick={onDelete}>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    size="sm"
+                    onClick={onDelete}
+                  >
                     <Trash2 className="h-3.5 w-3.5" />
                     Delete
                   </Button>

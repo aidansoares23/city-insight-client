@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/auth/authContext";
 
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/Loading";
 import { ConfirmDialog } from "@/components/ui/Dialog";
 import ErrorMessage from "@/components/ui/ErrorMessage";
@@ -151,7 +151,9 @@ export default function ReviewEditor() {
           state: { reviewSaved: true, created, citySlug: slug },
         });
       } catch (err) {
-        setError(err?.response?.data?.error?.message || "Failed to save review.");
+        setError(
+          err?.response?.data?.error?.message || "Failed to save review.",
+        );
       } finally {
         setIsSaving(false);
       }
@@ -220,10 +222,12 @@ export default function ReviewEditor() {
           title="Rate Your Experience"
           subtitle="Rate each category and share your thoughts."
           action={
-            <div className={cn(
-              "inline-flex items-baseline gap-1 rounded-lg border px-3 py-1.5",
-              overallColors.badge,
-            )}>
+            <div
+              className={cn(
+                "inline-flex items-baseline gap-1 rounded-lg border px-3 py-1.5",
+                overallColors.badge,
+              )}
+            >
               <span className="text-2xl font-bold tabular-nums leading-none">
                 {overallScore}
               </span>
@@ -256,7 +260,8 @@ export default function ReviewEditor() {
             <div className="space-y-1.5">
               <div className="flex items-baseline justify-between">
                 <label className="text-sm font-semibold text-slate-900">
-                  Additional Comments <span className="font-normal text-slate-400">(Optional)</span>
+                  Additional Comments{" "}
+                  <span className="font-normal text-slate-400">(Optional)</span>
                 </label>
                 <span className="text-xs tabular-nums text-slate-400">
                   {form.comment.length}&thinsp;/&thinsp;{COMMENT_MAX}
@@ -278,7 +283,11 @@ export default function ReviewEditor() {
               <div className="flex gap-2">
                 <Button type="submit" variant="primary" disabled={isBusy}>
                   <Save />
-                  {isSaving ? "Saving…" : mode === "edit" ? "Save changes" : "Submit review"}
+                  {isSaving
+                    ? "Saving…"
+                    : mode === "edit"
+                      ? "Save changes"
+                      : "Submit review"}
                 </Button>
 
                 <Button

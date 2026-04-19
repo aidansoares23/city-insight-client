@@ -1,12 +1,19 @@
 import { Heart } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/utils";
 
 /**
  * Toggle button for favoriting/unfavoriting a city.
  * @param {{ isFavorited: boolean, loading: boolean, onToggle: () => void, className?: string }} props
  */
-export default function FavoriteButton({ isFavorited, loading, onToggle, className, variant = "secondary", size = "default" }) {
+export default function FavoriteButton({
+  isFavorited,
+  loading,
+  onToggle,
+  className,
+  variant = "secondary",
+  size = "default",
+}) {
   return (
     <Button
       variant={variant}
