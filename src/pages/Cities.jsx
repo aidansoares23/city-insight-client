@@ -124,13 +124,13 @@ export default function Cities() {
       {/* Search + view toggle row */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative w-full sm:w-80">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" />
           <Input
             ref={searchRef}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search by city or state…"
-            className={`h-9 rounded-lg border-slate-300 bg-white pl-9 text-sm shadow-sm focus:border-[hsl(var(--primary))] focus:ring-2 focus:ring-[hsl(var(--primary))]/20 ${searchInput ? "pr-8" : ""}`}
+            className={`h-9 rounded-lg border-slate-400 bg-white pl-9 text-sm shadow-sm focus:border-[hsl(var(--primary))] focus:ring-2 focus:ring-[hsl(var(--primary))]/20 ${searchInput ? "pr-8" : ""}`}
             onFocus={() => {
               if (window.innerWidth >= 640) {
                 searchRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -149,11 +149,11 @@ export default function Cities() {
           )}
         </div>
 
-        <div className="flex w-fit items-center overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
+        <div className="flex w-fit items-center overflow-hidden rounded-md border border-slate-400 bg-white shadow-sm">
           <button
             onClick={() => setView("grid")}
             className={`flex items-center gap-1 px-2.5 h-9 text-xs transition ${
-              view === "grid" ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-50"
+              view === "grid" ? "bg-[hsl(var(--primary))] text-slate-900 font-semibold" : "text-slate-600 hover:bg-slate-50"
             }`}
           >
             <LayoutGrid className="h-3.5 w-3.5" />
@@ -161,8 +161,8 @@ export default function Cities() {
           </button>
           <button
             onClick={() => setView("map")}
-            className={`flex items-center gap-1 px-2.5 h-9 text-xs transition border-l border-slate-200 ${
-              view === "map" ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-50"
+            className={`flex items-center gap-1 px-2.5 h-9 text-xs transition border-l border-slate-400 ${
+              view === "map" ? "bg-[hsl(var(--primary))] text-slate-900 font-semibold" : "text-slate-600 hover:bg-slate-50"
             }`}
           >
             <Map className="h-3.5 w-3.5" />
@@ -171,13 +171,13 @@ export default function Cities() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white px-6 py-5">
+      <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
         {/* Secondary controls bar */}
-        <div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-100">
-          <span className="text-sm text-slate-400">{resultsLabel}</span>
+        <div className="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <span className="text-sm text-slate-500">{resultsLabel}</span>
           {view === "grid" && (
             <select
-              className="h-8 rounded-md border border-slate-200 bg-white px-2 text-xs text-slate-500 shadow-sm outline-none transition focus:border-[hsl(var(--primary))] focus:ring-1 focus:ring-[hsl(var(--primary))]/20"
+              className="h-8 rounded-md border border-slate-400 bg-white px-2 text-xs text-slate-500 shadow-sm outline-none transition focus:border-[hsl(var(--primary))] focus:ring-1 focus:ring-[hsl(var(--primary))]/20"
               value={sort}
               onChange={(e) => setSort(e.target.value)}
             >
@@ -228,7 +228,7 @@ export default function Cities() {
             No cities match your search.
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4 sm:pb-6">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 pb-2">
             {filtered.map((city) => (
               <CityCard key={city.slug} city={city} />
             ))}

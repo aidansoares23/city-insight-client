@@ -57,21 +57,18 @@ export default function CityPhotoGallery({ slug }) {
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        {/* Slides */}
         {photos.map((src, i) => (
           <div
             key={src}
             className="absolute inset-0 transition-opacity duration-700"
             style={{ opacity: i === index ? 1 : 0 }}
           >
-            {/* Blurred backdrop */}
             <img
               src={src}
               alt=""
               className="absolute inset-0 h-full w-full object-cover scale-110 blur-2xl"
             />
             <div className="absolute inset-0 bg-black/30" />
-            {/* Full photo */}
             <img
               src={src}
               alt=""

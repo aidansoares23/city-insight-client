@@ -62,7 +62,7 @@ export default function CostCalculator({ cities }) {
               step={1000}
               value={salary}
               onChange={(e) => setSalary(Math.max(0, parseInt(e.target.value) || 0))}
-              className="rounded-lg border border-slate-200 bg-white pl-7 pr-3 py-2 text-sm text-slate-900 w-36 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))]"
+              className="rounded-lg border border-slate-400 bg-white pl-7 pr-3 py-2 text-sm text-slate-900 w-36 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))]"
             />
           </div>
         </div>
@@ -72,7 +72,7 @@ export default function CostCalculator({ cities }) {
           <select
             value={originIdx}
             onChange={(e) => setOriginIdx(Number(e.target.value))}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))]"
+            className="rounded-lg border border-slate-400 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))]"
           >
             {cities.map((c, i) => (
               <option key={c.slug} value={i} disabled={costsByCityIdx[i] == null}>
@@ -84,9 +84,9 @@ export default function CostCalculator({ cities }) {
       </div>
 
       {/* Cost breakdown table */}
-      <div className="overflow-x-auto rounded-xl border border-slate-200">
+      <div className="overflow-x-auto rounded-xl border border-slate-400">
         <table className="w-full text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50">
+          <thead className="border-b border-slate-400 bg-slate-50">
             <tr>
               <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Monthly expense
@@ -112,7 +112,7 @@ export default function CostCalculator({ cities }) {
                 })}
               </tr>
             ))}
-            <tr className="border-t-2 border-slate-200 bg-slate-50 font-semibold">
+            <tr className="border-t-2 border-slate-400 bg-slate-50 font-semibold">
               <td className="px-4 py-2.5 text-slate-900">Total / month</td>
               {cities.map((_, i) => {
                 const costs = costsByCityIdx[i];

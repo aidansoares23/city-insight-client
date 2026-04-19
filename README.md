@@ -68,19 +68,24 @@ src/
 ├── state/
 │   └── apiStatus.jsx         # Global API status atom (ok / waking / down / rate-limited)
 ├── hooks/
+│   ├── scrollToTop.jsx       # Scrolls to top on route change
 │   ├── useApiStatus.jsx      # Subscribes to API status state
 │   └── usePageTitle.jsx      # Sets document.title per page
 ├── lib/
+│   ├── chartColors.js        # Recharts color constants (matches --chart-* theme tokens)
 │   ├── cities.js             # City slug parsing (prettyCityFromSlug)
 │   ├── city-photos.js        # City photo gallery helpers
+│   ├── cost-estimates.js     # National average monthly cost constants for moving calculator
 │   ├── datetime.js           # Date formatting (toDate, fmtDate, fmtDateTime)
 │   ├── favorites.js          # fetchMyFavorites, addFavorite, removeFavorite
 │   ├── format.js             # Number/money/score formatters (fmtMoney, fmtNum, toOutOf10, …)
 │   ├── leafletIcon.js        # Leaflet default marker icon fix for Vite
+│   ├── me.js                 # updateMyProfile (PATCH /me)
 │   ├── ratings.js            # Rating utilities (clampRating10, derivedOverall, scoreColor, scoreLabel)
 │   ├── reactions.js          # upsertReaction, deleteReaction
 │   ├── reviews.js            # fetchMyReviews, fetchMyReview, upsertMyReview, deleteMyReview, deleteMyAccount
-│   └── routing.js            # safeReturnTo — open-redirect prevention
+│   ├── routing.js            # safeReturnTo — open-redirect prevention
+│   └── sanitize.js           # Strips ASCII control characters (mirrors backend AI input sanitization)
 ├── pages/
 │   ├── Home.jsx              # Landing page
 │   ├── Cities.jsx            # City list with search and grid/map toggle
@@ -92,14 +97,17 @@ src/
 │   ├── AiQuery.jsx           # AI natural-language chat interface (protected)
 │   ├── Login.jsx             # Google sign-in page
 │   ├── Methodology.jsx       # How scores are calculated
-│   └── NotFound.jsx          # 404
+│   ├── NotFound.jsx          # 404
+│   ├── PrivacyPolicy.jsx     # Privacy policy page
+│   └── Terms.jsx             # Terms of service page
 ├── utils/
 │   └── utils.js              # cn() helper (clsx + tailwind-merge)
 ├── components/
 │   ├── layout/
 │   │   ├── ApiOverlay.jsx    # Server wake-up / error overlay
 │   │   ├── ErrorBoundary.jsx # React error boundary
-│   │   ├── Layout.jsx        # Main layout wrapper (navbar + outlet)
+│   │   ├── Footer.jsx        # Site footer with nav links (privacy, terms)
+│   │   ├── Layout.jsx        # Main layout wrapper (navbar + outlet + footer)
 │   │   ├── Navbar.jsx        # Sticky header with nav links, auth controls
 │   │   ├── PageHero.jsx      # Page title/description banner
 │   │   ├── PageNav.jsx       # Scroll-spy section navigator
@@ -108,10 +116,12 @@ src/
 │   │   ├── CityCard.jsx          # City grid card (score, safety, rent, reviews)
 │   │   ├── CityMap.jsx           # Leaflet single-city map
 │   │   ├── CityPhotoGallery.jsx  # City photo gallery
-│   │   ├── CityRadarChart.jsx    # Recharts radar chart (multiple cities)
+│   │   ├── CityRadarChart.jsx    # Recharts radar chart (multiple cities, used in Compare)
 │   │   ├── CitiesMap.jsx         # Leaflet multi-city map with markers
 │   │   ├── CostCalculator.jsx    # Moving cost estimate calculator
 │   │   ├── FavoriteButton.jsx    # Heart/favorite toggle button
+│   │   ├── InsightsRadarChart.jsx # Radar chart variant used on city detail page
+│   │   ├── LivabilityBreakdown.jsx # Per-signal livability score breakdown with icons
 │   │   └── PerceptionVsRealityChart.jsx # Community sentiment vs. public data chart
 │   ├── reviews/
 │   │   ├── ReactionBar.jsx   # Reaction buttons (helpful / agree / disagree) with counts
@@ -140,20 +150,17 @@ npm install
 
 ### 2. Configure environment variables
 
-Create `.env` in the `city-insight-client/` directory:
+Copy `.env.example` to `.env` in the `city-insight-client/` directory and fill in your values:
 
 ```env
-# Point at local backend
-VITE_API_URL=http://localhost:3000
-
 # Your Google OAuth client ID (required for sign-in to work)
 VITE_GOOGLE_CLIENT_ID=your-google-client-id-here
 
-# Optional — show the Ask AI page and nav link
-VITE_AI_ENABLED=true
+# Optional — show the Ask AI page and nav link (default: enabled)
+# VITE_AI_ENABLED=true
 ```
 
-> **Note:** When `VITE_API_URL` starts with `http://` (local), the Vite dev server proxies `/api/*` and `/health` to `localhost:3000` so cookies work on the same origin.
+> **Note:** In development the Vite dev server proxies `/api/*` and `/health` to `localhost:3000` (see `vite.config.js`), so cookies work on the same origin. In production, `vercel.json` rewrites those same paths to the Render backend.
 
 ### 3. Start the dev server
 
@@ -176,9 +183,10 @@ npm run preview    # serve the production build locally
 
 | Variable                | Required | Description                                                                                                                                                                                     |
 | ----------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VITE_API_URL`          | Yes      | Backend base URL. Use `http://localhost:3000` for local dev.                                                                                                                                    |
 | `VITE_GOOGLE_CLIENT_ID` | Yes      | Google OAuth 2.0 client ID. Used by `@react-oauth/google` to render the sign-in button.                                                                                                         |
-| `VITE_AI_ENABLED`       | No       | Set to `true` to show the **Ask AI** nav link and `/ask` route. The backend must also have AI enabled; the app falls back gracefully if the `/api/ai/status` endpoint returns `enabled: false`. |
+| `VITE_AI_ENABLED`       | No       | Set to `false` to hide the **Ask AI** nav link and `/ask` route (default: enabled). The backend must also have AI enabled; the app falls back gracefully if the `/api/ai/status` endpoint returns `enabled: false`. |
+
+> API routing is handled entirely by the Vite dev proxy (`vite.config.js`) in development and by `vercel.json` rewrites in production — no API URL env var is needed.
 
 ---
 
@@ -196,6 +204,8 @@ npm run preview    # serve the production build locally
 | `/login`               | Login        | —        | Google OAuth sign-in                                       |
 | `/account`             | Account      | Required | Profile, reviews, favorites, account deletion              |
 | `/methodology`         | Methodology  | —        | Data sources and scoring formulas                          |
+| `/privacy`             | PrivacyPolicy | —       | Privacy policy                                             |
+| `/terms`               | Terms        | —        | Terms of service                                           |
 | `*`                    | NotFound     | —        | 404 page                                                   |
 
 Protected routes redirect unauthenticated users to `/login` with a `returnTo` query param so they land back where they started after signing in.
@@ -236,7 +246,7 @@ npm run test        # run Vitest in watch mode
 npm run test:run    # run once and exit
 ```
 
-Unit tests live alongside the files they cover in `src/lib/`. They cover utility functions such as rating clamping and averaging (`ratings.test.js`), number and money formatters (`format.test.js`), date helpers (`datetime.test.js`), safe redirect validation (`routing.test.js`), and city slug parsing (`cities.test.js`).
+Unit tests live alongside the files they cover in `src/lib/`. They cover utility functions such as rating clamping and averaging (`ratings.test.js`), number and money formatters (`format.test.js`), date helpers (`datetime.test.js`), safe redirect validation (`routing.test.js`), city slug parsing (`cities.test.js`), and input sanitization (`sanitize.test.js`).
 
 ---
 

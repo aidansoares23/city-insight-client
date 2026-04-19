@@ -1,21 +1,9 @@
-// src/components/city/PerceptionVsRealityChart.jsx
 // Simple "Perception vs Reality" comparison row (0–10 scale).
 // - `user` is the crowd / review average (perception)
 // - `objective` is the metric score (reality)
 // The UI currently renders only the first valid row in `rows`.
 
-/** Clamps any numeric-ish input to the range [0, 1]; returns 0 for non-finite values. */
-function clampToUnitInterval(value) {
-  const n = Number(value);
-  if (!Number.isFinite(n)) return 0;
-  return Math.max(0, Math.min(1, n));
-}
-
-/** Formats a number to one decimal place (e.g. `7.3`); returns `"N/A"` for non-finite values. */
-function formatOneDecimal(value) {
-  const n = Number(value);
-  return Number.isFinite(n) ? (Math.round(n * 10) / 10).toFixed(1) : "N/A";
-}
+import { clamp01, fmtNum } from "@/lib/format";
 
 /**
  * CompareRow
@@ -42,9 +30,9 @@ function CompareRow({ label, user, objective, polarity = "higher_is_better" }) {
   const scoreGap = canCompare ? userScore - objectiveScore : null; // positive => people rate higher than data
 
   // Convert 0–10 scale to 0–1 widths for the bars.
-  const userWidth = hasUserScore ? clampToUnitInterval(userScore / 10) : 0;
+  const userWidth = hasUserScore ? clamp01(userScore / 10) : 0;
   const objectiveWidth = hasObjectiveScore
-    ? clampToUnitInterval(objectiveScore / 10)
+    ? clamp01(objectiveScore / 10)
     : 0;
 
   // Treat tiny differences as basically "the same".
@@ -76,7 +64,7 @@ function CompareRow({ label, user, objective, polarity = "higher_is_better" }) {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4">
+    <div className="rounded-lg border border-slate-400 bg-white p-4">
       <div className="flex items-center justify-between gap-3">
         <div className="text-sm font-semibold text-slate-900">{label}</div>
       </div>
@@ -88,7 +76,7 @@ function CompareRow({ label, user, objective, polarity = "higher_is_better" }) {
             <span className="text-slate-600">Data</span>
             <span className="font-medium text-slate-900">
               {hasObjectiveScore
-                ? `${formatOneDecimal(objectiveScore)}/10`
+                ? `${fmtNum(objectiveScore, { digits: 1 })}/10`
                 : "N/A"}
             </span>
           </div>
@@ -108,7 +96,7 @@ function CompareRow({ label, user, objective, polarity = "higher_is_better" }) {
           <div className="flex items-center justify-between text-xs">
             <span className="text-slate-600">People say</span>
             <span className="font-medium text-slate-900">
-              {hasUserScore ? `${formatOneDecimal(userScore)}/10` : "N/A"}
+              {hasUserScore ? `${fmtNum(userScore, { digits: 1 })}/10` : "N/A"}
             </span>
           </div>
           <div className="mt-1 h-2 w-full rounded-full bg-slate-100">
@@ -129,7 +117,7 @@ function CompareRow({ label, user, objective, polarity = "higher_is_better" }) {
             {canCompare ? (
               <span className="ml-2 font-medium text-slate-500">
                 ({scoreGap > 0 ? "+" : ""}
-                {formatOneDecimal(scoreGap)})
+                {fmtNum(scoreGap, { digits: 1 })})
               </span>
             ) : null}
           </span>

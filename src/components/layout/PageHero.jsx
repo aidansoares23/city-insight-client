@@ -48,7 +48,7 @@ export default function PageHero({
 
         {/* Description — full width, tighter */}
         {description ? (
-          <p className="mt-1 max-w-3xl text-base text-slate-600">
+          <p className="mt-1 max-w-3xl text-base text-slate-500">
             {description}
           </p>
         ) : null}

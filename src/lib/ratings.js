@@ -1,6 +1,13 @@
 export const RATING_KEYS = ["safety", "affordability", "walkability", "cleanliness"];
 export const DEFAULT_RATING = 6;
 
+export const RATING_LABELS = {
+  safety: "Safety",
+  affordability: "Affordability",
+  walkability: "Walkability",
+  cleanliness: "Cleanliness",
+};
+
 /** Clamp and coerce to an integer */
 export function clampInt(value, lo, hi) {
   const n = Math.round(Number(value));
@@ -61,6 +68,7 @@ export function scoreColor(outOf10) {
       pill:  "bg-[hsl(var(--score-neutral-subtle))] text-[hsl(var(--score-neutral))]",
       badge: "bg-[hsl(var(--score-neutral-subtle))] text-[hsl(var(--score-neutral))] border-[hsl(var(--score-neutral-subtle))]",
       bar:   "bg-[hsl(var(--score-neutral))]",
+      halo:  "border-[hsl(var(--score-neutral))]",
     };
   }
   if (outOf10 >= 7) {
@@ -68,6 +76,7 @@ export function scoreColor(outOf10) {
       pill:  "bg-[hsl(var(--score-good-subtle))] text-[hsl(var(--score-good))]",
       badge: "bg-[hsl(var(--score-good-subtle))] text-[hsl(var(--score-good))] border-[hsl(var(--score-good-subtle))]",
       bar:   "bg-[hsl(var(--score-good))]",
+      halo:  "border-[hsl(var(--score-good))]",
     };
   }
   if (outOf10 >= 4) {
@@ -75,12 +84,14 @@ export function scoreColor(outOf10) {
       pill:  "bg-[hsl(var(--score-ok-subtle))] text-[hsl(var(--score-ok))]",
       badge: "bg-[hsl(var(--score-ok-subtle))] text-[hsl(var(--score-ok))] border-[hsl(var(--score-ok-subtle))]",
       bar:   "bg-[hsl(var(--score-ok))]",
+      halo:  "border-[hsl(var(--score-ok))]",
     };
   }
   return {
     pill:  "bg-[hsl(var(--score-bad-subtle))] text-[hsl(var(--score-bad))]",
     badge: "bg-[hsl(var(--score-bad-subtle))] text-[hsl(var(--score-bad))] border-[hsl(var(--score-bad-subtle))]",
     bar:   "bg-[hsl(var(--score-bad))]",
+    halo:  "border-[hsl(var(--score-bad))]",
   };
 }
 

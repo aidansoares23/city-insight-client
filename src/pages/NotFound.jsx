@@ -26,7 +26,7 @@ const WIN_COLS_MED    = [82, 89, 96, 103, 110, 117, 124];
 
 function CityAnimation() {
   return (
-    <div className="relative mx-auto h-44 w-full max-w-2xl overflow-hidden rounded-2xl">
+    <div className="relative mx-auto h-44 w-full max-w-2xl overflow-hidden rounded-lg">
       {/* eslint-disable-next-line react/no-unknown-property */}
       <style>{`
         @keyframes nfWinBlink {
@@ -193,7 +193,7 @@ export default function NotFound() {
         <div className="mx-auto w-full max-w-5xl text-center">
           <div className="relative">
             {/* OUTER WRAPPER*/}
-            <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/70 p-8 shadow-sm backdrop-blur sm:p-12">
+            <div className="relative overflow-hidden rounded-3xl border border-slate-400/80 bg-white/70 p-8 shadow-sm backdrop-blur sm:p-12">
               {/* subtle inner highlight */}
               <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/50" />
 
@@ -203,7 +203,7 @@ export default function NotFound() {
 
                 {/* Headline */}
                 <div className="space-y-5">
-                  <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-4 py-2 text-sm font-medium text-slate-600 shadow-sm">
+                  <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-slate-400 bg-white/70 px-4 py-2 text-sm font-medium text-slate-600 shadow-sm">
                     <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sky-400/15 text-sky-700 ring-1 ring-sky-200/70">
                       404
                     </span>

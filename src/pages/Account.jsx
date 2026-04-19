@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/auth/authContext";
 
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/Dialog";
 import ReviewCard from "@/components/reviews/ReviewCard";
 import { usePageTitle } from "@/hooks/usePageTitle";
@@ -19,6 +18,7 @@ import { prettyCityFromSlug } from "@/lib/cities";
 import { fetchMyReviews, deleteMyReview, deleteMyAccount } from "@/lib/reviews";
 import { fetchMyFavorites, removeFavorite } from "@/lib/favorites";
 import { updateMyProfile } from "@/lib/me";
+import { sanitizeDisplayName } from "@/lib/sanitize";
 import { RATING_KEYS, scoreColor, derivedOverall } from "@/lib/ratings";
 
 /** Labelled info row with an icon for displaying user profile fields. */
@@ -28,7 +28,7 @@ function InfoRow({ icon: Icon, label, value }) {
       <Icon className="mt-0.5 h-4 w-4 text-slate-400" />
       <div className="min-w-0">
         <div className="font-semibold text-slate-900">{label}</div>
-        <div className="truncate text-slate-600">{value}</div>
+        <div className="truncate text-slate-500">{value}</div>
       </div>
     </div>
   );
@@ -42,13 +42,13 @@ function Avatar({ user }) {
       <img
         src={src}
         alt="Profile"
-        className="h-12 w-12 rounded-full border border-slate-200 object-cover"
+        className="h-12 w-12 rounded-full border border-slate-400 object-cover"
       />
     );
   }
 
   return (
-    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-900">
+    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-400 bg-white text-sm font-semibold text-slate-900">
       {initialsFromUser(user)}
     </div>
   );
@@ -240,8 +240,13 @@ export default function Account() {
   }
 
   async function commitNameEdit() {
-    const trimmed = nameValue.trim();
-    if (!trimmed || trimmed === user?.displayName) {
+    const result = sanitizeDisplayName(nameValue);
+    if (!result.ok) {
+      setNameError(result.error);
+      return;
+    }
+    const trimmed = result.value;
+    if (trimmed === user?.displayName) {
       setEditingName(false);
       return;
     }
@@ -315,11 +320,11 @@ export default function Account() {
         ]}
       />
 
-      <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-300">
-        <div id="profile" className="scroll-mt-32">
+      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div id="profile" className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4">
           <h2 className="text-xl font-semibold tracking-tight text-slate-900">Profile</h2>
-          <p className="mt-1 text-sm text-slate-600">Your account details and activity snapshot.</p>
-          <div className="mt-4">
+          <p className="mt-1 text-sm text-slate-500">Your account details and activity snapshot.</p>
+          <div className="mt-3">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex min-w-0 items-start gap-4">
                 <div className="shrink-0">
@@ -339,7 +344,7 @@ export default function Account() {
                           onKeyDown={handleNameKeyDown}
                           maxLength={50}
                           disabled={nameSaving}
-                          className="w-full rounded-md border border-slate-300 px-2 py-1 text-base font-semibold text-slate-900 outline-none focus:border-[hsl(var(--ring))] focus:ring-2 focus:ring-[hsl(var(--ring))]/30 disabled:opacity-50"
+                          className="w-full rounded-md border border-slate-400 px-2 py-1 text-base font-semibold text-slate-900 outline-none focus:border-[hsl(var(--ring))] focus:ring-2 focus:ring-[hsl(var(--ring))]/30 disabled:opacity-50"
                         />
                         <div className="flex items-center gap-2">
                           <button
@@ -357,7 +362,7 @@ export default function Account() {
                             onClick={cancelNameEdit}
                             disabled={nameSaving}
                             aria-label="Cancel"
-                            className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                            className="inline-flex items-center gap-1 rounded-md border border-slate-400 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                           >
                             <X className="h-3.5 w-3.5" />
                             Cancel
@@ -377,7 +382,7 @@ export default function Account() {
                         type="button"
                         onClick={startEditName}
                         aria-label="Edit display name"
-                        className="shrink-0 inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-0.5 text-xs font-medium text-slate-500 shadow-sm hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                        className="shrink-0 inline-flex items-center gap-1 rounded-md border border-slate-400 bg-white px-2 py-0.5 text-xs font-medium text-slate-500 shadow-sm hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                       >
                         <Pencil className="h-3 w-3" />
                         Edit
@@ -421,13 +426,13 @@ export default function Account() {
 
         {/* Stats — shown only once reviews are loaded and at least one exists */}
         {!isReviewsLoading && reviewStats ? (
-          <div className="border-t border-slate-200 pt-12">
+          <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
             <h2 className="text-xl font-semibold tracking-tight text-slate-900">Your Stats</h2>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-sm text-slate-500">
               Average ratings you've given across all {reviewStats.total}{" "}
               {reviewStats.total === 1 ? "review" : "reviews"}.
             </p>
-            <div className="mt-4">
+            <div className="mt-3">
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {RATING_KEYS.map((key) => {
                   const avg = reviewStats.avgs[key];
@@ -436,7 +441,7 @@ export default function Account() {
                   return (
                     <div
                       key={key}
-                      className="flex flex-col gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3"
+                      className="flex flex-col gap-2 rounded-lg border border-slate-400 bg-slate-50 px-4 py-3"
                     >
                       <div className="text-xs font-semibold capitalize text-slate-500">
                         {key}
@@ -469,29 +474,18 @@ export default function Account() {
           </div>
         ) : null}
 
-        <div id="reviews" className="scroll-mt-32 border-t border-slate-200 pt-12">
+        <div id="reviews" className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4">
           <h2 className="text-xl font-semibold tracking-tight text-slate-900">Your Reviews</h2>
-          <p className="mt-1 text-sm text-slate-600">View, edit, and delete all of your reviews.</p>
-          <div className="mt-4">
+          <p className="mt-1 text-sm text-slate-500">View, edit, and delete all of your reviews.</p>
+          <div className="mt-3">
             {isReviewsLoading ? <Loading label="Loading reviews…" /> : null}
 
             {error ? <ErrorMessage message={error} /> : null}
 
             {!isReviewsLoading && !error && myReviews.length === 0 ? (
-              <Card className="border-slate-200/70 shadow-sm ring-1 ring-[hsl(var(--border))]">
-                <CardContent className="px-6 py-5">
-                  <div className="flex items-start gap-3">
-                    <div>
-                      <div className="text-base font-semibold text-slate-900">
-                        No reviews yet.
-                      </div>
-                      <div className="mt-1 text-sm text-slate-600">
-                        Leave a city review and it'll show up here.
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="text-sm text-slate-500">
+                No reviews yet. Leave a city review and it'll show up here.
+              </div>
             ) : null}
 
             {!isReviewsLoading && !error && myReviews.length > 0 ? (
@@ -508,7 +502,7 @@ export default function Account() {
                       id="review-sort"
                       value={reviewSort}
                       onChange={(e) => setReviewSort(e.target.value)}
-                      className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-600 outline-none focus:border-[hsl(var(--ring))] focus:ring-2 focus:ring-[hsl(var(--ring))]/30"
+                      className="rounded-md border border-slate-400 bg-white px-2 py-1 text-xs font-medium text-slate-600 outline-none focus:border-[hsl(var(--ring))] focus:ring-2 focus:ring-[hsl(var(--ring))]/30"
                     >
                       <option value="newest">Newest first</option>
                       <option value="oldest">Oldest first</option>
@@ -519,40 +513,42 @@ export default function Account() {
                   </div>
                 ) : null}
 
-                {sortedReviews.map((review, index) => {
-                  const citySlug = review?.cityId || "unknown-city";
-                  const key =
-                    review?.id ||
-                    `${citySlug}__${review?.updatedAt ?? review?.updatedAtIso ?? review?.createdAt ?? review?.createdAtIso ?? index}`;
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {sortedReviews.map((review, index) => {
+                    const citySlug = review?.cityId || "unknown-city";
+                    const key =
+                      review?.id ||
+                      `${citySlug}__${review?.updatedAt ?? review?.updatedAtIso ?? review?.createdAt ?? review?.createdAtIso ?? index}`;
 
-                  const cityLabel =
-                    review?.cityName ||
-                    review?.cityLabel ||
-                    prettyCityFromSlug(citySlug);
+                    const cityLabel =
+                      review?.cityName ||
+                      review?.cityLabel ||
+                      prettyCityFromSlug(citySlug);
 
-                  return (
-                    <ReviewCard
-                      key={key}
-                      review={review}
-                      variant="account"
-                      title="You"
-                      showCity
-                      cityLabel={cityLabel}
-                      editTo={`/cities/${citySlug}/review`}
-                      editState={{ returnTo: "/account" }}
-                      onDelete={() => onDeleteReview(citySlug)}
-                    />
-                  );
-                })}
+                    return (
+                      <ReviewCard
+                        key={key}
+                        review={review}
+                        variant="account"
+                        title="You"
+                        showCity
+                        cityLabel={cityLabel}
+                        editTo={`/cities/${citySlug}/review`}
+                        editState={{ returnTo: "/account" }}
+                        onDelete={() => onDeleteReview(citySlug)}
+                      />
+                    );
+                  })}
+                </div>
               </div>
             ) : null}
           </div>
         </div>
 
-        <div id="favorites" className="scroll-mt-32 border-t border-slate-200 pt-12">
+        <div id="favorites" className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4">
           <h2 className="text-xl font-semibold tracking-tight text-slate-900">Favorite Cities</h2>
-          <p className="mt-1 text-sm text-slate-600">Cities you've saved for easy access.</p>
-          <div className="mt-4">
+          <p className="mt-1 text-sm text-slate-500">Cities you've saved for easy access.</p>
+          <div className="mt-3">
             {isFavoritesLoading ? <Loading label="Loading favorites…" /> : null}
 
             {favoritesError ? <ErrorMessage message={favoritesError} /> : null}
@@ -560,16 +556,9 @@ export default function Account() {
             {!isFavoritesLoading &&
             !favoritesError &&
             myFavorites.length === 0 ? (
-              <Card className="border-slate-200/70 shadow-sm ring-1 ring-[hsl(var(--border))]">
-                <CardContent className="px-6 py-5">
-                  <div className="text-base font-semibold text-slate-900">
-                    No favorites yet.
-                  </div>
-                  <div className="mt-1 text-sm text-slate-600">
-                    Favorite a city on its detail page and it'll appear here.
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="text-sm text-slate-500">
+                No favorites yet. Favorite a city on its detail page and it'll appear here.
+              </div>
             ) : null}
 
             {!isFavoritesLoading &&
@@ -583,7 +572,7 @@ export default function Account() {
                   return (
                     <div
                       key={slug}
-                      className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3"
+                      className="flex items-center justify-between gap-3 rounded-lg border border-slate-400 bg-slate-50 px-4 py-3"
                     >
                       <Link
                         to={`/cities/${slug}`}
@@ -608,28 +597,25 @@ export default function Account() {
           </div>
         </div>
 
-        <Card className="border-slate-200/70 bg-white shadow-md ring-1 ring-[hsl(var(--destructive))]/20">
-          <CardContent className="px-6 py-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <div className="text-base font-semibold text-slate-900">
-                  Delete Your Account
-                </div>
-                <div className="mt-1 text-sm text-slate-600">
-                  Permanently delete your account and associated data.
-                </div>
+        <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <div className="text-base font-semibold text-slate-900">
+                Delete Your Account
               </div>
-
-              <Button
-                variant="danger"
-                onClick={() => setDeleteAccountOpen(true)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete account
-              </Button>
+              <div className="mt-1 text-sm text-slate-500">
+                Permanently delete your account and associated data.
+              </div>
             </div>
-          </CardContent>
-        </Card>
+            <Button
+              variant="danger"
+              onClick={() => setDeleteAccountOpen(true)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete account
+            </Button>
+          </div>
+        </div>
       </div>
     </>
   );

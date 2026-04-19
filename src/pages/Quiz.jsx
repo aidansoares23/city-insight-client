@@ -5,7 +5,6 @@ import { usePageTitle } from "@/hooks/usePageTitle";
 import PageHero from "@/components/layout/PageHero";
 import { Button } from "@/components/ui/Button";
 import ErrorMessage from "@/components/ui/ErrorMessage";
-import { RatingSlider } from "@/components/ui/RatingSlider";
 import CityCard from "@/components/city/CityCard";
 import SectionCard from "@/components/layout/SectionCard";
 import {
@@ -23,28 +22,41 @@ const CRITERIA = [
   {
     key: "safety",
     label: "Safety",
+    statement: "Living in a safe neighborhood is important to me.",
     description: "Low crime, secure neighborhoods",
   },
   {
     key: "affordability",
     label: "Affordability",
+    statement: "Low cost of living and rent is important to me.",
     description: "Low rent and cost of living",
   },
   {
     key: "walkability",
     label: "Walkability",
+    statement: "Being able to get around on foot is important to me.",
     description: "Easy to get around on foot",
   },
   {
     key: "cleanliness",
     label: "Cleanliness",
+    statement: "Clean streets and public spaces are important to me.",
     description: "Clean streets and public spaces",
   },
   {
     key: "environment",
     label: "Environment",
+    statement: "Clean air and low pollution are important to me.",
     description: "Clean air and low pollution",
   },
+];
+
+const LIKERT_OPTIONS = [
+  { value: 0,   label: "Strongly\nDisagree" },
+  { value: 2.5, label: "Disagree" },
+  { value: 5,   label: "Neutral" },
+  { value: 7.5, label: "Agree" },
+  { value: 10,  label: "Strongly\nAgree" },
 ];
 
 const SIZE_OPTIONS = [
@@ -57,11 +69,11 @@ const SIZE_OPTIONS = [
 const TOTAL_STEPS = CRITERIA.length + 1; // 5 sliders + city size step
 
 const DEFAULT_WEIGHTS = {
-  safety: 5,
-  affordability: 5,
-  walkability: 5,
-  cleanliness: 5,
-  environment: 5,
+  safety: 7.5,
+  affordability: 7.5,
+  walkability: 7.5,
+  cleanliness: 7.5,
+  environment: 7.5,
 };
 
 export default function Quiz() {
@@ -138,7 +150,7 @@ export default function Quiz() {
       : null;
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-8rem)] space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
       <PageHero
         title="City Match"
         description="Tell us what matters most to you — we'll match you with the cities that fit your lifestyle."
@@ -150,7 +162,7 @@ export default function Quiz() {
         <SectionCard icon={Sliders} title="What matters most to you?">
           <div>
             {/* Progress bar */}
-            <div className="mb-6">
+            <div className="mb-4">
               <div className="flex items-center justify-between mb-1.5 text-xs text-slate-500">
                 <span>
                   Question {questionIndex + 1} of {TOTAL_STEPS}
@@ -167,28 +179,40 @@ export default function Quiz() {
             <ErrorMessage message={error} className="mb-4" />
 
             {/* Current question */}
-            <div className="py-4">
+            <div className="py-2">
               <p className="text-xl font-semibold text-slate-900 mb-1">
                 {currentCriterion.label}
               </p>
               <p className="text-sm text-slate-500 mb-6">
-                {currentCriterion.description}
+                {currentCriterion.statement}
               </p>
-              <RatingSlider
-                key={currentCriterion.key}
-                label={currentCriterion.label}
-                description=""
-                value={weights[currentCriterion.key]}
-                onChange={(val) => setWeight(currentCriterion.key, val)}
-                min={0}
-                max={10}
-                minLabel="Not important"
-                maxLabel="Very important"
-              />
+              <div className="flex gap-2">
+                {LIKERT_OPTIONS.map((opt) => {
+                  const selected = weights[currentCriterion.key] === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setWeight(currentCriterion.key, opt.value)}
+                      aria-pressed={selected}
+                      className={cn(
+                        "flex-1 rounded-xl border-2 px-1 py-3 text-center text-xs font-semibold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[hsl(var(--primary))]",
+                        selected
+                          ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))] text-white shadow-sm"
+                          : "border-slate-200 bg-white text-slate-500 hover:border-slate-400 hover:text-slate-900",
+                      )}
+                    >
+                      {opt.label.split("\n").map((line, i) => (
+                        <span key={i} className="block">{line}</span>
+                      ))}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Navigation */}
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-4 flex items-center justify-between">
               <div>
                 {questionIndex > 0 && (
                   <Button variant="outline" onClick={handleBack}>
@@ -220,7 +244,7 @@ export default function Quiz() {
         <SectionCard icon={Sliders} title="What size city do you prefer?">
           <div>
             {/* Progress bar */}
-            <div className="mb-6">
+            <div className="mb-4">
               <div className="flex items-center justify-between mb-1.5 text-xs text-slate-500">
                 <span>Question {TOTAL_STEPS} of {TOTAL_STEPS}</span>
                 <span>{Math.round(sizeProgressPct)}%</span>
@@ -246,7 +270,7 @@ export default function Quiz() {
                     "rounded-xl border-2 px-4 py-3 text-left transition-colors",
                     sizePreference === opt.key
                       ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary)/.08)]"
-                      : "border-slate-200 bg-white hover:border-slate-300",
+                      : "border-slate-400 bg-white hover:border-slate-400",
                   )}
                 >
                   <p className={cn("text-sm font-semibold", sizePreference === opt.key ? "text-[hsl(var(--primary))]" : "text-slate-900")}>
@@ -257,7 +281,7 @@ export default function Quiz() {
               ))}
             </div>
 
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-4 flex items-center justify-between">
               <Button variant="outline" onClick={handleBackFromSize}>
                 <ArrowLeft className="mr-1.5 h-4 w-4" />
                 Back

@@ -26,19 +26,19 @@ export default function ApiOverlay({ show, title, message, hint }) {
 
       {/* modal */}
       <div className="relative w-full max-w-xl">
-        <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/70 p-7 shadow-sm backdrop-blur sm:p-9">
+        <div className="relative overflow-hidden rounded-3xl border border-slate-400/80 bg-white/70 p-7 shadow-sm backdrop-blur sm:p-9">
           {/* subtle inner highlight ring */}
           <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/50" />
 
           <div className="relative flex gap-5">
             {/* spinner bubble */}
-            <div className="mt-1 inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white/80 shadow-sm">
+            <div className="mt-1 inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-slate-400 bg-white/80 shadow-sm">
               <Loader2 className="h-5 w-5 animate-spin text-slate-600" />
             </div>
 
             <div className="min-w-0 space-y-3">
               {/* pill */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-4 py-2 text-sm font-medium text-slate-600 shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-400 bg-white/70 px-4 py-2 text-sm font-medium text-slate-600 shadow-sm">
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sky-400/15 text-sky-700 ring-1 ring-sky-200/70">
                   <Server className="h-3.5 w-3.5" />
                 </span>

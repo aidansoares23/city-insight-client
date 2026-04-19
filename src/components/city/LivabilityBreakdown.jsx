@@ -5,24 +5,20 @@ import { scoreColor, scoreLabel } from "@/lib/ratings";
 import { toOutOf10, clamp01 } from "@/lib/format";
 import { cn } from "@/utils/utils";
 
-// ---------------------------------------------------------------------------
 // Representative dataset norms used for the interactive demo.
 // These approximate the real min/max values in our database.
-// ---------------------------------------------------------------------------
 const NORMS = {
-  review: { min: 3.5, max: 9.0 },
-  safety: { min: 2.5, max: 9.5 },
-  rent:   { min: 900,  max: 3800 },
-  aqi:    { min: 10,  max: 180 },
+  review: { min: 3.5, max: 9.0 },         // average review score (0–10)
+  safety: { min: 2.5, max: 9.5 },         // safety score (0–10)
+  rent:   { min: 900,  max: 3800 },        // monthly rent in USD
+  aqi:    { min: 10,  max: 180 },          // EPA Air Quality Index
 };
 
 const WEIGHTS = { review: 0.45, safety: 0.30, rent: 0.15, aqi: 0.10 };
 
 const DEFAULTS = { review: 7.0, safety: 7.0, rent: 1800, aqi: 50 };
 
-// ---------------------------------------------------------------------------
 // Scoring math — mirrors the server-side V1 algorithm
-// ---------------------------------------------------------------------------
 
 function rangeScore(value, min, max) {
   if (max <= min) return null;
@@ -46,10 +42,6 @@ function computeLivability({ review, safety, rent, aqi }) {
   const totalWeight = signals.reduce((sum, s) => sum + s.weight, 0);
   return Math.round(signals.reduce((sum, s) => sum + s.score * (s.weight / totalWeight), 0));
 }
-
-// ---------------------------------------------------------------------------
-// ScoreRing
-// ---------------------------------------------------------------------------
 
 function arcStroke(score10) {
   if (score10 == null) return "hsl(var(--score-neutral))";
@@ -167,7 +159,7 @@ function SliderInput({ icon: Icon, label, description, value, min, max, step, on
     <div className="space-y-1.5">
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--secondary))] text-slate-600">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
             <Icon className="h-3.5 w-3.5" />
           </span>
           <div className="min-w-0">

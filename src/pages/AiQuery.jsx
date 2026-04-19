@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import api from "@/services/api";
+import { sanitizeAiQuery } from "@/lib/sanitize";
 import { fetchAllCities } from "@/lib/cities";
 import { useAuth } from "@/auth/authContext";
 import { usePageTitle } from "@/hooks/usePageTitle";
@@ -120,7 +121,7 @@ function ReferencedCities({ trace }) {
           <Link
             key={c.slug}
             to={`/cities/${c.slug}`}
-            className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm transition hover:border-[hsl(var(--primary))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--foreground))]"
+            className="inline-flex items-center gap-1.5 rounded-full border border-slate-400 bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm transition hover:border-[hsl(var(--primary))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--foreground))]"
           >
             {c.name}
             {c.state ? `, ${c.state}` : ""}
@@ -130,7 +131,7 @@ function ReferencedCities({ trace }) {
         {compareLink && (
           <Link
             to={compareLink}
-            className="inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--border))] bg-[hsl(var(--secondary))] px-3 py-1 text-xs font-medium text-[hsl(var(--secondary-foreground))] shadow-sm transition hover:bg-[hsl(var(--accent))]"
+            className="inline-flex items-center gap-1.5 rounded-full border border-slate-400 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 shadow-sm transition hover:border-[hsl(var(--primary))] hover:bg-[hsl(var(--accent))]"
           >
             <GitCompareArrows className="h-3 w-3" />
             Compare these cities
@@ -148,7 +149,7 @@ function TracePanel({ trace }) {
   if (!trace || trace.length === 0) return null;
 
   return (
-    <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50">
+    <div className="mt-4 rounded-lg border border-slate-400 bg-slate-50">
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
@@ -158,7 +159,7 @@ function TracePanel({ trace }) {
       </button>
 
       {open && (
-        <div className="divide-y divide-slate-200 border-t border-slate-200">
+        <div className="divide-y divide-slate-200 border-t border-slate-400">
           {trace.map((step, idx) => (
             <div key={idx} className="px-4 py-3 text-xs">
               <p className="font-semibold text-slate-900">
@@ -166,11 +167,11 @@ function TracePanel({ trace }) {
                 <span className="font-mono text-[hsl(var(--primary-foreground))]">{step.tool}</span>
               </p>
               <p className="mt-1 text-slate-500">Input:</p>
-              <pre className="mt-0.5 overflow-x-auto rounded border border-slate-200 bg-white p-2 text-slate-700">
+              <pre className="mt-0.5 overflow-x-auto rounded border border-slate-400 bg-white p-2 text-slate-700">
                 {JSON.stringify(step.input, null, 2)}
               </pre>
               <p className="mt-2 text-slate-500">Result:</p>
-              <pre className="mt-0.5 max-h-48 overflow-x-auto overflow-y-auto rounded border border-slate-200 bg-white p-2 text-slate-700">
+              <pre className="mt-0.5 max-h-48 overflow-x-auto overflow-y-auto rounded border border-slate-400 bg-white p-2 text-slate-700">
                 {JSON.stringify(step.result, null, 2)}
               </pre>
             </div>
@@ -204,10 +205,10 @@ function InlineLoadingIndicator() {
 
   return (
     <div className="flex items-start gap-3">
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--secondary))]">
-        <Sparkles className="h-3.5 w-3.5 text-[hsl(var(--primary-foreground))]" />
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100">
+        <Sparkles className="h-3.5 w-3.5 text-slate-500" />
       </div>
-      <div className="flex items-center gap-2 rounded-2xl rounded-tl-sm bg-white border border-slate-100 px-4 py-3 shadow-sm text-sm text-slate-500">
+      <div className="flex items-center gap-2 rounded-lg rounded-tl-sm bg-white border border-slate-100 px-4 py-3 shadow-sm text-sm text-slate-500">
         <span className="inline-flex gap-0.5">
           {[0, 1, 2].map((i) => (
             <span
@@ -229,10 +230,10 @@ function InlineLoadingIndicator() {
 function AssistantBubble({ message }) {
   return (
     <div className="flex items-start gap-3 animate-in fade-in slide-in-from-bottom-1 duration-300">
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--secondary))]">
-        <Sparkles className="h-3.5 w-3.5 text-[hsl(var(--primary-foreground))]" />
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100">
+        <Sparkles className="h-3.5 w-3.5 text-slate-500" />
       </div>
-      <div className="min-w-0 flex-1 rounded-2xl rounded-tl-sm bg-white border border-slate-100 px-4 py-3 shadow-sm">
+      <div className="min-w-0 flex-1 rounded-lg rounded-tl-sm bg-white border border-slate-100 px-4 py-3 shadow-sm">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
@@ -263,12 +264,12 @@ function AssistantBubble({ message }) {
               </code>
             ),
             table: ({ children }) => (
-              <div className="my-3 overflow-x-auto rounded-xl border border-slate-200">
+              <div className="my-3 overflow-x-auto rounded-xl border border-slate-400">
                 <table className="w-full text-sm">{children}</table>
               </div>
             ),
             thead: ({ children }) => (
-              <thead className="border-b border-slate-200 bg-[hsl(var(--secondary))]">
+              <thead className="border-b border-slate-400 bg-slate-50">
                 {children}
               </thead>
             ),
@@ -301,7 +302,7 @@ function AssistantBubble({ message }) {
 function UserBubble({ message }) {
   return (
     <div className="flex justify-end animate-in fade-in slide-in-from-bottom-1 duration-200">
-      <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-[hsl(var(--primary-foreground))] px-4 py-2.5 text-sm text-white shadow-sm">
+      <div className="max-w-[80%] rounded-lg rounded-tr-sm bg-[hsl(var(--primary-foreground))] px-4 py-2.5 text-sm text-white shadow-sm">
         {message.content}
       </div>
     </div>
@@ -383,7 +384,7 @@ export default function AiQuery() {
 
   async function handleSubmit(e) {
     e?.preventDefault();
-    const q = query.trim();
+    const q = sanitizeAiQuery(query);
     if (!q || loading) return;
 
     setQuery("");
@@ -432,8 +433,8 @@ export default function AiQuery() {
   if (!authLoading && !user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[55vh] gap-6 py-16 animate-in fade-in slide-in-from-bottom-2 duration-300">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--secondary))]">
-          <Sparkles className="h-7 w-7 text-[hsl(var(--primary-foreground))]" />
+        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-slate-100">
+          <Sparkles className="h-7 w-7 text-slate-500" />
         </div>
         <div className="text-center space-y-2">
           <h1 className="text-xl font-semibold text-slate-900">Ask AI</h1>
@@ -457,7 +458,7 @@ export default function AiQuery() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-10 py-12 animate-in fade-in slide-in-from-bottom-2 duration-300">
         {/* Icon + headline */}
         <div className="text-center space-y-3">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--secondary))]">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-lg bg-[hsl(var(--secondary))]">
             <Sparkles className="h-7 w-7 text-[hsl(var(--primary-foreground))]" />
           </div>
           <h1 className="text-2xl font-semibold text-slate-900">Ask anything</h1>
@@ -485,7 +486,7 @@ export default function AiQuery() {
               maxLength={1000}
               autoComplete="off"
               disabled={!backendEnabled}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition disabled:opacity-50"
+              className="w-full rounded-xl border border-slate-400 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition disabled:opacity-50"
             />
             <Button
               type="button"
@@ -505,7 +506,7 @@ export default function AiQuery() {
                 <button
                   key={s}
                   onClick={() => pickSuggestion(s)}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 shadow-sm transition-colors hover:border-[hsl(var(--primary))] hover:text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary)/.06)]"
+                  className="rounded-full border border-slate-400 bg-white px-3 py-1.5 text-xs text-slate-600 shadow-sm transition-colors hover:border-[hsl(var(--primary))] hover:text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary)/.06)]"
                 >
                   {s}
                 </button>
@@ -521,7 +522,7 @@ export default function AiQuery() {
 
   // ── Chat state ─────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col gap-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+    <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
       {/* Thread */}
       <div className="space-y-4">
         {messages.map((msg, idx) =>
@@ -549,7 +550,7 @@ export default function AiQuery() {
             maxLength={1000}
             autoComplete="off"
             disabled={loading}
-            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition disabled:opacity-50"
+            className="w-full rounded-xl border border-slate-400 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] focus:border-[hsl(var(--primary))] transition disabled:opacity-50"
           />
           <Button
             type="button"
@@ -565,7 +566,7 @@ export default function AiQuery() {
         <div className="mt-2 flex items-center justify-between">
           <p className="text-xs text-slate-400">
             Press{" "}
-            <kbd className="rounded border border-slate-200 bg-slate-50 px-1 py-0.5 font-mono text-[10px] text-slate-500">
+            <kbd className="rounded border border-slate-400 bg-slate-50 px-1 py-0.5 font-mono text-[10px] text-slate-500">
               Enter
             </kbd>{" "}
             to send

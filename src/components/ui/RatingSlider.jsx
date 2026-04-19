@@ -35,7 +35,7 @@ export function RatingSlider({
         )}
       </div>
 
-      <div className="flex gap-1">
+      <div className="grid grid-cols-5 gap-1 sm:flex">
         {steps.map((n) => {
           const selected = n === value;
           return (
@@ -46,7 +46,8 @@ export function RatingSlider({
               aria-label={`${label}: ${n}`}
               aria-pressed={selected}
               className={cn(
-                "flex-1 rounded-lg py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[hsl(var(--primary))]",
+                "rounded-lg py-1.5 text-sm font-semibold transition-colors sm:flex-1",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[hsl(var(--primary))]",
                 selected
                   ? "bg-[hsl(var(--primary))] text-white shadow-sm"
                   : "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900",

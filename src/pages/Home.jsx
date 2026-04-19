@@ -60,63 +60,32 @@ function FloatingCityPins() {
 
 export default function Home() {
   return (
-    <div className="relative min-h-[calc(100vh-64px)] overflow-hidden">
+    <div className="relative flex-1 overflow-hidden flex flex-col">
       <FloatingCityPins />
 
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="container mx-auto px-4 sm:px-6 flex flex-col flex-1 justify-center gap-4">
         {/* Hero */}
-        <div className="py-16 text-center space-y-7 sm:space-y-9">
-          {/* Logo + wordmark */}
-          <div className="home-enter-1 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-            <img
-              src="/city-insight-logo.png"
-              alt="City Insight"
-              className="h-12 w-12 shrink-0 object-contain drop-shadow-sm sm:h-14 sm:w-14 lg:h-16 lg:w-16"
-            />
-            <div className="brand-font text-4xl font-semibold leading-none text-slate-900 sm:text-3xl">
-              City Insight
-            </div>
-          </div>
-
+        <div className="text-center space-y-3 sm:space-y-4">
           {/* Headline */}
-          <div className="home-enter-2 space-y-4 sm:space-y-5">
-            <div
-              className="
-                brand-font
-                mx-auto
-                max-w-xl
-                text-2xl
-                sm:text-3xl
-                md:text-2xl
-                lg:text-2xl
-                font-semibold
-                leading-tight
-                tracking-tight
-                text-slate-900
-"
-            >
-              Compare California Cities{" "}
-              <span className="block sm:inline">
-                Using{" "}
-                <span className="bg-sky-400 bg-clip-text text-transparent">
-                  Real Data
-                </span>{" "}
-                and{" "}
-                <span className="bg-sky-400 bg-clip-text text-transparent">
-                  Real Reviews
-                </span>
+          <div className="home-enter-1 space-y-3">
+            <h1 className="brand-font mx-auto max-w-2xl text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight tracking-tight text-slate-900">
+              Compare California Cities Using{" "}
+              <span className="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">
+                Real Data
+              </span>{" "}
+              and{" "}
+              <span className="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">
+                Real Reviews
               </span>
-            </div>
+            </h1>
 
-            <p className="mx-auto max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
-              Make informed decisions about where to live with crowdsourced
-              insights and objective metrics covering safety, cost of
-              living, and quality of life.
+            <p className="mx-auto max-w-lg text-base leading-relaxed text-slate-500 sm:text-lg">
+              Crowdsourced insights and objective metrics on safety, cost of living, and quality of life.
             </p>
           </div>
 
           {/* CTA */}
-          <div className="home-enter-3 flex flex-col gap-3 pt-1 sm:flex-row sm:justify-center sm:gap-4">
+          <div className="home-enter-2 flex flex-col gap-3 pt-2 sm:flex-row sm:justify-center sm:gap-3">
             <Button
               asChild
               variant="primary"
@@ -138,57 +107,53 @@ export default function Home() {
               size="lg"
               className="w-full sm:w-auto"
             >
-              <Link
-                to="/login"
-                className="flex items-center justify-center"
-              >
-                <span>Or Create An Account</span>
+              <Link to="/login" className="flex items-center justify-center">
+                <span>Sign Up Free</span>
               </Link>
             </Button>
           </div>
         </div>
 
         {/* Feature cards */}
-        <div className="max-w-4xl mx-auto pb-16">
-          <div className="grid gap-4 sm:gap-6 md:grid-cols-3">
-            <Card className="home-enter-4 border-slate-200/70 bg-white/80 shadow-md">
-              <CardContent className="p-5 sm:p-6 text-left">
+        <div className="max-w-3xl mx-auto w-full">
+          <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
+            <Card className="home-enter-3 border-slate-400/70 bg-white/80 shadow-sm">
+              <CardContent className="p-5 text-left">
                 <div className="flex items-center gap-3 text-sm font-medium text-slate-900">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sky-600/10 text-sky-700 ring-1 ring-sky-200/60">
-                    <Shield className="h-5 w-5" />
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-sky-600/10 text-sky-700 ring-1 ring-sky-200/60">
+                    <Shield className="h-4 w-4" />
                   </span>
                   Safety snapshot
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                  Quick comparisons across cities with consistent
-                  indicators.
+                <p className="mt-2.5 text-sm leading-relaxed text-slate-500">
+                  Quick comparisons across cities with consistent indicators.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="home-enter-5 border-slate-200/70 bg-white/80 shadow-md">
-              <CardContent className="p-5 sm:p-6 text-left">
+            <Card className="home-enter-4 border-slate-400/70 bg-white/80 shadow-sm">
+              <CardContent className="p-5 text-left">
                 <div className="flex items-center gap-3 text-sm font-medium text-slate-900">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600/10 text-emerald-700 ring-1 ring-emerald-200/60">
-                    <DollarSign className="h-5 w-5" />
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600/10 text-emerald-700 ring-1 ring-emerald-200/60">
+                    <DollarSign className="h-4 w-4" />
                   </span>
                   Rent + cost
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                <p className="mt-2.5 text-sm leading-relaxed text-slate-500">
                   Use median rent as a simple cost-of-living proxy.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="home-enter-6 border-slate-200/70 bg-white/80 shadow-md">
-              <CardContent className="p-5 sm:p-6 text-left">
+            <Card className="home-enter-5 border-slate-400/70 bg-white/80 shadow-sm">
+              <CardContent className="p-5 text-left">
                 <div className="flex items-center gap-3 text-sm font-medium text-slate-900">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-600/10 text-rose-700 ring-1 ring-rose-200/60">
-                    <MapPin className="h-5 w-5" />
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-rose-600/10 text-rose-700 ring-1 ring-rose-200/60">
+                    <MapPin className="h-4 w-4" />
                   </span>
                   Real reviews
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                <p className="mt-2.5 text-sm leading-relaxed text-slate-500">
                   See what people say and weigh it against the data.
                 </p>
               </CardContent>

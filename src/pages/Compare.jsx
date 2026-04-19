@@ -150,7 +150,7 @@ function CitySelector({ allCities, selectedSlug, onSelect, placeholder }) {
       </div>
 
       {open && (
-        <div className="absolute z-30 mt-1 w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-md">
+        <div className="absolute z-30 mt-1 w-full overflow-hidden rounded-lg border border-slate-400 bg-white shadow-md">
           {filtered.length === 0 ? (
             <div className="px-4 py-3 text-sm text-slate-500">
               No cities found.
@@ -461,29 +461,28 @@ export default function Compare() {
         : "grid-cols-1 sm:grid-cols-2";
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-300">
+    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
       <PageHero
         title="Compare Cities"
         description="Pick two to four cities and see how they stack up — ratings, rent, and more, all side by side."
       />
 
       {/* City selectors */}
-      <div>
+      <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
         <div className="flex items-center gap-2">
           <GitCompareArrows className="h-5 w-5 text-slate-500" />
           <h2 className="text-xl font-semibold tracking-tight text-slate-900">Choose Your Cities</h2>
         </div>
-        <p className="mt-1 text-sm text-slate-600">Add up to {MAX_CITIES} cities to compare.</p>
-        <div className="mt-4">
+        <p className="mt-1 text-sm text-slate-500">Add up to {MAX_CITIES} cities to compare.</p>
+        <div className="mt-3">
           {citiesLoading ? (
             <Loading label="Loading cities…" />
           ) : allCitiesError ? (
             <ErrorMessage message="Could not load city list. Please refresh to try again." />
           ) : (
-            <div className={`grid gap-5 ${selectorCols}`}>
+            <div className={`grid gap-4 ${selectorCols}`}>
               {slugs.map((slug, i) => (
                 <div key={i}>
-                  {/* Slot header */}
                   <div className="mb-1.5 flex items-center gap-1.5">
                     <span
                       className={`inline-block h-2 w-2 rounded-full ${CITY_COLORS[i].dot}`}
@@ -533,15 +532,17 @@ export default function Compare() {
           {slotCount < MAX_CITIES && (
             <button
               onClick={addSlot}
-              className="mt-5 flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900"
+              className="mt-3 flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900"
             >
-              <Plus className="h-4 w-4" />
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[hsl(var(--primary))]">
+                <Plus className="h-3 w-3 text-slate-900" />
+              </span>
               Add another city
             </button>
           )}
 
           {hasDuplicates && (
-            <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               You've picked the same city more than once — each slot should be a
               different city.
             </div>
@@ -551,20 +552,20 @@ export default function Compare() {
 
       {/* Empty state */}
       {activeSlugs.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-sm text-slate-500">
+        <div className="rounded-lg border border-dashed border-slate-400 bg-white px-6 py-10 text-center text-sm text-slate-400">
           Search for cities above to start comparing.
         </div>
       )}
 
       {/* Radar chart */}
       {canShowResults && (
-        <div className="border-t border-slate-200 pt-12">
+        <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-slate-500" />
             <h2 className="text-xl font-semibold tracking-tight text-slate-900">Score Overview</h2>
           </div>
-          <p className="mt-1 text-sm text-slate-600">How each city rates across all categories.</p>
-          <div className="mt-4">
+          <p className="mt-1 text-sm text-slate-500">How each city rates across all categories.</p>
+          <div className="mt-3">
             <CityRadarChart cities={radarCities} height={320} />
           </div>
         </div>
@@ -572,74 +573,74 @@ export default function Compare() {
 
       {/* Comparison table */}
       {canShowResults && (
-        <div className="border-t border-slate-200 pt-12">
+        <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
           <div className="flex items-center gap-2">
             <GitCompareArrows className="h-5 w-5 text-slate-500" />
             <h2 className="text-xl font-semibold tracking-tight text-slate-900">Side-by-Side Breakdown</h2>
           </div>
-          <p className="mt-1 text-sm text-slate-600">✓ marks the best city for each category.</p>
-          <div className="mt-4">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="pb-3 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 whitespace-nowrap">
-                    Category
-                  </th>
-                  {loadedCities.map((c, i) => (
-                    <th
-                      key={i}
-                      className="pb-3 pr-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-500"
-                      style={{ minWidth: 100 }}
-                    >
-                      <div className="flex items-center justify-center gap-1.5">
-                        <span
-                          className={`inline-block h-2.5 w-2.5 rounded-full ${c.color.dot}`}
-                        />
-                        <span className="max-w-[100px] truncate">
-                          {c.data?.city?.name}
-                        </span>
-                      </div>
+          <p className="mt-1 text-sm text-slate-500">✓ marks the best city for each category.</p>
+          <div className="mt-3">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-slate-400">
+                    <th className="pb-3 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 whitespace-nowrap">
+                      Category
                     </th>
+                    {loadedCities.map((c, i) => (
+                      <th
+                        key={i}
+                        className="pb-3 pr-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-500"
+                        style={{ minWidth: 100 }}
+                      >
+                        <div className="flex items-center justify-center gap-1.5">
+                          <span
+                            className={`inline-block h-2.5 w-2.5 rounded-full ${c.color.dot}`}
+                          />
+                          <span className="max-w-[100px] truncate">
+                            {c.data?.city?.name}
+                          </span>
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {tableRows.map((row) => (
+                    <CompareRow
+                      key={row.metric}
+                      metric={row.metric}
+                      values={row.values}
+                      winnerIdx={row.dir ? findWinner(row.values, row.dir) : null}
+                      renderValue={row.render}
+                    />
                   ))}
-                </tr>
-              </thead>
-              <tbody>
-                {tableRows.map((row) => (
-                  <CompareRow
-                    key={row.metric}
-                    metric={row.metric}
-                    values={row.values}
-                    winnerIdx={row.dir ? findWinner(row.values, row.dir) : null}
-                    renderValue={row.render}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </tbody>
+              </table>
+            </div>
 
-          <div className="mt-4 flex flex-wrap gap-3 border-t border-slate-100 pt-4">
-            {loadedCities.map((c, i) => (
-              <Button key={i} variant="secondary" size="sm" asChild>
-                <Link to={`/cities/${c.slug}`} state={{ from: "compare" }}>
-                  View {c.data?.city?.name}
-                </Link>
-              </Button>
-            ))}
-          </div>
+            <div className="mt-4 flex flex-wrap gap-3 border-t border-slate-100 pt-4">
+              {loadedCities.map((c, i) => (
+                <Button key={i} variant="secondary" size="sm" asChild>
+                  <Link to={`/cities/${c.slug}`} state={{ from: "compare" }}>
+                    View {c.data?.city?.name}
+                  </Link>
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       {/* Moving Cost Calculator */}
       {canShowResults && (
-        <div className="border-t border-slate-200 pt-12">
+        <div className="rounded-lg border border-slate-400 bg-white px-5 py-4">
           <div className="flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-slate-500" />
             <h2 className="text-xl font-semibold tracking-tight text-slate-900">Moving Cost Estimate</h2>
           </div>
-          <p className="mt-1 text-sm text-slate-600">Monthly budget comparison based on median rent ratios.</p>
-          <div className="mt-4">
+          <p className="mt-1 text-sm text-slate-500">Monthly budget comparison based on median rent ratios.</p>
+          <div className="mt-3">
             <CostCalculator cities={loadedCities} />
           </div>
         </div>

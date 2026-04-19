@@ -125,7 +125,7 @@ function mergeReactionsIntoState(prevState, reviews) {
 /** Summary metric tile showing an icon, title, large value, and a subtitle note. */
 function MetricCard({ title, icon: Icon, value, subtitle }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-md">
+    <div className="rounded-lg border border-slate-400 bg-white px-4 py-4 shadow-sm">
       <div className="flex items-center gap-3">
         {Icon ? (
           <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
@@ -230,7 +230,7 @@ function AttractionCard({ place }) {
   )}`;
 
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="flex flex-col gap-2 rounded-xl border border-slate-400 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-2">
         <span className="leading-snug text-sm font-semibold text-slate-900">
           {place.name}
@@ -326,6 +326,10 @@ export default function CityDetail() {
   const goLoginAndReturn = useCallback(() => {
     navigate("/login", { state: { returnTo } });
   }, [navigate, returnTo]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]); // scroll to top of page when a new page is loaded
 
   // Fetch core city data (name, state, metrics, stats)
   useEffect(() => {
@@ -709,7 +713,7 @@ export default function CityDetail() {
   }
 
   return (
-    <div className="animate-in space-y-12 fade-in slide-in-from-bottom-2 duration-300">
+    <div className="animate-in space-y-4 fade-in slide-in-from-bottom-2 duration-300">
       <ConfirmDialog
         open={isConfirmDeleteOpen}
         onOpenChange={setIsConfirmDeleteOpen}
@@ -720,9 +724,9 @@ export default function CityDetail() {
       />
 
       {/* Hero */}
-      <div className="pb-2">
+      <div>
         {/* Back link / breadcrumb */}
-        <div className="mb-5">
+        <div className="mb-2">
           <Link
             to={location.state?.from === "compare" ? "/compare" : "/cities"}
             className="group inline-flex items-center gap-1 text-s font-medium text-slate-400 no-underline transition-colors hover:text-slate-900"
@@ -759,7 +763,9 @@ export default function CityDetail() {
               <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
                 <div
                   className="inline-flex w-fit items-center gap-2 rounded-xl border bg-white px-3 py-2 shadow"
-                  style={{ borderColor: `hsl(var(${livScore == null ? '--score-neutral' : livScore >= 7 ? '--score-good' : livScore >= 4 ? '--score-ok' : '--score-bad'}))` }}
+                  style={{
+                    borderColor: `hsl(var(${livScore == null ? "--score-neutral" : livScore >= 7 ? "--score-good" : livScore >= 4 ? "--score-ok" : "--score-bad"}))`,
+                  }}
                 >
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
                     Livability
@@ -774,10 +780,14 @@ export default function CityDetail() {
                       </span>
                     </div>
                   ) : (
-                    <span className="text-sm font-semibold text-slate-400">N/A</span>
+                    <span className="text-sm font-semibold text-slate-400">
+                      N/A
+                    </span>
                   )}
                   {label && (
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${tone.pill}`}>
+                    <span
+                      className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${tone.pill}`}
+                    >
                       {label}
                     </span>
                   )}
@@ -790,7 +800,12 @@ export default function CityDetail() {
                     variant="secondary"
                     size="sm"
                   />
-                  <Button variant="secondary" size="sm" className="group" asChild>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="group"
+                    asChild
+                  >
                     <Link to={`/compare?a=${slug}`}>
                       <GitCompareArrows className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:scale-110" />
                       Compare
@@ -817,12 +832,17 @@ export default function CityDetail() {
         label="Jump to:"
       />
 
-      <div id="snapshot" className="scroll-mt-32 rounded-2xl border border-slate-200 bg-white px-6 py-6">
+      <div
+        id="snapshot"
+        className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+      >
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-slate-500" />
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">City Snapshot</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            City Snapshot
+          </h2>
         </div>
-        <div className="mt-4">
+        <div className="mt-3">
           {isSummaryLoading ? (
             <div className="space-y-2.5">
               <div className="h-3.5 w-full animate-pulse rounded-full bg-slate-100" />
@@ -876,89 +896,103 @@ export default function CityDetail() {
         </div>
       </div>
 
-      <div id="metrics" className="scroll-mt-32 rounded-2xl border border-slate-200 bg-white px-6 py-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-slate-500" />
-                <h2 className="text-xl font-semibold tracking-tight text-slate-900">At a Glance</h2>
-              </div>
-              <p className="mt-1 text-sm text-slate-600">Key facts and figures about this city.</p>
+      <div
+        id="metrics"
+        className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-slate-500" />
+              <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+                At a Glance
+              </h2>
             </div>
-            <div className="group relative sm:shrink-0">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => navigate("/methodology")}
-              >
-                <Info className="h-4 w-4 shrink-0 text-slate-400" />
-                <span>How we calculate this</span>
-              </Button>
-              <div className="pointer-events-none absolute right-0 top-11 z-20 w-64 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 shadow-md opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                Learn where this data comes from and how it's calculated.
-              </div>
-            </div>
+            <p className="mt-1 text-sm text-slate-500">
+              Key facts and figures about this city.
+            </p>
           </div>
-          <div className="mt-4">
-            <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-              <MetricCard
-                title="Safety Score"
-                icon={Shield}
-                value={fmtOutOf10(metrics?.safetyScore)}
-                subtitle="based on crime data"
-              />
-              <MetricCard
-                title="Typical Rent"
-                icon={DollarSign}
-                value={
-                  metrics?.medianRent != null
-                    ? fmtMoney(metrics.medianRent)
-                    : "N/A"
-                }
-                subtitle="median monthly rent"
-              />
-              <MetricCard
-                title="Population"
-                icon={Users}
-                value={
-                  metrics?.population != null
-                    ? Number(metrics.population).toLocaleString()
-                    : "N/A"
-                }
-                subtitle="latest estimate"
-              />
-              <MetricCard
-                title="Air Quality"
-                icon={Wind}
-                value={
-                  metrics?.aqiValue != null ? `${metrics.aqiValue} AQI` : "N/A"
-                }
-                subtitle={
-                  metrics?.aqiValue != null ? (
-                    <span className={aqiColor}>{aqiLabel}</span>
-                  ) : (
-                    "no data yet"
-                  )
-                }
-              />
-            </div>
-
-            <div className="mt-3 text-xs text-slate-500">
-              Data last updated{" "}
-              {fmtDateTime(metrics?.meta?.metricsSync?.syncedAtIso)}
+          <div className="group relative sm:shrink-0">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => navigate("/methodology")}
+            >
+              <Info className="h-4 w-4 shrink-0 text-slate-400" />
+              <span>How we calculate this</span>
+            </Button>
+            <div className="pointer-events-none absolute right-0 top-11 z-20 w-64 rounded-md border border-slate-400 bg-white px-3 py-2 text-xs text-slate-600 shadow-md opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+              Learn where this data comes from and how it's calculated.
             </div>
           </div>
         </div>
+        <div className="mt-3">
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+            <MetricCard
+              title="Safety Score"
+              icon={Shield}
+              value={fmtOutOf10(metrics?.safetyScore)}
+              subtitle="based on crime data"
+            />
+            <MetricCard
+              title="Typical Rent"
+              icon={DollarSign}
+              value={
+                metrics?.medianRent != null
+                  ? fmtMoney(metrics.medianRent)
+                  : "N/A"
+              }
+              subtitle="median monthly rent"
+            />
+            <MetricCard
+              title="Population"
+              icon={Users}
+              value={
+                metrics?.population != null
+                  ? Number(metrics.population).toLocaleString()
+                  : "N/A"
+              }
+              subtitle="latest estimate"
+            />
+            <MetricCard
+              title="Air Quality"
+              icon={Wind}
+              value={
+                metrics?.aqiValue != null ? `${metrics.aqiValue} AQI` : "N/A"
+              }
+              subtitle={
+                metrics?.aqiValue != null ? (
+                  <span className={aqiColor}>{aqiLabel}</span>
+                ) : (
+                  "no data yet"
+                )
+              }
+            />
+          </div>
 
-      <div id="radar" className="scroll-mt-32 rounded-2xl border border-slate-200 bg-white px-6 py-6">
+          <div className="mt-3 text-xs text-slate-500">
+            Data last updated{" "}
+            {fmtDateTime(metrics?.meta?.metricsSync?.syncedAtIso)}
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="radar"
+        className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+      >
         <div>
           <div className="flex items-center gap-2">
             <Star className="h-5 w-5 text-slate-500" />
-            <h2 className="text-xl font-semibold tracking-tight text-slate-900">Ratings & Insights</h2>
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+              Ratings & Insights
+            </h2>
           </div>
-          <p className="mt-1 text-sm text-slate-600">Resident scores compared to objective city data.</p>
+          <p className="mt-1 text-sm text-slate-500">
+            Resident scores compared to objective city data.
+          </p>
         </div>
-        <div className="mt-4">
+        <div className="mt-3">
           <div className="space-y-4">
             <RatingRow
               label="Safety"
@@ -996,19 +1030,29 @@ export default function CityDetail() {
         </div>
       </div>
 
-      <div id="photos" className="scroll-mt-32 rounded-2xl border border-slate-200 bg-white px-6 py-6">
+      <div
+        id="photos"
+        className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+      >
         <CityPhotoGallery slug={slug} />
       </div>
 
-      <div id="location" className="scroll-mt-32 rounded-2xl border border-slate-200 bg-white px-6 py-6">
+      <div
+        id="location"
+        className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+      >
         <div>
           <div className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-slate-500" />
-            <h2 className="text-xl font-semibold tracking-tight text-slate-900">Location</h2>
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+              Location
+            </h2>
           </div>
-          <p className="mt-1 text-sm text-slate-600">Where this city is on the map.</p>
+          <p className="mt-1 text-sm text-slate-500">
+            Where this city is on the map.
+          </p>
         </div>
-        <div className="mt-4">
+        <div className="mt-3">
           {Number.isFinite(cityLat) && Number.isFinite(cityLng) ? (
             <CityMap
               cityName={city.name}
@@ -1024,13 +1068,20 @@ export default function CityDetail() {
         </div>
       </div>
 
-      <div id="things-to-do" className="scroll-mt-32 rounded-2xl border border-slate-200 bg-white px-6 py-6">
+      <div
+        id="things-to-do"
+        className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+      >
         <div className="flex items-center gap-2">
           <Compass className="h-5 w-5 text-slate-500" />
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Things To Do</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            Things To Do
+          </h2>
         </div>
-        <p className="mt-1 text-sm text-slate-600">Popular spots nearby sourced from Foursquare.</p>
-        <div className="mt-4">
+        <p className="mt-1 text-sm text-slate-500">
+          Popular spots nearby sourced from Foursquare.
+        </p>
+        <div className="mt-3">
           <div className="mb-4 flex flex-wrap gap-2">
             {ATTRACTION_CATEGORIES.map((category) => (
               <Button
@@ -1074,18 +1125,25 @@ export default function CityDetail() {
         </div>
       </div>
 
-      <div id="your-review" className="scroll-mt-32 rounded-2xl border border-slate-200 bg-white px-6 py-6">
+      <div
+        id="your-review"
+        className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+      >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
               <UserIcon className="h-5 w-5 text-slate-500" />
-              <h2 className="text-xl font-semibold tracking-tight text-slate-900">Your Review</h2>
+              <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+                Your Review
+              </h2>
             </div>
-            <p className="mt-1 text-sm text-slate-600">Your ratings and comment for this city.</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Your ratings and comment for this city.
+            </p>
           </div>
           {myReviewAction}
         </div>
-        <div className="mt-4">
+        <div className="mt-3">
           {myReviewState === "auth_loading" ? (
             <Loading label="Checking sign-in…" />
           ) : myReviewState === "signed_out" ? (
@@ -1110,13 +1168,20 @@ export default function CityDetail() {
         </div>
       </div>
 
-      <div id="reviews" className="scroll-mt-32 rounded-2xl border border-slate-200 bg-white px-6 py-6">
+      <div
+        id="reviews"
+        className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+      >
         <div className="flex items-center gap-2">
           <MessageCircle className="h-5 w-5 text-slate-500" />
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Reviews</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            Reviews
+          </h2>
         </div>
-        <p className="mt-1 text-sm text-slate-600">Public reviews for this city.</p>
-        <div className="mt-4">
+        <p className="mt-1 text-sm text-slate-500">
+          Public reviews for this city.
+        </p>
+        <div className="mt-3">
           {isPublicLoading ? <Loading label="Loading reviews…" /> : null}
 
           {reviewsError ? <ErrorMessage message={reviewsError} /> : null}
@@ -1126,7 +1191,7 @@ export default function CityDetail() {
           publicReviewsExcludingMine.length === 0 ? (
             <div className="text-sm text-slate-600">No reviews yet.</div>
           ) : !reviewsError ? (
-            <div className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               {publicReviewsExcludingMine.map((review, idx) => {
                 const reviewReactions = reactionState[review?.id] ?? {
                   reactions:

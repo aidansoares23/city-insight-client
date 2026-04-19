@@ -105,7 +105,7 @@ export default function Terms() {
         icon={AlertTriangle}
         subtitle="No warranties — this is a student project."
       >
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4 text-sm leading-relaxed text-amber-800">
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-4 text-sm leading-relaxed text-amber-800">
           <p>
             City Insight is provided <strong>as-is</strong>, without any
             warranty of accuracy, completeness, or fitness for a particular

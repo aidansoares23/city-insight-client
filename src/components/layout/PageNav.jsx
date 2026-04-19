@@ -10,7 +10,9 @@ import { ChevronLeft } from "lucide-react";
  * @param {{ to?: string, onClick?: () => void, label: string }} [backLink]
  */
 export default function PageNav({ items = [], backLink, label = "Jump to:" }) {
-  const [active, setActive] = useState(() => items[0]?.href?.replace("#", "") ?? "");
+  const [active, setActive] = useState(
+    () => items[0]?.href?.replace("#", "") ?? "",
+  );
 
   useEffect(() => {
     if (!items.length) return;
@@ -41,7 +43,7 @@ export default function PageNav({ items = [], backLink, label = "Jump to:" }) {
   return (
     <nav
       aria-label="Page sections"
-      className="sticky top-[4.5rem] z-10 flex items-center gap-0.5 overflow-x-auto rounded-xl border border-slate-400 bg-white px-2 py-2 shadow-sm scrollbar-none"
+      className="sticky top-8 sm:top-4 z-10 flex items-center gap-0.5 overflow-x-auto rounded-xl border border-slate-200 bg-[hsl(var(--muted))]/85 px-2 py-1.5 mb-8 shadow-md scrollbar-none backdrop-blur-xl"
     >
       {backLink && (
         <>
@@ -80,7 +82,7 @@ export default function PageNav({ items = [], backLink, label = "Jump to:" }) {
               "shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-150",
               isActive
                 ? "bg-[hsl(var(--primary))] text-slate-900 shadow-sm scale-[1.02]"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 hover:scale-[1.02]",
+                : "text-slate-600 hover:bg-[hsl(var(--secondary))] hover:text-slate-900 hover:scale-[1.02]",
             ].join(" ")}
           >
             {label}

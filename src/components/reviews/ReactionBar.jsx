@@ -61,7 +61,7 @@ export default function ReactionBar({
               "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium transition-colors sm:gap-1.5 sm:px-2.5 sm:py-1",
               isActive
                 ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))] text-slate-900"
-                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300",
+                : "border-slate-400 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-400",
               disabled && "cursor-not-allowed opacity-60",
             )}
             aria-pressed={isActive}

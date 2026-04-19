@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/Button";
 import { Loading } from "@/components/ui/Loading";
 import { ConfirmDialog } from "@/components/ui/Dialog";
 import ErrorMessage from "@/components/ui/ErrorMessage";
+import { RatingSlider } from "@/components/ui/RatingSlider";
 import SectionCard from "@/components/layout/SectionCard";
 import PageHero from "@/components/layout/PageHero";
-import { BackLink } from "@/components/ui/BackLink";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { cn } from "@/utils/utils";
 
@@ -18,6 +18,7 @@ import { safeReturnTo } from "@/lib/routing";
 import { prettyCityFromSlug } from "@/lib/cities";
 import {
   RATING_KEYS,
+  RATING_LABELS,
   clampRating10,
   derivedOverall,
   makeEmptyReviewForm,
@@ -25,13 +26,6 @@ import {
   scoreColor,
 } from "@/lib/ratings";
 import { fetchMyReview, upsertMyReview, deleteMyReview } from "@/lib/reviews";
-
-const RATING_LABELS = {
-  safety: "Safety",
-  affordability: "Affordability",
-  walkability: "Walkability",
-  cleanliness: "Cleanliness",
-};
 
 const RATING_DESCRIPTIONS = {
   safety: "How safe did you feel day-to-day?",
@@ -41,50 +35,6 @@ const RATING_DESCRIPTIONS = {
 };
 
 const COMMENT_MAX = 800;
-
-const STEPS = Array.from({ length: 10 }, (_, i) => i + 1);
-
-function RatingSlider({ label, description, value, onChange }) {
-  return (
-    <div className="space-y-2">
-      <div>
-        <p className="text-sm font-semibold text-slate-900">{label}</p>
-        {description && (
-          <p className="text-xs text-slate-500 mt-0.5">{description}</p>
-        )}
-      </div>
-
-      <div className="grid grid-cols-5 gap-1 sm:flex">
-        {STEPS.map((n) => {
-          const selected = n === value;
-          return (
-            <button
-              key={n}
-              type="button"
-              onClick={() => onChange(n)}
-              aria-label={`${label}: ${n}`}
-              aria-pressed={selected}
-              className={cn(
-                "rounded-lg py-2 text-sm font-semibold transition-colors sm:flex-1",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[hsl(var(--primary))]",
-                selected
-                  ? "bg-[hsl(var(--primary))] text-slate-900 shadow-sm"
-                  : "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900",
-              )}
-            >
-              {n}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="flex justify-between text-[10px] text-slate-400">
-        <span>Poor</span>
-        <span>Excellent</span>
-      </div>
-    </div>
-  );
-}
 
 /** Review create/edit form — loads an existing review if one exists, then saves or deletes via the API. */
 export default function ReviewEditor() {
@@ -252,11 +202,8 @@ export default function ReviewEditor() {
         onConfirm={executeDelete}
       />
 
-      <BackLink onClick={() => navigate(returnTo)}>
-        {cityLabel}
-      </BackLink>
-
       <PageHero
+        className="pt-1 pb-1"
         title={mode === "edit" ? "Edit Review" : "Write a Review"}
         description={
           mode === "edit"
@@ -267,7 +214,7 @@ export default function ReviewEditor() {
 
       {error ? <ErrorMessage message={error} /> : null}
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-4 mt-1">
+      <form onSubmit={onSubmit} className="flex flex-col gap-2 mt-0">
         <SectionCard
           icon={Star}
           title="Rate Your Experience"
@@ -287,8 +234,8 @@ export default function ReviewEditor() {
             </div>
           }
         >
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
               {RATING_KEYS.map((key) => (
                 <RatingSlider
                   key={key}
@@ -296,6 +243,10 @@ export default function ReviewEditor() {
                   description={RATING_DESCRIPTIONS[key]}
                   value={Number(form.ratings[key]) || 6}
                   onChange={(newValue) => setRating(key, newValue)}
+                  min={1}
+                  max={10}
+                  minLabel="Poor"
+                  maxLabel="Excellent"
                 />
               ))}
             </div>
@@ -312,10 +263,10 @@ export default function ReviewEditor() {
                 </span>
               </div>
               <textarea
-                className="w-full resize-none rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 shadow-inner outline-none transition placeholder:text-slate-400 focus:border-[hsl(var(--ring))] focus:bg-white focus:ring-2 focus:ring-[hsl(var(--ring))]/30"
+                className="w-full resize-y rounded-lg border border-slate-400 bg-slate-50 px-4 py-3 text-sm text-slate-900 shadow-inner outline-none transition placeholder:text-slate-400 focus:border-[hsl(var(--ring))] focus:bg-white focus:ring-2 focus:ring-[hsl(var(--ring))]/30"
                 value={form.comment}
                 onChange={(e) => setComment(e.target.value)}
-                rows={4}
+                rows={2}
                 placeholder="What stood out most? Any tips for someone considering a visit or move?"
                 maxLength={COMMENT_MAX}
               />

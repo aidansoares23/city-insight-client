@@ -1,7 +1,33 @@
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { fmtMoney, fmtNum, toOutOf10 } from "@/lib/format";
 import { scoreColor, scoreLabel } from "@/lib/ratings";
+
+/** Intercepts wheel events: Ctrl/Cmd+scroll zooms the map; plain scroll shows a hint. */
+function CtrlScrollZoom({ onHint }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const container = map.getContainer();
+
+    const onWheel = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        const delta = e.deltaY < 0 ? 1 : -1;
+        map.setZoom(map.getZoom() + delta);
+      } else {
+        onHint();
+      }
+    };
+
+    container.addEventListener("wheel", onWheel, { passive: false });
+    return () => container.removeEventListener("wheel", onWheel);
+  }, [map, onHint]);
+
+  return null;
+}
 
 function CityPopup({ city }) {
   const score = toOutOf10(city?.livabilityScore);
@@ -67,6 +93,15 @@ export default function CitiesMap({ cities = [] }) {
     (city) => Number.isFinite(Number(city.lat)) && Number.isFinite(Number(city.lng)),
   );
 
+  const [showHint, setShowHint] = useState(false);
+  const hintTimer = useRef(null);
+
+  const triggerHint = () => {
+    setShowHint(true);
+    clearTimeout(hintTimer.current);
+    hintTimer.current = setTimeout(() => setShowHint(false), 1800);
+  };
+
   if (mapped.length === 0) {
     return (
       <div className="py-6 text-center text-sm text-slate-500">
@@ -90,6 +125,7 @@ export default function CitiesMap({ cities = [] }) {
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
+        <CtrlScrollZoom onHint={triggerHint} />
 
         {mapped.map((city) => (
           <Marker key={city.slug} position={[Number(city.lat), Number(city.lng)]}>
@@ -99,6 +135,14 @@ export default function CitiesMap({ cities = [] }) {
           </Marker>
         ))}
       </MapContainer>
+
+      {showHint && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="rounded-lg bg-black/60 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+            Hold <kbd className="rounded bg-white/20 px-1 font-mono">Ctrl</kbd> and scroll to zoom
+          </div>
+        </div>
+      )}
     </div>
   );
 }

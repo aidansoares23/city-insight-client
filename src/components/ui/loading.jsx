@@ -44,7 +44,7 @@ export function Loading({
   // overlay
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/20 backdrop-blur-[1px]">
-      <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-lg">
+      <div className="rounded-lg border border-slate-400 bg-white px-5 py-4 shadow-lg">
         {body}
       </div>
     </div>

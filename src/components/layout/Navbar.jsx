@@ -112,7 +112,7 @@ function AvatarDropdown({ user, logout }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 z-50 overflow-hidden rounded-lg bg-white min-w-[160px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+        <div className="absolute right-0 top-full mt-2 z-50 overflow-hidden rounded-lg bg-white min-w-[160px] border border-slate-400 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
           <button
             type="button"
             className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
@@ -158,7 +158,7 @@ export default function Navbar() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-slate-200/30 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-[hsl(var(--muted))]/80 backdrop-blur-xl shadow-sm">
       <div className="mx-auto flex h-14 sm:h-16 w-full max-w-6xl items-center gap-2 px-3 sm:px-6 lg:px-10">
         <div className="flex items-center gap-3">
           <Link
@@ -168,7 +168,7 @@ export default function Navbar() {
                         focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             aria-label="City Insight home"
           >
-            <span className="brand-font text-xl font-semibold tracking-tight text-black sm:text-3xl sm:inline">
+            <span className="brand-font text-xl font-semibold tracking-tight sm:text-3xl sm:inline bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">
               City Insight
             </span>
           </Link>
@@ -220,62 +220,82 @@ export default function Navbar() {
       <div
         id="mobile-nav"
         className={[
-          "sm:hidden overflow-hidden border-t border-slate-400 bg-white",
-          "transition-[max-height,opacity,transform] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]",
-          open
-            ? "max-h-96 opacity-100 translate-y-0"
-            : "max-h-0 opacity-0 -translate-y-2",
+          "sm:hidden overflow-hidden border-t border-slate-200",
+          "transition-[max-height,opacity] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
+          open ? "max-h-[32rem] opacity-100" : "max-h-0 opacity-0",
         ].join(" ")}
         aria-hidden={!open}
       >
         <div className="mx-auto max-w-6xl px-4 py-3">
           <div
             className={[
-              "rounded-2xl border border-slate-200 bg-white p-2 shadow-sm",
-              "transition-transform duration-400 ease-out",
-              open ? "scale-100" : "scale-[0.98]",
+              "rounded-xl border border-slate-200 bg-[hsl(var(--muted))]/90 backdrop-blur-xl p-2",
+              "shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.06)]",
+              "transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
+              open ? "scale-100 opacity-100 translate-y-0" : "scale-[0.96] opacity-0 -translate-y-3",
             ].join(" ")}
           >
             {NAV_ITEMS.filter((item) => !item.aiOnly || AI_ENABLED).map(
-              ({ to, icon: Icon, label }) => (
-                <MobileNavLink key={to} to={to} onClick={() => setOpen(false)}>
-                  <Icon className="h-3.5 w-3.5 mr-1.5 inline-block" />
-                  {label}
-                </MobileNavLink>
+              ({ to, icon: Icon, label }, i) => (
+                <div
+                  key={to}
+                  className="transition-[opacity,transform] duration-300 ease-out"
+                  style={open ? { transitionDelay: `${60 + i * 40}ms`, opacity: 1, transform: "translateY(0)" } : { opacity: 0, transform: "translateY(-6px)" }}
+                >
+                  <MobileNavLink to={to} onClick={() => setOpen(false)}>
+                    <Icon className="h-3.5 w-3.5 mr-1.5 inline-block" />
+                    {label}
+                  </MobileNavLink>
+                </div>
               ),
             )}
 
-            <div className="my-2 h-px bg-slate-100" />
+            <div className="my-2 h-px bg-slate-200/60" />
 
             {loading ? (
               <span className="block px-3 py-2 text-sm text-slate-500">…</span>
             ) : user ? (
               <>
-                <MobileNavLink to="/account" onClick={() => setOpen(false)}>
-                  <UserCircle className="h-3.5 w-3.5 mr-1.5 inline-block" />
-                  My Account
-                </MobileNavLink>
-
-                <Button
-                  variant="outline"
-                  className="mt-2 w-full justify-center rounded-xl"
-                  onClick={() => {
-                    setOpen(false);
-                    logout();
-                  }}
-                  type="button"
+                <div
+                  className="transition-[opacity,transform] duration-300 ease-out"
+                  style={open ? { transitionDelay: `${60 + NAV_ITEMS.length * 40}ms`, opacity: 1, transform: "translateY(0)" } : { opacity: 0, transform: "translateY(-6px)" }}
                 >
-                  <LogOut className="h-3.5 w-3.5 mr-1.5 inline-block" />
-                  Sign out
-                </Button>
+                  <MobileNavLink to="/account" onClick={() => setOpen(false)}>
+                    <UserCircle className="h-3.5 w-3.5 mr-1.5 inline-block" />
+                    My Account
+                  </MobileNavLink>
+                </div>
+
+                <div
+                  className="transition-[opacity,transform] duration-300 ease-out"
+                  style={open ? { transitionDelay: `${60 + (NAV_ITEMS.length + 1) * 40}ms`, opacity: 1, transform: "translateY(0)" } : { opacity: 0, transform: "translateY(-6px)" }}
+                >
+                  <Button
+                    variant="outline"
+                    className="mt-2 w-full justify-center rounded-xl"
+                    onClick={() => {
+                      setOpen(false);
+                      logout();
+                    }}
+                    type="button"
+                  >
+                    <LogOut className="h-3.5 w-3.5 mr-1.5 inline-block" />
+                    Sign out
+                  </Button>
+                </div>
               </>
             ) : (
-              <Button asChild className="mt-2 w-full rounded-xl">
-                <NavLink to="/login" onClick={() => setOpen(false)}>
-                  <LogIn className="h-3.5 w-3.5 mr-1.5 inline-block" />
-                  Sign in
-                </NavLink>
-              </Button>
+              <div
+                className="transition-[opacity,transform] duration-300 ease-out"
+                style={open ? { transitionDelay: `${60 + NAV_ITEMS.length * 40}ms`, opacity: 1, transform: "translateY(0)" } : { opacity: 0, transform: "translateY(-6px)" }}
+              >
+                <Button asChild className="mt-2 w-full rounded-xl">
+                  <NavLink to="/login" onClick={() => setOpen(false)}>
+                    <LogIn className="h-3.5 w-3.5 mr-1.5 inline-block" />
+                    Sign in
+                  </NavLink>
+                </Button>
+              </div>
             )}
           </div>
         </div>

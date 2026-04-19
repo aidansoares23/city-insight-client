@@ -27,16 +27,16 @@ import {
 /** Small bordered card with an icon, title, and description — used in overview grids. */
 function MiniCard({ icon: Icon, title, children }) {
   return (
-    <div className="rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4">
+    <div className="rounded-lg border border-slate-400 bg-white px-4 py-4">
       <div className="flex items-center gap-2.5">
         {Icon ? (
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--secondary))]">
-            <Icon className="h-4 w-4 text-[hsl(var(--foreground))]" />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+            <Icon className="h-4 w-4 text-slate-500" />
           </div>
         ) : null}
         <div className="text-sm font-semibold text-slate-900">{title}</div>
       </div>
-      <div className="mt-2.5 text-sm leading-relaxed text-slate-600">
+      <div className="mt-2.5 text-sm leading-relaxed text-slate-500">
         {children}
       </div>
     </div>
@@ -46,17 +46,17 @@ function MiniCard({ icon: Icon, title, children }) {
 /** Card with an icon, title, optional badge, and description — used in data-source sections. */
 function StatCard({ icon: Icon, title, badge, children }) {
   return (
-    <div className="rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4">
+    <div className="rounded-lg border border-slate-400 bg-white px-4 py-4">
       <div className="flex flex-wrap items-center gap-2">
         {Icon ? (
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--secondary))]">
-            <Icon className="h-4 w-4 text-[hsl(var(--foreground))]" />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+            <Icon className="h-4 w-4 text-slate-500" />
           </div>
         ) : null}
-        <div className="font-medium text-slate-900">{title}</div>
+        <div className="text-sm font-semibold text-slate-900">{title}</div>
         {badge ? <Badge variant="secondary">{badge}</Badge> : null}
       </div>
-      <p className="mt-2.5 text-sm leading-relaxed text-slate-600">
+      <p className="mt-2.5 text-sm leading-relaxed text-slate-500">
         {children}
       </p>
     </div>
@@ -75,7 +75,7 @@ function Mono({ children }) {
 /** Indented formula block — shows the actual math. */
 function FormulaBlock({ children }) {
   return (
-    <div className="mt-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-4 py-3 font-mono text-xs leading-relaxed text-slate-700">
+    <div className="mt-3 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-4 py-3 font-mono text-xs leading-relaxed text-slate-700">
       {children}
     </div>
   );
@@ -84,11 +84,11 @@ function FormulaBlock({ children }) {
 /** One row in the formula section — label left, detail right. */
 function FormulaRow({ label, children }) {
   return (
-    <div className="flex flex-col gap-1 rounded-2xl border border-[hsl(var(--border))] bg-white px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="flex flex-col gap-1 rounded-lg border border-[hsl(var(--border))] bg-white px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
       <div className="shrink-0 text-sm font-semibold text-slate-900 sm:w-[30%] flex items-center gap-2">
         {label}
       </div>
-      <div className="text-sm leading-relaxed text-slate-600 sm:w-[66%]">
+      <div className="text-sm leading-relaxed text-slate-500 sm:w-[66%]">
         {children}
       </div>
     </div>
@@ -113,7 +113,7 @@ export default function Methodology() {
   usePageTitle("How It Works");
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-4">
       <PageHero
         title="How it works"
         description="City Insight blends community reviews with public data to give you a fast, honest read on any California city. Here's exactly what we measure, where it comes from, and how the numbers are calculated."
@@ -127,13 +127,21 @@ export default function Methodology() {
       />
 
       {/* ── At a glance ────────────────────────────────────────────────── */}
-      <div id="glance" className="scroll-mt-32">
+      <div
+        id="glance"
+        className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+      >
         <div className="flex items-center gap-2">
           <Info className="h-5 w-5 text-slate-500" />
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">At a glance</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            At a glance
+          </h2>
         </div>
-        <p className="mt-1 text-sm text-slate-600">The quick version — what we use, how often it updates, and how we handle missing data.</p>
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <p className="mt-1 text-sm text-slate-500">
+          The quick version — what we use, how often it updates, and how we
+          handle missing data.
+        </p>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
           <MiniCard icon={Database} title="Data sources">
             <ul className="list-disc space-y-1 pl-5">
               <li>
@@ -143,7 +151,9 @@ export default function Methodology() {
                 U.S. Census Bureau (ACS 5-year estimates, 2023)
               </li>
               <li>
-                <span className="font-semibold text-slate-900">Crime data —</span>{" "}
+                <span className="font-semibold text-slate-900">
+                  Crime data —
+                </span>{" "}
                 FBI Crime Data Explorer API (agency-level per-100k rates,
                 2020–2023)
               </li>
@@ -191,32 +201,40 @@ export default function Methodology() {
 
           <MiniCard icon={CheckCircle2} title="Missing data">
             Any unknown value is shown as{" "}
-            <span className="font-semibold text-slate-900">N/A</span> rather than
-            guessed. The Livability score simply drops the missing signal and
-            renormalizes the remaining weights so the result still reflects
+            <span className="font-semibold text-slate-900">N/A</span> rather
+            than guessed. The Livability score simply drops the missing signal
+            and renormalizes the remaining weights so the result still reflects
             everything that is known.
           </MiniCard>
         </div>
       </div>
 
       {/* ── Scores ─────────────────────────────────────────────────────── */}
-      <div id="scores" className="scroll-mt-32 border-t border-slate-200 pt-12">
+      <div
+        id="scores"
+        className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+      >
         <div className="flex items-center gap-2">
           <Calculator className="h-5 w-5 text-slate-500" />
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">How scores are calculated</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            How scores are calculated
+          </h2>
         </div>
-        <p className="mt-1 text-sm text-slate-600">Exact formulas — no black boxes.</p>
-        <div className="space-y-3">
+        <p className="mt-1 text-sm text-slate-500">
+          Exact formulas — no black boxes.
+        </p>
+        <div className="mt-3 space-y-3">
           {/* Review ratings */}
           <FormulaRow label="Review ratings (1–10)">
             Reviewers rate four categories:{" "}
             <span className="font-semibold text-slate-900">
               safety, affordability, walkability,
             </span>{" "}
-            and <span className="font-semibold text-slate-900">cleanliness</span>.
+            and{" "}
+            <span className="font-semibold text-slate-900">cleanliness</span>.
             Each is an integer from 1–10. An{" "}
-            <span className="font-semibold text-slate-900">overall</span> score is
-            then automatically derived as the simple average of the four,
+            <span className="font-semibold text-slate-900">overall</span> score
+            is then automatically derived as the simple average of the four,
             rounded to the nearest integer. City averages update in real time on
             every review change.
           </FormulaRow>
@@ -292,8 +310,8 @@ export default function Methodology() {
 
             <div className="mt-3 space-y-2">
               {/* Signal 1 */}
-              <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-900">
+              <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
+                <div className="flex items-center justify-between text-sm font-semibold text-slate-900">
                   <span>Community overall rating</span>
                   <Badge variant="secondary">45 %</Badge>
                 </div>
@@ -306,8 +324,8 @@ export default function Methodology() {
               </div>
 
               {/* Signal 2 */}
-              <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-900">
+              <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
+                <div className="flex items-center justify-between text-sm font-semibold text-slate-900">
                   <span>Objective safety score</span>
                   <Badge variant="secondary">30 %</Badge>
                 </div>
@@ -320,8 +338,8 @@ export default function Methodology() {
               </div>
 
               {/* Signal 3 */}
-              <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-900">
+              <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
+                <div className="flex items-center justify-between text-sm font-semibold text-slate-900">
                   <span>Rent affordability</span>
                   <Badge variant="secondary">15 %</Badge>
                 </div>
@@ -333,8 +351,8 @@ export default function Methodology() {
               </div>
 
               {/* Signal 4 */}
-              <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-900">
+              <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-2">
+                <div className="flex items-center justify-between text-sm font-semibold text-slate-900">
                   <span>Air quality (AQI)</span>
                   <Badge variant="secondary">10 %</Badge>
                 </div>
@@ -346,11 +364,10 @@ export default function Methodology() {
                 </p>
               </div>
             </div>
-
           </FormulaRow>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4">
+        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-4">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-amber-500" />
             <div className="font-medium text-amber-900">Keep in mind</div>
@@ -365,18 +382,25 @@ export default function Methodology() {
       </div>
 
       {/* ── Interactive score calculator ───────────────────────────────── */}
-      <div id="calculator" className="scroll-mt-32 border-t border-slate-200 pt-12">
+      <div id="calculator" className="scroll-mt-28">
         <LivabilityBreakdown />
       </div>
 
       {/* ── Metrics glossary ───────────────────────────────────────────── */}
-      <div id="metrics" className="scroll-mt-32 border-t border-slate-200 pt-12">
+      <div
+        id="metrics"
+        className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+      >
         <div className="flex items-center gap-2">
           <BarChart3 className="h-5 w-5 text-slate-500" />
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">What the metrics mean</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            What the metrics mean
+          </h2>
         </div>
-        <p className="mt-1 text-sm text-slate-600">Plain-English definitions for every number on city pages.</p>
-        <div className="grid gap-3 md:grid-cols-2">
+        <p className="mt-1 text-sm text-slate-500">
+          Plain-English definitions for every number on city pages.
+        </p>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
           <StatCard icon={Users} title="Population" badge="residents">
             ACS 5-year estimate. Useful for context when comparing review counts
             or crime rates between cities of very different sizes.
@@ -428,21 +452,32 @@ export default function Methodology() {
       </div>
 
       {/* ── Sources ────────────────────────────────────────────────────── */}
-      <div id="sources" className="scroll-mt-32 border-t border-slate-200 pt-12">
+      <div
+        id="sources"
+        className="scroll-mt-28 rounded-lg border border-slate-400 bg-white px-5 py-4"
+      >
         <div className="flex items-center gap-2">
           <Database className="h-5 w-5 text-slate-500" />
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Where the data comes from</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            Where the data comes from
+          </h2>
         </div>
-        <p className="mt-1 text-sm text-slate-600">Every source, every cadence.</p>
-        <div className="grid gap-3 md:grid-cols-2">
+        <p className="mt-1 text-sm text-slate-500">
+          Every source, every cadence.
+        </p>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
           <MiniCard icon={Users} title="U.S. Census Bureau — ACS">
             <div className="space-y-1">
               <div>
-                <span className="font-semibold text-slate-900">Population:</span>{" "}
+                <span className="font-semibold text-slate-900">
+                  Population:
+                </span>{" "}
                 ACS 5-year estimate (B01003)
               </div>
               <div>
-                <span className="font-semibold text-slate-900">Median rent:</span>{" "}
+                <span className="font-semibold text-slate-900">
+                  Median rent:
+                </span>{" "}
                 ACS 5-year median gross rent (B25064)
               </div>
               <div className="pt-1 text-slate-500">
@@ -515,8 +550,8 @@ export default function Methodology() {
       </div>
 
       {/* ── Bottom CTA ─────────────────────────────────────────────────── */}
-      <div className="flex flex-col items-center gap-3 rounded-2xl px-6 py-8 text-center">
-        <p className="text-base text-slate-600">
+      <div className="flex flex-col items-center gap-3 rounded-lg px-6 py-8 text-center">
+        <p className="text-base text-slate-500">
           Now you know how it works — go see for yourself.
         </p>
         <Button asChild variant="primary" size="lg">

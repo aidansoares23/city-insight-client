@@ -1,74 +1,52 @@
 import * as React from "react";
-import { Card, CardContent } from "@/components/ui/Card";
 import { cn } from "@/utils/utils";
 
 /**
- * Reusable section wrapper:
- * - tinted header
- * - optional right-side action
- * - consistent padding / borders / ring
+ * Reusable section wrapper - contains various chunks of content per page
  */
 export default function SectionCard({
   icon: Icon,
   title,
   subtitle,
-  action, // optional ReactNode (button, link, etc)
+  action,
   children,
-
   className,
-  headerClassName,
   contentClassName,
-
-  // if you ever want to toggle header entirely
   showHeader = true,
 }) {
   return (
-    <Card
+    <div
       className={cn(
-        "overflow-hidden border-slate-200 bg-white p-0 shadow-sm",
+        "rounded-lg border border-slate-400 bg-white px-5 py-4",
         className,
       )}
     >
       {showHeader ? (
-        <div
-          className={cn(
-            "relative rounded-t-xs",
-            "bg-[hsl(var(--secondary))]",
-            "px-6 py-6",
-            headerClassName,
-          )}
-          x
-        >
-          <div className="pointer-events-none absolute inset-0 rounded-t-3xl ring-1 ring-inset ring-slate-900/5" />
-
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                {Icon ? <Icon className="h-5 w-5 text-slate-500" /> : null}
-                <h2 className="truncate text-xl font-semibold tracking-tight text-slate-900">
-                  {title}
-                </h2>
-              </div>
-
-              {subtitle ? (
-                <p className="mt-1 text-sm text-slate-600">{subtitle}</p>
-              ) : null}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              {Icon ? <Icon className="h-5 w-5 text-slate-500" /> : null}
+              <h2 className="truncate text-xl font-semibold tracking-tight text-slate-900">
+                {title}
+              </h2>
             </div>
-
-            {action ? (
-              <div className="sm:shrink-0">
-                <div className="flex flex-wrap gap-2 sm:justify-end">
-                  {action}
-                </div>
-              </div>
+            {subtitle ? (
+              <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
             ) : null}
           </div>
+          {action ? (
+            <div className="sm:shrink-0">
+              <div className="flex flex-wrap gap-2 sm:justify-end">
+                {action}
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
-      <CardContent className={cn("bg-white px-6 py-5", contentClassName)}>
+      <div className={cn(showHeader ? "mt-3" : "", contentClassName)}>
         {children}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
