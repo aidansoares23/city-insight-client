@@ -4,10 +4,10 @@ import api from "@/services/api";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 import CityRadarChart from "@/components/city/CityRadarChart";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/Input";
-import { Loading } from "@/components/ui/loading";
-import ErrorMessage from "@/components/ui/ErrorMessage";
+import { Button } from "@/components/ui/button.jsx";
+import { Input } from "@/components/ui/Input.jsx";
+import { Loading } from "@/components/ui/loading.jsx";
+import ErrorMessage from "@/components/ui/ErrorMessage.jsx";
 import { fetchAllCities } from "@/lib/cities";
 import PageHero from "@/components/layout/PageHero";
 

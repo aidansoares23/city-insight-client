@@ -7,8 +7,8 @@ import { sanitizeAiQuery } from "@/lib/sanitize";
 import { fetchAllCities } from "@/lib/cities";
 import { useAuth } from "@/auth/authContext";
 import { usePageTitle } from "@/hooks/usePageTitle";
-import { Button } from "@/components/ui/button";
-import ErrorMessage from "@/components/ui/ErrorMessage";
+import { Button } from "@/components/ui/button.jsx";
+import ErrorMessage from "@/components/ui/ErrorMessage.jsx";
 import {
   Sparkles,
   ChevronDown,

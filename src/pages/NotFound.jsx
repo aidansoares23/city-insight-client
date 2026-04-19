@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button.jsx";
 import { ArrowRight, Home as HomeIcon } from "lucide-react";
 
 /** Truncates a pathname to 48 characters with an ellipsis to prevent overflow on mobile. */

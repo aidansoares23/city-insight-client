@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Images } from "lucide-react";
 import { getCityPhotos } from "@/lib/city-photos";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button.jsx";
 import SectionCard from "@/components/layout/SectionCard";
 
 const AUTO_SCROLL_MS = 4000;

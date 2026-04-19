@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import api from "@/services/api";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import PageHero from "@/components/layout/PageHero";
-import { Button } from "@/components/ui/button";
-import ErrorMessage from "@/components/ui/ErrorMessage";
+import { Button } from "@/components/ui/button.jsx";
+import ErrorMessage from "@/components/ui/ErrorMessage.jsx";
 import CityCard from "@/components/city/CityCard";
 import SectionCard from "@/components/layout/SectionCard";
 import {

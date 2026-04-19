@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LayoutGrid, Map, Search, X } from "lucide-react";
 import CityCard from "@/components/city/CityCard";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/Input.jsx";
 import { usePageTitle } from "@/hooks/usePageTitle";
-import { Loading } from "@/components/ui/loading";
-import ErrorMessage from "@/components/ui/ErrorMessage";
+import { Loading } from "@/components/ui/loading.jsx";
+import ErrorMessage from "@/components/ui/ErrorMessage.jsx";
 import CitiesMap from "@/components/city/CitiesMap";
 import { fetchAllCities } from "@/lib/cities";
 import PageHero from "@/components/layout/PageHero";

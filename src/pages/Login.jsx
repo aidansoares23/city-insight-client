@@ -3,8 +3,8 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "@/auth/authContext";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { Button } from "@/components/ui/button";
-import ErrorMessage from "@/components/ui/ErrorMessage";
+import { Button } from "@/components/ui/button.jsx";
+import ErrorMessage from "@/components/ui/ErrorMessage.jsx";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
 import {

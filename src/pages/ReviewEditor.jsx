@@ -2,11 +2,11 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/auth/authContext";
 
-import { Button } from "@/components/ui/button";
-import { Loading } from "@/components/ui/loading";
-import { ConfirmDialog } from "@/components/ui/dialog";
-import ErrorMessage from "@/components/ui/ErrorMessage";
-import { RatingSlider } from "@/components/ui/RatingSlider";
+import { Button } from "@/components/ui/button.jsx";
+import { Loading } from "@/components/ui/loading.jsx";
+import { ConfirmDialog } from "@/components/ui/dialog.jsx";
+import ErrorMessage from "@/components/ui/ErrorMessage.jsx";
+import { RatingSlider } from "@/components/ui/RatingSlider.jsx";
 import SectionCard from "@/components/layout/SectionCard";
 import PageHero from "@/components/layout/PageHero";
 import { usePageTitle } from "@/hooks/usePageTitle";

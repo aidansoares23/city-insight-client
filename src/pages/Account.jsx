@@ -2,13 +2,13 @@ import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/auth/authContext";
 
-import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button.jsx";
+import { ConfirmDialog } from "@/components/ui/dialog.jsx";
 import ReviewCard from "@/components/reviews/ReviewCard";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import PageHero from "@/components/layout/PageHero";
-import { Loading } from "@/components/ui/loading";
-import ErrorMessage from "@/components/ui/ErrorMessage";
+import { Loading } from "@/components/ui/loading.jsx";
+import ErrorMessage from "@/components/ui/ErrorMessage.jsx";
 
 import {
   Pencil,
