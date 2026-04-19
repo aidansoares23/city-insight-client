@@ -3,7 +3,7 @@ import { LayoutGrid, Map, Search, X } from "lucide-react";
 import CityCard from "@/components/city/CityCard";
 import { Input } from "@/components/ui/Input";
 import { usePageTitle } from "@/hooks/usePageTitle";
-import { Loading } from "@/components/ui/Loading";
+import { Loading } from "@/components/ui/loading";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import CitiesMap from "@/components/city/CitiesMap";
 import { fetchAllCities } from "@/lib/cities";
@@ -14,7 +14,8 @@ function toNum(value) {
 }
 
 function sortDesc(a, b) {
-  const aNum = toNum(a), bNum = toNum(b);
+  const aNum = toNum(a),
+    bNum = toNum(b);
   if (aNum == null && bNum == null) return 0;
   if (aNum == null) return 1;
   if (bNum == null) return -1;
@@ -22,7 +23,8 @@ function sortDesc(a, b) {
 }
 
 function sortAsc(a, b) {
-  const aNum = toNum(a), bNum = toNum(b);
+  const aNum = toNum(a),
+    bNum = toNum(b);
   if (aNum == null && bNum == null) return 0;
   if (aNum == null) return 1;
   if (bNum == null) return -1;
@@ -71,9 +73,13 @@ export default function Cities() {
 
     switch (sort) {
       case "livability_desc":
-        return [...list].sort((a, b) => sortDesc(a.livabilityScore, b.livabilityScore));
+        return [...list].sort((a, b) =>
+          sortDesc(a.livabilityScore, b.livabilityScore),
+        );
       case "livability_asc":
-        return [...list].sort((a, b) => sortAsc(a.livabilityScore, b.livabilityScore));
+        return [...list].sort((a, b) =>
+          sortAsc(a.livabilityScore, b.livabilityScore),
+        );
       case "safety_desc":
         return [...list].sort((a, b) => sortDesc(a.safetyScore, b.safetyScore));
       case "safety_asc":
@@ -133,7 +139,10 @@ export default function Cities() {
             className={`h-9 rounded-lg border-slate-400 bg-white pl-9 text-sm shadow-sm focus:border-[hsl(var(--primary))] focus:ring-2 focus:ring-[hsl(var(--primary))]/20 ${searchInput ? "pr-8" : ""}`}
             onFocus={() => {
               if (window.innerWidth >= 640) {
-                searchRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                searchRef.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "nearest",
+                });
               }
             }}
           />
@@ -153,7 +162,9 @@ export default function Cities() {
           <button
             onClick={() => setView("grid")}
             className={`flex items-center gap-1 px-2.5 h-9 text-xs transition ${
-              view === "grid" ? "bg-[hsl(var(--primary))] text-slate-900 font-semibold" : "text-slate-600 hover:bg-slate-50"
+              view === "grid"
+                ? "bg-[hsl(var(--primary))] text-slate-900 font-semibold"
+                : "text-slate-600 hover:bg-slate-50"
             }`}
           >
             <LayoutGrid className="h-3.5 w-3.5" />
@@ -162,7 +173,9 @@ export default function Cities() {
           <button
             onClick={() => setView("map")}
             className={`flex items-center gap-1 px-2.5 h-9 text-xs transition border-l border-slate-400 ${
-              view === "map" ? "bg-[hsl(var(--primary))] text-slate-900 font-semibold" : "text-slate-600 hover:bg-slate-50"
+              view === "map"
+                ? "bg-[hsl(var(--primary))] text-slate-900 font-semibold"
+                : "text-slate-600 hover:bg-slate-50"
             }`}
           >
             <Map className="h-3.5 w-3.5" />

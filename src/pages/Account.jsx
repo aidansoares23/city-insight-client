@@ -7,7 +7,7 @@ import { ConfirmDialog } from "@/components/ui/Dialog";
 import ReviewCard from "@/components/reviews/ReviewCard";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import PageHero from "@/components/layout/PageHero";
-import { Loading } from "@/components/ui/Loading";
+import { Loading } from "@/components/ui/loading";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 
 import {

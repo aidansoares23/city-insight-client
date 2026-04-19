@@ -6,7 +6,7 @@ import { usePageTitle } from "@/hooks/usePageTitle";
 import CityRadarChart from "@/components/city/CityRadarChart";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
-import { Loading } from "@/components/ui/Loading";
+import { Loading } from "@/components/ui/loading";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import { fetchAllCities } from "@/lib/cities";
 import PageHero from "@/components/layout/PageHero";

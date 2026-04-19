@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/auth/authContext";
 
 import { Button } from "@/components/ui/button";
-import { Loading } from "@/components/ui/Loading";
+import { Loading } from "@/components/ui/loading";
 import { ConfirmDialog } from "@/components/ui/Dialog";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import { RatingSlider } from "@/components/ui/RatingSlider";
