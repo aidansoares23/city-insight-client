@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button.jsx";
 
 import { fmtDateTime, fmtDate } from "@/lib/datetime";
 
-import { Pencil, MapPin, Trash2 } from "lucide-react";
+import { Pencil, MapPin, Trash2, Shield, DollarSign, PersonStanding, Sparkles } from "lucide-react";
 import ReactionBar from "@/components/reviews/ReactionBar";
 import {
   RATING_KEYS,
@@ -84,29 +84,50 @@ function CommentBlock({ text, clampChars = 200 }) {
   );
 }
 
+const CATEGORY_ICONS = {
+  safety: Shield,
+  affordability: DollarSign,
+  walkability: PersonStanding,
+  cleanliness: Sparkles,
+};
+
 function CategoryChips({ ratings }) {
   const items = RATING_KEYS.map((key) => {
     const rating = clampRating10(ratings?.[key]);
     const tone = scoreColor(rating ?? null);
-    return { key, label: RATING_LABELS[key] ?? key, rating, halo: tone.halo };
+    return { key, label: RATING_LABELS[key] ?? key, rating, halo: tone.halo, bar: tone.bar };
   });
 
   return (
     <div className="grid grid-cols-2 gap-1.5 md:grid-cols-4">
-      {items.map(({ key, label, rating, halo }) => (
-        <div
-          key={key}
-          className={cn(
-            "flex items-center gap-1 overflow-hidden rounded-lg border bg-white px-2.5 py-1.5",
-            halo,
-          )}
-        >
-          <span className="min-w-0 flex-1 truncate text-xs font-medium text-slate-500">{label}</span>
-          <span className="shrink-0 text-sm font-bold tabular-nums text-slate-900">
-            {rating ?? "—"}
-          </span>
-        </div>
-      ))}
+      {items.map(({ key, label, rating, halo, bar }) => {
+        const Icon = CATEGORY_ICONS[key];
+        return (
+          <div
+            key={key}
+            className={cn(
+              "flex items-center gap-1.5 overflow-hidden rounded-lg border bg-white px-2.5 py-1.5",
+              halo,
+            )}
+          >
+            {Icon && <Icon className="h-3 w-3 shrink-0 text-slate-400" />}
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <span className="truncate text-xs font-medium text-slate-500">{label}</span>
+                <span className="shrink-0 text-sm font-bold tabular-nums text-slate-900">
+                  {rating ?? "—"}
+                </span>
+              </div>
+              <div className="h-1 w-full overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className={cn("h-full rounded-full", bar)}
+                  style={{ width: rating != null ? `${rating * 10}%` : "0%" }}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -216,8 +237,8 @@ export default function ReviewCard({
           {/* Overall score badge */}
           <div
             className={cn(
-              "shrink-0 inline-flex items-baseline gap-0.5 rounded-lg border bg-white px-2.5 py-1",
-              tone.halo,
+              "shrink-0 inline-flex items-baseline gap-0.5 rounded-lg border px-2.5 py-1",
+              tone.badge,
             )}
           >
             <span className="text-lg font-bold tabular-nums leading-none text-slate-900">
@@ -227,7 +248,7 @@ export default function ReviewCard({
             {label && (
               <span
                 className={cn(
-                  "ml-1 hidden rounded-full px-2 py-0.5 text-[10px] font-semibold sm:inline",
+                  "ml-1 rounded-full px-2 py-0.5 text-[10px] font-semibold",
                   tone.pill,
                 )}
               >

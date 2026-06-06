@@ -8,6 +8,12 @@ const REACTIONS = [
   { type: "disagree", label: "Disagree", Icon: ThumbsDown },
 ];
 
+const ACTIVE_STYLE = {
+  helpful:  "border-emerald-400 bg-emerald-50 text-emerald-700",
+  agree:    "border-sky-400 bg-sky-50 text-sky-700",
+  disagree: "border-rose-400 bg-rose-50 text-rose-700",
+};
+
 /**
  * Three-button reaction bar (Helpful / Agree / Disagree) for a review.
  * - Unauthenticated users are redirected to /login on click.
@@ -60,7 +66,7 @@ export default function ReactionBar({
             className={cn(
               "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium transition-colors sm:gap-1.5 sm:px-2.5 sm:py-1",
               isActive
-                ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))] text-slate-900"
+                ? ACTIVE_STYLE[type]
                 : "border-slate-400 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-400",
               disabled && "cursor-not-allowed opacity-60",
             )}

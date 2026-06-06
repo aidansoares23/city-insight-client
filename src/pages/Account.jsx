@@ -553,7 +553,7 @@ export default function Account() {
                   </div>
                 ) : null}
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4">
                   {sortedReviews.map((review, index) => {
                     const citySlug = review?.cityId || "unknown-city";
                     const key =

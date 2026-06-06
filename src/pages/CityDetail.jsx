@@ -1191,7 +1191,7 @@ export default function CityDetail() {
           publicReviewsExcludingMine.length === 0 ? (
             <div className="text-sm text-slate-600">No reviews yet.</div>
           ) : !reviewsError ? (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4">
               {publicReviewsExcludingMine.map((review, idx) => {
                 const reviewReactions = reactionState[review?.id] ?? {
                   reactions:
