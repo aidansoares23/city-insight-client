@@ -5,21 +5,21 @@ import Layout from "./components/layout/Layout";
 import { useApiStatus } from "./hooks/useApiStatus";
 import ApiOverlay from "./components/layout/ApiOverlay";
 import { useAuth } from "./auth/authContext";
-import { Loading } from "@/components/ui/Loading.jsx";
+import { Loading } from "./components/ui/Loading.jsx";
 
-const Home         = lazy(() => import("./pages/Home"));
-const Cities       = lazy(() => import("./pages/Cities"));
-const CityDetail   = lazy(() => import("./pages/CityDetail"));
-const Login        = lazy(() => import("./pages/Login"));
-const Account      = lazy(() => import("./pages/Account"));
+const Home = lazy(() => import("./pages/Home"));
+const Cities = lazy(() => import("./pages/Cities"));
+const CityDetail = lazy(() => import("./pages/CityDetail"));
+const Login = lazy(() => import("./pages/Login"));
+const Account = lazy(() => import("./pages/Account"));
 const ReviewEditor = lazy(() => import("./pages/ReviewEditor"));
-const Methodology  = lazy(() => import("./pages/Methodology"));
-const Compare      = lazy(() => import("./pages/Compare"));
-const AiQuery      = lazy(() => import("./pages/AiQuery"));
-const Quiz         = lazy(() => import("./pages/Quiz"));
-const NotFound     = lazy(() => import("./pages/NotFound"));
+const Methodology = lazy(() => import("./pages/Methodology"));
+const Compare = lazy(() => import("./pages/Compare"));
+const AiQuery = lazy(() => import("./pages/AiQuery"));
+const Quiz = lazy(() => import("./pages/Quiz"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
-const Terms        = lazy(() => import("./pages/Terms"));
+const Terms = lazy(() => import("./pages/Terms"));
 
 const AI_ENABLED = import.meta.env.VITE_AI_ENABLED !== "false";
 
