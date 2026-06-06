@@ -5,7 +5,15 @@ import { Button } from "@/components/ui/Button.jsx";
 
 import { fmtDateTime, fmtDate } from "@/lib/datetime";
 
-import { Pencil, MapPin, Trash2, Shield, DollarSign, PersonStanding, Sparkles } from "lucide-react";
+import {
+  Pencil,
+  MapPin,
+  Trash2,
+  Shield,
+  DollarSign,
+  PersonStanding,
+  Sparkles,
+} from "lucide-react";
 import ReactionBar from "@/components/reviews/ReactionBar";
 import {
   RATING_KEYS,
@@ -95,7 +103,13 @@ function CategoryChips({ ratings }) {
   const items = RATING_KEYS.map((key) => {
     const rating = clampRating10(ratings?.[key]);
     const tone = scoreColor(rating ?? null);
-    return { key, label: RATING_LABELS[key] ?? key, rating, halo: tone.halo, bar: tone.bar };
+    return {
+      key,
+      label: RATING_LABELS[key] ?? key,
+      rating,
+      halo: tone.halo,
+      bar: tone.bar,
+    };
   });
 
   return (
@@ -110,10 +124,12 @@ function CategoryChips({ ratings }) {
               halo,
             )}
           >
-            {Icon && <Icon className="h-3 w-3 shrink-0 text-slate-400" />}
+            {Icon && <Icon className="h-4 w-4 shrink-0 text-slate-400" />}
             <div className="flex min-w-0 flex-1 flex-col gap-1">
               <div className="flex items-center justify-between">
-                <span className="truncate text-xs font-medium text-slate-500">{label}</span>
+                <span className="truncate text-xs font-medium text-slate-500">
+                  {label}
+                </span>
                 <span className="shrink-0 text-sm font-bold tabular-nums text-slate-900">
                   {rating ?? "—"}
                 </span>
