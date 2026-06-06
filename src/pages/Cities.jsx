@@ -3,7 +3,7 @@ import { LayoutGrid, Map, Search, X } from "lucide-react";
 import CityCard from "@/components/city/CityCard";
 import { Input } from "@/components/ui/Input.jsx";
 import { usePageTitle } from "@/hooks/usePageTitle";
-import { Loading } from "@/components/ui/loading.jsx";
+import { Loading } from "@/components/ui/Loading.jsx";
 import ErrorMessage from "@/components/ui/ErrorMessage.jsx";
 import CitiesMap from "@/components/city/CitiesMap";
 import { fetchAllCities } from "@/lib/cities";

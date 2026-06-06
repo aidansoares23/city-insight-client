@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import api from "@/services/api";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import PageHero from "@/components/layout/PageHero";
-import { Button } from "@/components/ui/button.jsx";
+import { Button } from "@/components/ui/Button.jsx";
 import ErrorMessage from "@/components/ui/ErrorMessage.jsx";
 import CityCard from "@/components/city/CityCard";
 import SectionCard from "@/components/layout/SectionCard";

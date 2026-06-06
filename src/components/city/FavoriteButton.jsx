@@ -1,5 +1,5 @@
 import { Heart } from "lucide-react";
-import { Button } from "@/components/ui/button.jsx";
+import { Button } from "@/components/ui/Button.jsx";
 import { cn } from "@/utils/utils";
 
 /**

@@ -5,13 +5,13 @@ import remarkGfm from "remark-gfm";
 import api from "@/services/api";
 import { useAuth } from "@/auth/authContext";
 
-import { Button } from "@/components/ui/button.jsx";
+import { Button } from "@/components/ui/Button.jsx";
 import { Badge } from "@/components/ui/Badge.jsx";
-import { ConfirmDialog } from "@/components/ui/dialog.jsx";
+import { ConfirmDialog } from "@/components/ui/Dialog.jsx";
 import ReviewCard from "@/components/reviews/ReviewCard";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import PageNav from "@/components/layout/PageNav";
-import { Loading } from "@/components/ui/loading.jsx";
+import { Loading } from "@/components/ui/Loading.jsx";
 import ErrorMessage from "@/components/ui/ErrorMessage.jsx";
 
 import CityMap from "@/components/city/CityMap";
