@@ -5,7 +5,7 @@ import Layout from "./components/layout/Layout";
 import { useApiStatus } from "./hooks/useApiStatus";
 import ApiOverlay from "./components/layout/ApiOverlay";
 import { useAuth } from "./auth/authContext";
-import { Loading } from "@/components/ui/Loading.jsx";
+import Loading from "./components/ui/Loading.jsx";
 
 const Home = lazy(() => import("./pages/Home"));
 const Cities = lazy(() => import("./pages/Cities"));
