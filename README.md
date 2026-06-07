@@ -29,7 +29,7 @@ A React SPA for exploring and comparing California cities using objective metric
 - **Favorites** — authenticated users can save cities to a personal favorites list, accessible from the account page
 - **Compare cities** — pick 2–4 cities side by side; see a radar chart and metric table with per-category winner highlighting; shareable via URL query params (`?a=slug&b=slug`)
 - **City Match** — weighted preference quiz; adjust sliders for safety, affordability, walkability, cleanliness, and environment (0–10); server returns ranked top matches with a match percentage
-- **Ask AI** — natural-language queries against the city database (e.g. "Which city is the safest?"); multi-turn conversation with session persistence; responses include AI markdown rendering, referenced-city chips, and a compare shortcut link; requires authentication and `VITE_AI_ENABLED=true`
+- **Ask AI** — natural-language queries against the city database (e.g. "Which city is the safest?"); multi-turn conversation with session persistence; responses include AI markdown rendering, referenced-city chips, and a compare shortcut link; requires `VITE_AI_ENABLED=true`; unauthenticated users see an in-page sign-in prompt rather than a redirect
 - **Account page** — view, edit, and delete your own reviews across all cities; manage your saved favorites; option to delete your account entirely
 - **Google OAuth** — sign in via Google; auth is backed by an httpOnly session cookie with no tokens in localStorage
 - **Methodology page** — transparent, step-by-step explanation of how every score is calculated
@@ -73,19 +73,25 @@ src/
 │   └── usePageTitle.jsx      # Sets document.title per page
 ├── lib/
 │   ├── chartColors.js        # Recharts color constants (matches --chart-* theme tokens)
-│   ├── cities.js             # City slug parsing (prettyCityFromSlug)
+│   ├── cities.js             # prettyCityFromSlug, fetchAllCities
+│   ├── cities.test.js
 │   ├── city-photos.js        # City photo gallery helpers
 │   ├── cost-estimates.js     # National average monthly cost constants for moving calculator
 │   ├── datetime.js           # Date formatting (toDate, fmtDate, fmtDateTime)
+│   ├── datetime.test.js
 │   ├── favorites.js          # fetchMyFavorites, addFavorite, removeFavorite
 │   ├── format.js             # Number/money/score formatters (fmtMoney, fmtNum, toOutOf10, …)
+│   ├── format.test.js
 │   ├── leafletIcon.js        # Leaflet default marker icon fix for Vite
 │   ├── me.js                 # updateMyProfile (PATCH /me)
 │   ├── ratings.js            # Rating utilities (clampRating10, derivedOverall, scoreColor, scoreLabel)
+│   ├── ratings.test.js
 │   ├── reactions.js          # upsertReaction, deleteReaction
 │   ├── reviews.js            # fetchMyReviews, fetchMyReview, upsertMyReview, deleteMyReview, deleteMyAccount
 │   ├── routing.js            # safeReturnTo — open-redirect prevention
-│   └── sanitize.js           # Strips ASCII control characters (mirrors backend AI input sanitization)
+│   ├── routing.test.js
+│   ├── sanitize.js           # Strips ASCII control characters (mirrors backend AI input sanitization)
+│   └── sanitize.test.js
 ├── pages/
 │   ├── Home.jsx              # Landing page
 │   ├── Cities.jsx            # City list with search and grid/map toggle
@@ -200,7 +206,7 @@ npm run preview    # serve the production build locally
 | `/cities/:slug/review` | ReviewEditor | Required | Create or edit a review for this city                      |
 | `/compare`             | Compare      | —        | Side-by-side comparison of 2–4 cities                      |
 | `/quiz`                | Quiz         | —        | City Match — weighted preference matcher                   |
-| `/ask`                 | AiQuery      | Required | AI natural-language chat (requires `VITE_AI_ENABLED=true`) |
+| `/ask`                 | AiQuery      | — (page gate) | AI natural-language chat (requires `VITE_AI_ENABLED=true`); unauthenticated users see an in-page sign-in prompt |
 | `/login`               | Login        | —        | Google OAuth sign-in                                       |
 | `/account`             | Account      | Required | Profile, reviews, favorites, account deletion              |
 | `/methodology`         | Methodology  | —        | Data sources and scoring formulas                          |
@@ -208,7 +214,7 @@ npm run preview    # serve the production build locally
 | `/terms`               | Terms        | —        | Terms of service                                           |
 | `*`                    | NotFound     | —        | 404 page                                                   |
 
-Protected routes redirect unauthenticated users to `/login` with a `returnTo` query param so they land back where they started after signing in.
+Protected routes redirect unauthenticated users to `/login` with a `returnTo` value in router state so they land back where they started after signing in.
 
 ---
 
@@ -223,7 +229,7 @@ Protected routes redirect unauthenticated users to `/login` with a `returnTo` qu
 
 State-changing requests (POST/PUT/PATCH/DELETE) also send an `X-Requested-With: XMLHttpRequest` header as a lightweight CSRF guard.
 
-Protected routes (`/account`, `/cities/:slug/review`, `/ask`) redirect unauthenticated users to `/login` with a `returnTo` param, so users land back where they started after signing in.
+Protected routes (`/account`, `/cities/:slug/review`) redirect unauthenticated users to `/login` with a `returnTo` value in router state, so users land back where they started after signing in. (`/ask` handles auth inline and shows a sign-in prompt rather than redirecting.)
 
 ---
 
@@ -235,7 +241,7 @@ The backend runs on a free-tier host that sleeps when idle. The Axios response i
 2. Starts polling `GET /health` with exponential backoff (max 60 s).
 3. Automatically retries the original request once the server responds.
 
-Rate-limit responses (429) are also handled: a dismissible alert is shown and auto-clears after the `Retry-After` window.
+Rate-limit responses (429) are also handled: an alert is shown and auto-clears after the `Retry-After` window.
 
 ---
 
