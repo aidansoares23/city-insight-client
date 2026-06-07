@@ -361,6 +361,18 @@ export default function Compare() {
       n.push(null);
       return n;
     });
+    setLoadingStates((prev) => {
+      const n = [...prev];
+      n.splice(index, 1);
+      n.push(false);
+      return n;
+    });
+    setErrorStates((prev) => {
+      const n = [...prev];
+      n.splice(index, 1);
+      n.push("");
+      return n;
+    });
     setSlotCount((c) => Math.max(c - 1, MIN_CITIES));
   };
 
